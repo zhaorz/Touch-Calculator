@@ -1,0 +1,7 @@
+TypeCrypt
+Richard Zhao
+15-112 S15 term project
+
+################################## time log ##################################
+
+Wed Feb 18 12:32:10 EST 2015 - Created project, initialized repo, timelog, changelog
