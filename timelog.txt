@@ -4,4 +4,15 @@ Richard Zhao
 
 ################################## time log ##################################
 
-Wed Feb 18 12:32:10 EST 2015 - Created project, initialized repo, timelog, changelog
+Wed Feb 18 12:32:10 EST 2015
+-Created project, initialized repo, timelog, changelog
+-Downloaded Kivy for eventual trackpad usage
+Wed Feb 18 13:13:00 EST 2015
+
+Wed Feb 18 18:00:04 EST 2015
+-Kivy: made paint, pong tutorials
+Wed Feb 18 19:00:04 EST 2015
+
+Wed Feb 18 20:35:25 EST 2015
+-Research
+Wed Feb 18 21:16:05 EST 2015
