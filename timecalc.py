@@ -95,24 +95,4 @@ def secondsToDays(seconds):
     SS = "%.2d" % minutesRemainder
     return DD + ':' + HH + ':' + MM + ':' + SS
 
-
-def testSecondsToTime():
-    print "Testing secondsToTime() and timeToSeconds()... ",
-    assert(timeToSeconds(secondsToTime(12314)) == 12314)
-    assert(timeToSeconds(secondsToTime(123)) == 123)
-    assert(timeToSeconds(secondsToTime(54321)) == 54321)
-    assert(timeToSeconds(secondsToTime(5645)) == 5645)
-    print "Passed!"
-
-
-
-
-
-
-
-
-
-
-
-
-
+print displayTime("timelog.txt")

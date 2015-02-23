@@ -33,3 +33,6 @@ Fri Feb 20 20:10:41 EST 2015
 -TimeCalc script
 Fri Feb 20 21:10:41 EST 2015
 
+Sat Feb 21 15:02:34 EST 2015
+-Watched MIT video lecture 12
+Sat Feb 21 15:52:34 EST 2015
