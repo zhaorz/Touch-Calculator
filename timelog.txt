@@ -36,3 +36,24 @@ Fri Feb 20 21:10:41 EST 2015
 Sat Feb 21 15:02:34 EST 2015
 -Watched MIT video lecture 12
 Sat Feb 21 15:52:34 EST 2015
+
+Mon Feb 23 12:59:45 EST 2015
+-Research
+Mon Feb 23 13:15:52 EST 2015
+
+Tue Feb 24 16:00:22 EST 2015
+-Research
+Tue Feb 24 16:16:33 EST 2015
+
+Thu Mar  5 15:43:10 EST 2015
+-Ctypes
+Thu Mar  5 16:41:30 EST 2015
+
+Mon Mar  9 17:26:57 EDT 2015
+-Callbacks, multitouch framework
+Mon Mar  9 19:14:55 EDT 2015
+
+Mon Mar  9 19:40:45 EDT 2015
+
+
+

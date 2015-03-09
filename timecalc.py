@@ -1,3 +1,6 @@
+# Richard Zhao
+# script that calculates total time logged
+
 # Total time from all pairs
 def displayTime(filename):
     return totalTime(totalTimeList(filename))
@@ -95,4 +98,4 @@ def secondsToDays(seconds):
     SS = "%.2d" % minutesRemainder
     return DD + ':' + HH + ':' + MM + ':' + SS
 
-print displayTime("timelog.txt")
+print "Total time:", displayTime("timelog.txt")
