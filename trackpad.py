@@ -1,4 +1,9 @@
-# from 
+# 
+# 
+# Richard Zhao
+#
+# Modified code into classes to use as an importable module
+# Original source from 
 # http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
 
 from __future__ import with_statement
@@ -40,7 +45,10 @@ class MTData(ctypes.Structure):
 
 class trackpad:
 
+    # Initializes contents of private framework MultitouchSupport
     def __init__(self):
+        self.strokeData = []  # holds data from one call of stroke()
+
         self.CFArrayRef = ctypes.c_void_p
         self.CFMutableArrayRef = ctypes.c_void_p
         self.CFIndex = ctypes.c_long
@@ -104,28 +112,35 @@ class trackpad:
         self.touches[:] = [(frame, timestamp, self.fingers)]
         return 0
 
-    def newTouch(self):
+    # 
+    def stroke(self):
         self.touch_callback = self.MTContactCallbackFunction(self.touch_callback)
         self.touches_lock = threading.Lock()
         self.touches = []
         self.devs = self.init_multitouch(self.touch_callback)
         self.fingers = []
+        strokeStart = False
         while True:
-            if self.touches:
+            # touch did happen
+            if (self.touches != []):
                 (frame, timestamp, self.fingers) = self.touches.pop()
-
-            if (len(self.fingers) > 1):
+                strokeStart = True
+            # stroke ended
+            elif (strokeStart == True):
                 break
-            #print frame, timestamp
 
-            for (i, finger) in enumerate(self.fingers):
+            # Only use first finger
+            for finger in self.fingers[:1]:
                 pos = finger.normalized.position
                 p = (pos.x, pos.y)
-                print "finger", i, "at", p
+                self.strokeData.append(p)    # add point to return array
+                print p
 
             time.sleep(0.01)
 
         self.stop_multitouch(self.devs)
+
+        return self.strokeData
 
 
 

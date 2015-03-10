@@ -64,6 +64,9 @@ Tue Mar 10 00:27:26 EDT 2015
 Tue Mar 10 15:25:52 EDT 2015
 -Reading “The singularity is near” - Ray Kurzweil
 -Decorators
--Encapsulating touchpad code into classes 
+-Encapsulating touchpad code into classes
+-started GUI
+Tue Mar 10 19:13:47 EDT 2015
+
 
 
