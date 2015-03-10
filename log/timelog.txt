@@ -1,0 +1,69 @@
+# TypeCrypt
+# Richard Zhao
+# 15-112 S15 term project
+
+################################## time log ##################################
+
+Wed Feb 18 12:32:10 EST 2015
+-Created project, initialized repo, timelog, changelog
+-Downloaded Kivy for eventual trackpad usage
+Wed Feb 18 13:13:00 EST 2015
+
+Wed Feb 18 18:00:04 EST 2015
+-Kivy: made paint, pong tutorials
+Wed Feb 18 19:00:04 EST 2015
+
+Wed Feb 18 20:35:25 EST 2015
+-Research
+Wed Feb 18 21:16:05 EST 2015
+
+Thu Feb 19 10:00:41 EST 2015
+-Research
+Thu Feb 19 10:30:41 EST 2015
+
+Fri Feb 20 12:46:22 EST 2015
+-Research - backpropagation algorithm
+Fri Feb 20 13:21:29 EST 2015
+
+Fri Feb 20 17:18:02 EST 2015
+-Research/reading - backprop algorithm
+Fri Feb 20 17:54:51 EST 2015
+
+Fri Feb 20 20:10:41 EST 2015
+-TimeCalc script
+Fri Feb 20 21:10:41 EST 2015
+
+Sat Feb 21 15:02:34 EST 2015
+-Watched MIT video lecture 12
+Sat Feb 21 15:52:34 EST 2015
+
+Mon Feb 23 12:59:45 EST 2015
+-Research
+Mon Feb 23 13:15:52 EST 2015
+
+Tue Feb 24 16:00:22 EST 2015
+-Research
+Tue Feb 24 16:16:33 EST 2015
+
+Thu Mar  5 15:43:10 EST 2015
+-Ctypes
+Thu Mar  5 16:41:30 EST 2015
+
+Mon Mar  9 17:26:57 EDT 2015
+-Callbacks, multitouch framework
+Mon Mar  9 19:14:55 EDT 2015
+
+Mon Mar  9 19:40:45 EDT 2015
+-multitouch
+Mon Mar  9 19:55:58 EDT 2015
+
+Mon Mar  9 23:44:22 EDT 2015
+-multitouch
+Tue Mar 10 00:27:26 EDT 2015
+
+Tue Mar 10 15:25:52 EDT 2015
+-Reading “The singularity is near” - Ray Kurzweil
+-Decorators
+-Encapsulating touchpad code into classes 
+
+
