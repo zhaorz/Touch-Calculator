@@ -2,8 +2,6 @@
 # http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
 
 from __future__ import with_statement
-
-# {{{ MultitouchSupport
 import time
 import ctypes
 import threading
@@ -13,7 +11,8 @@ CFArrayRef = ctypes.c_void_p
 CFMutableArrayRef = ctypes.c_void_p
 CFIndex = ctypes.c_long
 
-MultitouchSupport = ctypes.CDLL("/System/Library/PrivateFrameworks/MultitouchSupport.framework/MultitouchSupport")
+MultitouchSupport = ctypes.CDLL("/System/Library/PrivateFrameworks/" + 
+                                "MultitouchSupport.framework/MultitouchSupport")
 
 CFArrayGetCount = MultitouchSupport.CFArrayGetCount
 CFArrayGetCount.argtypes = [CFArrayRef]
@@ -59,8 +58,8 @@ class MTData(ctypes.Structure):
 
 MTDataRef = ctypes.POINTER(MTData)
 
-MTContactCallbackFunction = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, MTDataRef,
-    ctypes.c_int, ctypes.c_double, ctypes.c_int)
+MTContactCallbackFunction = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.c_int, 
+    MTDataRef, ctypes.c_int, ctypes.c_double, ctypes.c_int)
 
 MTDeviceRef = ctypes.c_void_p
 
@@ -83,12 +82,6 @@ def _cfarray_to_list(arr):
         rv.append(CFArrayGetValueAtIndex(arr, i))
     return rv
 
-# }}}
-
-from Queue import Queue
-
-touches_lock = threading.Lock()
-touches = []
 
 def init_multitouch(cb):
     devices = _cfarray_to_list(MultitouchSupport.MTDeviceCreateList())
@@ -109,29 +102,12 @@ def touch_callback(device, data_ptr, n_fingers, timestamp, frame):
     touches[:] = [(frame, timestamp, fingers)]
     return 0
 
-import pygame
-from pygame import draw, display, mouse
-from pygame.locals import *
-from numpy import *
 
-pygame.init()
-
-#n_samples = 22050 * 4
-#sa = zeros((n_samples, 2))
-#sound = sndarray.make_sound(sa)
-#sa = sndarray.samples(sound)
-#sound.play(-1)
+touches_lock = threading.Lock()
+touches = []
 
 devs = init_multitouch(touch_callback)
 
-flags = FULLSCREEN | HWSURFACE | DOUBLEBUF
-mode = max(display.list_modes(0, flags))
-display.set_mode(mode, flags)
-#display.set_mode((640, 480))
-screen = display.get_surface()
-width, height = screen.get_size()
-
-mouse.set_visible(False)
 
 fingers = []
 
@@ -139,53 +115,19 @@ while True:
     if touches:
         frame, timestamp, fingers = touches.pop()
 
+    if (len(fingers) > 1):
+        break
     #print frame, timestamp
-    screen.fill((0xef, 0xef, 0xef))
 
-    prev = None
     for i, finger in enumerate(fingers):
         pos = finger.normalized.position
         vel = finger.normalized.velocity
 
-        x = int(pos.x * width)
-        y = int((1 - pos.y) * height)
+        x = pos.x
+        y = pos.y
         p = (x, y)
-        r = int(finger.size * 10)
-        #print "finger", i, "at", (x, y)
-        #xofs = int(finger.minor_axis / 2)
-        #yofs = int(finger.major_axis / 2)
+        print "finger", i, "at", (x, y)
 
-        if prev:
-            draw.line(screen, (0xd0, 0xd0, 0xd0), p, prev[0], 3)
-            draw.circle(screen, 0, prev[0], prev[1], 0)
-        prev = p, r
-
-        draw.circle(screen, 0, p, r, 0)
-        #draw.ellipse(screen, 0, (x - xofs, y - yofs, xofs * 2, yofs * 2))
-
-        #sa[int(pos.x * n_samples)] = int(-32768 + pos.y * 65536)
-
-        vx = vel.x
-        vy = -vel.y
-        posvx = x + vx / 10 * width
-        posvy = y + vy / 10 * height
-        draw.line(screen, 0, p, (posvx, posvy))
-
-    # EXIT! One finger still, four motioning quickly downward.
-    if len(fingers) == 5:
-        n_still = 0
-        n_down = 0
-        for i, finger in enumerate(fingers):
-            vel = finger.normalized.velocity
-            #print i, "%.2f, %.2f" % (vel.x, vel.y)
-            t = 0.1
-            if -t <= vel.x < t and -t <= vel.y < t:
-                n_still += 1
-            elif -2 <= vel.x < 2 and vel.y < -4:
-                n_down += 1
-        if n_still == 1 and n_down == 4:
-            break
-
-    display.flip()
+    time.sleep(0.01)
 
 stop_multitouch(devs)
