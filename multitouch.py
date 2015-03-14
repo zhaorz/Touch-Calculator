@@ -119,9 +119,8 @@ class Trackpad:
             # Only send first finger's data
             for finger in self.fingers[:1]:
                 pos = finger.normalized.position
-                p = (pos.x, pos.y)
+                p = (pos.x, pos.y, timestamp)
                 self.touchData.append(p)    # add point to return array
-                print p
         #self.touches[:] = [(frame, timestamp, self.fingers)]
         return 0
 

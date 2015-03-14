@@ -48,6 +48,7 @@ def keyFn(event, data):
         else:
             data.drawing = False
             data.Trackpad.stop()
+            print data.Trackpad.touchData
 
 
 ###########################################
@@ -72,7 +73,7 @@ def drawPoints(canvas, data):
     left = data.width / 2 - data.TrackpadWidth / 2
     top = data.height / 2 - data.TrackpadHeight / 2
     r = 10
-    for (normx, normy) in data.Trackpad.touchData:
+    for (normx, normy, timestamp) in data.Trackpad.touchData:
         x = left + normx * data.TrackpadWidth
         y = data.height - (top + normy * data.TrackpadHeight)
         drawDot(canvas, x, y, r)

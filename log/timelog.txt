@@ -73,9 +73,16 @@ Fri Mar 13 18:06:24 EDT 2015
 Fri Mar 13 18:59:16 EDT 2015
 
 Sat Mar 14 11:17:53 EDT 2015
+-modified multitouch
+-added feature detection
+Sat Mar 14 12:42:12 EDT 2015
 
+Sat Mar 14 13:22:12 EDT 2015
+-additions to feature detection
+-created feature detection tests
+Sat Mar 14 15:32:52 EDT 2015
 
-
+Sat Mar 14 16:53:30 EDT 2015
 
 
 
