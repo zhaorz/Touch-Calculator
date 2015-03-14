@@ -11,6 +11,38 @@ import math
 ################################################################################
 
 
+def process(touchData):
+    strokes = splitToStrokes(touchData)
+    for stroke in strokes:
+        stroke = vectorizeStroke(stroke)
+    for i in xrange(len(strokes)):
+        print 'Stroke', i, '\tcurvature:', curvature(strokes[i])
+
+
+
+################################################################################
+# Curvature (higher number = less linear)
+
+
+# Vectorized stroke, first element is starting position
+def curvature(stroke):
+    n = len(stroke)
+    curve = 0.0
+    # skip head, each stroke element is (magnitude, direction)
+    for i in xrange(2, n):
+        curve += abs(stroke[i][1] - stroke[i - 1][1])
+    return curve
+
+
+    
+
+
+
+
+################################################################################
+# Vectorization
+
+
 # stroke is a list of tuples (x, y, timestamp)
 # returns a list where the first element is the stroke origin (x0, y0)
 # and the rest of the list consists of tuples (magnitude, direction)
@@ -39,7 +71,7 @@ def direction((x0, y0), (x1, y1)):
 
 
 ################################################################################
-
+# Data Preprocessing
 
 # Take an array containing raw data of touch points and split
 # into individual strokes (in order). Returns a 2D array consiting
@@ -64,8 +96,8 @@ def splitToStrokes(touchData):
             newStroke = [touchData[i]]
     if (newStroke != []):
         strokes.append(newStroke)
-    finalStrokes = removeTimestamp(strokes)
-    return strokes
+    noTimestamps = removeTimestamp(strokes)
+    return removeOverlaps(noTimestamps)
 
 
 # True if the two datapoints belong on the same stroke, False otherwise
@@ -84,6 +116,23 @@ def removeTimestamp(strokes):
             newStroke.append((x, y))
         newStrokes.append(newStroke)
     return newStrokes
+
+# Returns a list with overlapping touch points removed from one stroke
+# stroke is a list of (x, y) touch points
+def removeOverlaps(strokes):
+    newStrokes = []
+    for stroke in strokes:
+        n = len(stroke)
+        newStroke = []
+        for i in xrange(1, n):
+            if (isOverlap(stroke[i - 1], stroke[i]) == False):
+                newStroke.append(stroke[i])
+        newStrokes.append(newStroke)
+    return newStrokes
+
+# True if the two points are within epsilon of each other
+def isOverlap((x0, y0), (x1, y1), epsilon=0.015):
+    return True if (magnitude((x0, y0), (x1, y1)) < epsilon) else False
 
 
 ################################################################################
