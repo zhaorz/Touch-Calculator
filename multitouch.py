@@ -1,16 +1,20 @@
-# 
-# 
-# Richard Zhao
-#
-# Modified code into classes to use as an importable module
-# Original source from 
-# http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
+"""
+multitouch.py
+~~~~~~~~~~~~~~~
 
-from __future__ import with_statement
+A customized wrapper for source code found at
+http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
+
+Wrapped code into classes to use as an importable module.
+
+"""
+
+
 import time
 import ctypes
 import threading
 from ctypes.util import find_library
+
 
 class MTPoint(ctypes.Structure):
     _fields_ = [("x", ctypes.c_float),
@@ -43,11 +47,12 @@ class MTData(ctypes.Structure):
     ]
 
 
-class trackpad:
+class Trackpad:
 
     # Initializes contents of private framework MultitouchSupport
     def __init__(self):
-        self.strokeData = []  # holds data from one call of stroke()
+        self.touchData = []  # holds data from one call of stroke()
+        self.strokeData = []
 
         self.CFArrayRef = ctypes.c_void_p
         self.CFMutableArrayRef = ctypes.c_void_p
@@ -95,6 +100,7 @@ class trackpad:
         return self.rv
 
     def init_multitouch(self, cb):
+        self.strokeStart = False
         self.devices = self._cfarray_to_list(self.MultitouchSupport.MTDeviceCreateList())
         for device in self.devices:
             self.MTRegisterContactFrameCallback(device, cb)
@@ -102,6 +108,7 @@ class trackpad:
         return self.devices
 
     def stop_multitouch(self, devices):
+        self.strokeStart = True
         for device in devices:
             self.MTDeviceStop(device)
 
@@ -109,39 +116,23 @@ class trackpad:
         self.fingers = []
         for i in xrange(n_fingers):
             self.fingers.append(data_ptr[i])
-        self.touches[:] = [(frame, timestamp, self.fingers)]
-        return 0
-
-    # 
-    def stroke(self):
-        self.touch_callback = self.MTContactCallbackFunction(self.touch_callback)
-        self.touches_lock = threading.Lock()
-        self.touches = []
-        self.devs = self.init_multitouch(self.touch_callback)
-        self.fingers = []
-        strokeStart = False
-        while True:
-            # touch did happen
-            if (self.touches != []):
-                (frame, timestamp, self.fingers) = self.touches.pop()
-                strokeStart = True
-            # stroke ended
-            elif (strokeStart == True):
-                break
-
-            # Only use first finger
+            # Only send first finger's data
             for finger in self.fingers[:1]:
                 pos = finger.normalized.position
                 p = (pos.x, pos.y)
-                self.strokeData.append(p)    # add point to return array
+                self.touchData.append(p)    # add point to return array
                 print p
+        #self.touches[:] = [(frame, timestamp, self.fingers)]
+        return 0
 
-            time.sleep(0.01)
+    def start(self):
+        del self.touchData[:]   # reset data
+        self.touch_callback = self.MTContactCallbackFunction(self.touch_callback)
+        self.touches_lock = threading.Lock()
+        self.devs = self.init_multitouch(self.touch_callback)
 
+    def stop(self):
         self.stop_multitouch(self.devs)
-
-        return self.strokeData
-
 
 
 

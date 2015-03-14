@@ -68,5 +68,15 @@ Tue Mar 10 15:25:52 EDT 2015
 -started GUI
 Tue Mar 10 19:13:47 EDT 2015
 
+Fri Mar 13 18:06:24 EDT 2015
+-multithreading
+Fri Mar 13 18:59:16 EDT 2015
+
+Sat Mar 14 11:17:53 EDT 2015
+
+
+
+
+
 
 

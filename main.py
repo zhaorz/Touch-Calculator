@@ -1,15 +1,24 @@
-import trackpad
+"""
+main.py
+~~~~~~~~~~~~~~~
+
+
+"""
+
+
+import multitouch
 import eventBasedAnimation
+from time import sleep
 
 
 ###########################################
 
 
 def initFn(data):
-    (data.trackpadWidth, data.trackpadHeight) = (668, 484)
-    data.strokes = []
+    data.windowTitle = 'main'
+    (data.TrackpadWidth, data.TrackpadHeight) = (668, 484)
     data.drawing = False
-    data.trackpad = trackpad.trackpad()
+    data.Trackpad = multitouch.Trackpad()
 
 
 ###########################################
@@ -23,9 +32,9 @@ def stepFn(data):
 
 
 def mouseMoveFn(event, data):
-    if (data.drawing == True):
-        data.strokes.append(data.trackpad.stroke())
-        print len(data.strokes)
+    pass
+
+
 
 ###########################################
 
@@ -33,12 +42,12 @@ def mouseMoveFn(event, data):
 def keyFn(event, data):
     # toggle drawing
     if (event.keysym == 'space'):
-        data.drawing = not data.drawing
-        print data.drawing
-    # clear
-    elif (event.keysym == 'r'):
-        data.strokes = []
-
+        if (data.drawing == False):
+            data.drawing = True
+            data.Trackpad.start()
+        else:
+            data.drawing = False
+            data.Trackpad.stop()
 
 
 ###########################################
@@ -50,26 +59,22 @@ def drawFn(canvas, data):
 
 def drawTrackpad(canvas, data):
     (cx, cy) = (data.width / 2, data.height / 2)
-    rx = data.trackpadWidth / 2
-    ry = data.trackpadHeight / 2
+    rx = data.TrackpadWidth / 2
+    ry = data.TrackpadHeight / 2
     x0 = cx - rx
     x1 = cx + rx
     y0 = cy + ry
     y1 = cy - ry
     canvas.create_rectangle(x0, y0, x1, y1, fill="lightgrey", width=0)
-    drawStrokes(canvas, data)
+    drawPoints(canvas, data)
 
-def drawStrokes(canvas, data):
-    for stroke in data.strokes:
-        drawStroke(canvas, data, stroke)
-
-def drawStroke(canvas, data, stroke):
-    left = data.width / 2 - data.trackpadWidth / 2
-    top = data.height / 2 - data.trackpadHeight / 2
+def drawPoints(canvas, data):
+    left = data.width / 2 - data.TrackpadWidth / 2
+    top = data.height / 2 - data.TrackpadHeight / 2
     r = 10
-    for (normx, normy) in stroke:
-        x = left + normx * data.trackpadWidth
-        y = data.height - (top + normy * data.trackpadHeight)
+    for (normx, normy) in data.Trackpad.touchData:
+        x = left + normx * data.TrackpadWidth
+        y = data.height - (top + normy * data.TrackpadHeight)
         drawDot(canvas, x, y, r)
 
 def drawDot(canvas, cx, cy, r, color='black'):

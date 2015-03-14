@@ -1,0 +1,22 @@
+Neural network implementation:
+
+Features:
+-number of strokes
+
+For each stroke:
+-curvature
+-concavity
+-start position
+-end position
+
+
+
+character —> stroke 
+		     -> curvature
+		     -> concavity
+		     -> start position
+		     -> end position
+	  -> stroke
+	  -> stroke
+	  -> stroke
+	  -> stroke
