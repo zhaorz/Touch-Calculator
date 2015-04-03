@@ -8,6 +8,7 @@ main.py
 
 import multitouch
 import eventBasedAnimation
+import featureDetection
 from time import sleep
 
 
@@ -48,7 +49,7 @@ def keyFn(event, data):
         else:
             data.drawing = False
             data.Trackpad.stop()
-            print data.Trackpad.touchData
+            print featureDetection.process(data.Trackpad.touchData)
 
 
 ###########################################

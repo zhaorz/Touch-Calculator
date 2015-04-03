@@ -13,10 +13,22 @@ import math
 
 def process(touchData):
     strokes = splitToStrokes(touchData)
+    u = dimensionalize(strokes)
+    print u
+
+def dimensionalize(strokes):
+    vector = [0, 0, 0, 0, 0]
+    nDimensions = len(vector)
+    d1 = -1   # initial dimension
+    d2 = d1 + 1
     for stroke in strokes:
-        stroke = vectorizeStroke(stroke)
-    for i in xrange(len(strokes)):
-        print 'Stroke', i, '\tcurvature:', curvature(strokes[i])
+        d1 += 1
+        d2 += 1
+        d1, d2 = d1 % nDimensions, d2 % nDimensions
+        (x, y) = stroke[-1]     # last element
+        vector[d1] += x
+        vector[d2] += y
+    return vector
 
 
 
@@ -34,7 +46,7 @@ def curvature(stroke):
     return curve
 
 
-    
+
 
 
 

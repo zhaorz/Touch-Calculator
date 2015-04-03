@@ -47,7 +47,7 @@ class MTData(ctypes.Structure):
     ]
 
 
-class Trackpad:
+class Trackpad(object):
 
     # Initializes contents of private framework MultitouchSupport
     def __init__(self):
