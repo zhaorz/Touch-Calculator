@@ -70,12 +70,12 @@ def vectorizeStroke(stroke):
     return vectors
 
 def magnitude((x0, y0), (x1, y1)):
-    return math.sqrt((x1 - x0) ** 2 + (y1 - y0) ** 2)
+    return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
 
 def direction((x0, y0), (x1, y1)):
     dx = x1 - x0
     dy = y1 - y0
-    if (dx == 0.0):
+    if (dx == 0.0):     # points are at same x value
         sign = -1 if ((y1 - y0) < 0) else 1
         return sign * math.pi / 2
     else:

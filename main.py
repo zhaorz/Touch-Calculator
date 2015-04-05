@@ -49,7 +49,8 @@ def keyFn(event, data):
         else:
             data.drawing = False
             data.Trackpad.stop()
-            print featureDetection.process(data.Trackpad.touchData)
+            print data.Trackpad.touchData
+            #print featureDetection.process(data.Trackpad.touchData)
 
 
 ###########################################

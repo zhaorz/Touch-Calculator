@@ -1,8 +1,18 @@
 # eventBasedAnimation.py
 # David Kosbie
-EVENT_BASED_ANIMATION_VERSION = "1.07"
+EVENT_BASED_ANIMATION_VERSION = "1.10"
 
 # change log
+# 03-17-15: v1.10 DK:
+#   * added Animation class for class-based use
+# 02-21-15: v1.09 DK:
+#   * added quitfn
+#   * added quit on ctrl-c (thanks to Owen Fan)
+# 02-20-15: v1.08 DK:
+#   * bug fix: redraw after key/mouse other non-step events (whoops)
+#   * make window non-resizable
+#   * adjust error msg font so it fits (actually, no smaller than 8, and
+#   *   stop when >80% of width or height)
 # 02-15-15 - 02-19-15: v1.03 - 1.07: DK:
 #   * various bug fixes (+/-/>/< work, reset works)
 #   * no pause on reset
@@ -32,6 +42,7 @@ import traceback
 import json
 import random
 import tkMessageBox
+import signal
 
 class Struct(object): pass
 
@@ -86,20 +97,21 @@ class BlockableCanvas(Canvas):
 
 def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
         mouseMoveFn=None, mouseDragFn=None, mouseReleaseFn=None,
-        keyReleaseFn=None,
+        keyReleaseFn=None, quitFn=None,
         width=300, height=300, timerDelay=128,
-        mvcCheckFrequency=1.0, **kwargs):
+        mvcCheckFrequency=1.0, disableMainModuleCheck=False, **kwargs):
 
     assert(0 <= mvcCheckFrequency <= 1.0)
     # make sure no user modules defined in this module
     # (so users must import this module from external file)
-    if (run.__module__ == "__main__"):
-        raise Exception("run in main module (must import eventBasedAnimation)")
-    for fn in [initFn, mouseFn, keyFn, stepFn, drawFn]:
-        if ((fn != None) and (fn.__module__ == run.__module__)):
-            errMsg = ("run in same module as %s" +
-                      " (must import eventBasedAnimation)")
-            raise Exception(errMsg % (fn.__name__))
+    if (not disableMainModuleCheck):
+        if (run.__module__ == "__main__"):
+            raise Exception("run in main module (must import eventBasedAnimation)")
+        for fn in [initFn, mouseFn, keyFn, stepFn, drawFn]:
+            if ((fn != None) and (fn.__module__ == run.__module__)):
+                errMsg = ("run in same module as %s" +
+                          " (must import eventBasedAnimation)")
+                raise Exception(errMsg % (fn.__name__))
 
     data = Struct()
 
@@ -131,7 +143,15 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
             traceback.print_exc(file=sys.stdout)
             data.isPaused = True
             data.errMsg = str(error)
+        if (fn != drawFn):
             redrawAll()
+
+    # From: http://www.cs.cmu.edu/~112/notes/hw4.html
+    def textSize(canvas, text, font):
+        temp = canvas.create_text(0, 0, text=text, anchor=NW, font=font)
+        (x0, y0, x1, y1) = canvas.bbox(temp)
+        canvas.delete(temp)
+        return (x1-x0, y1-y0)
 
     def redrawErrMsg():
         data.canvas.delete(ALL)
@@ -139,8 +159,15 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
         msg = (linewrap(data.errMsg, 40) +
                "\nSee console for stack trace." + 
                "\nPress ctrl-r to reset.")
+        fontSize = 8
+        while True:
+            font = "Arial %d bold" % fontSize
+            (textWidth, textHeight) = textSize(data.canvas, msg, font)
+            if ((textWidth > width*.8) or (textHeight > height*.8)):
+                break
+            fontSize += 2
         data.canvas.create_text(width/2, height/4,
-                                text=msg, font="Arial 16 bold", fill="red",
+                                text=msg, font=font, fill="red",
                                 justify=LEFT)
         data.canvas.setBlocked(True)
 
@@ -168,7 +195,7 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
     def doStep():
         data.userData.step += 1
         callAnimationFn(stepFn, data.userData)
-        redrawAll()
+        #redrawAll()
 
     def doCommand(command):
         if (command == "go"): data.isPaused = False
@@ -185,7 +212,7 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
             data.userData.timerDelay = 2*data.userData.timerDelay
         elif (command == "help"): doHelp()
         elif (command == "about"): doAbout()
-        elif (command == "quit"): quit()
+        elif (command == "quit"): doQuit()
         else:
             raise Exception("Unknown command: " + command)
 
@@ -260,7 +287,7 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
             callAnimationFn(keyFn, event, data.userData)
 
     def onKeyReleasedWrapper(event):
-        if (not data.isRunning): return        
+        if (not data.isRunning): return
         callAnimationFn(keyReleaseFn, event, data.userData)
 
     def onTimerFiredWrapper():
@@ -268,7 +295,7 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
         if (not data.isPaused): doStep()
         data.canvas.after(data.userData.timerDelay, onTimerFiredWrapper)         
 
-    def quit():
+    def doQuit():
         if (not data.isRunning): return
         data.isRunning = False
         if (data.runningInIDLE):
@@ -277,6 +304,7 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
         else:
             # not IDLE, then we'll destroy in the canvas.after handler
             data.root.quit()
+        callAnimationFn(quitFn, data.userData)
 
     def runAnimation():
         print "eventBasedAnimation version %s" % (
@@ -291,7 +319,8 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
                              height=data.userData.height)
         data.canvas.pack()
         data.canvas.setBlocked(True)
-        data.root.protocol("WM_DELETE_WINDOW", lambda: quit())
+        signal.signal(signal.SIGINT, lambda n, f: doQuit())
+        data.root.protocol("WM_DELETE_WINDOW", lambda: doQuit())
         data.runningInIDLE =  ("idlelib" in sys.modules)
         bindings = [("<Motion>"          , onMouseMovedWrapper),
                     ("<Button-1>"        , onMousePressedWrapper),
@@ -305,10 +334,54 @@ def run(initFn=None, mouseFn=None, keyFn=None, stepFn=None, drawFn=None,
         callAnimationFn(initFn, data.userData)
         data.root.wm_title(data.userData.__dict__.get("windowTitle",
                                              "eventBasedAnimation"))
+        data.root.resizable(width=0, height=0)
         onTimerFiredWrapper()
         data.root.mainloop()
 
     runAnimation()
+
+class Animation(object):
+    def __init__(self, width=300, height=300, timerDelay=128,
+                 mvcCheckFrequency=1.0, **kwargs):
+        self.width = width
+        self.height = height
+        self.timerDelay = timerDelay
+        self.mvcCheckFrequency = mvcCheckFrequency
+        self.__dict__.update(kwargs)
+
+    def onInit(self): pass
+    def onMouse(self, event): pass
+    def onKey(self, event): pass
+    def onStep(self): pass
+    def onDraw(self, canvas): pass
+    def onMouseMove(self, event): pass
+    def onMouseDrag(self, event): pass
+    def onMouseRelease(self, event): pass
+    def onKeyRelease(self, event): pass
+    def onQuit(self): pass
+
+    def run(self):
+        global run
+        def initFn(data):
+            data.__dict__.update(self.__dict__)
+            self.__dict__ = data.__dict__
+            self.onInit()
+        def mouseFn(event, data): self.onMouse(event)
+        def keyFn(event, data): self.onKey(event)
+        def stepFn(data): self.onStep()
+        def drawFn(canvas, data): self.onDraw(canvas)
+        def mouseMoveFn(event, data): self.onMouseMove(event)
+        def mouseDragFn(event, data): self.onMouseDrag(event)
+        def mouseReleaseFn(event, data): self.onMouseRelease(event)
+        def keyReleaseFn(event, data): self.onKeyRelease(event)
+        def quitFn(data): self.onQuit()
+        run(initFn=initFn, mouseFn=mouseFn, keyFn=keyFn, stepFn=stepFn,
+            drawFn=drawFn, mouseMoveFn=mouseMoveFn, mouseDragFn=mouseDragFn,
+            mouseReleaseFn=mouseReleaseFn, keyReleaseFn=keyReleaseFn,
+            quitFn=quitFn,
+            width=self.width, height=self.height, timerDelay=self.timerDelay,
+            mvcCheckFrequency=self.mvcCheckFrequency,
+            disableMainModuleCheck=True)
 
 """
 import eventBasedAnimation
