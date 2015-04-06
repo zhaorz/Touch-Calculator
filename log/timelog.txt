@@ -106,4 +106,10 @@ Sun Apr  5 17:54:14 EDT 2015
 -datacollect
 Sun Apr  5 19:13:23 EDT 2015
 
+Sun Apr  5 23:41:06 EDT 2015
+-datacollect working
+-write file working
+Mon Apr  6 01:13:04 EDT 2015
+
+
 

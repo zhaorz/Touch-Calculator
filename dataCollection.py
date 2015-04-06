@@ -7,15 +7,18 @@ dataCollection.py
 
 import multitouch
 import string
+import copy
 from eventBasedAnimation import Animation
+
 
 
 class MainWindow(Animation):
 
     def onInit(self):
         self.initTrackpad()
-        self.initDisplayCharacters()
-        self.initDisplayData()
+        self.initCharactersDisplay()
+        self.initDataDisplay()
+        self.initInstructionsDisplay()
 
     def initTrackpad(self):
         self.trackpad = DataCollectionTrackpad()
@@ -23,14 +26,24 @@ class MainWindow(Animation):
         self.trackpad.width, self.trackpad.height = 415, 300
         self.trackpad.isDrawing = False
     
-    def initDisplayCharacters(self):
-        self.display = DisplayCharacters(
+    def initCharactersDisplay(self):
+        self.display = CharactersDisplay(
             x=25, y=50, width=self.width, height=125, margin=self.margin)
 
-    def initDisplayData(self):
-        self.chars = DisplayData(
+    def initDataDisplay(self):
+        self.chars = DataDisplay(
             x=25, y=225, width=self.width, height=125, margin=self.margin)
-        self.chars.data = self.trackpad.touchData   # alias
+        self.chars.touchData = self.trackpad.touchData   # alias for raw data
+        self.chars.charData = dict()    # dict for char:touchData values
+
+    def initInstructionsDisplay(self):
+        self.instructions = InstructionsDisplay(
+            x=490, y=375, width=485, height=300, margin=self.margin)
+        self.instructions.numCells = self.display.numCells
+        self.instructions.activeCell = self.display.activeCell
+        self.instructions.completedCells = self.display.completedCells
+        self.instructions.isDrawing = self.trackpad.isDrawing
+
 
     def onMouse(self, event): pass
     
@@ -42,19 +55,34 @@ class MainWindow(Animation):
             else:
                 self.trackpad.isDrawing = False
                 self.trackpad.stop()
-                print self.trackpad.touchData
+                #print self.trackpad.touchData
                 #print featureDetection.process(data.Trackpad.touchData)
         elif (event.keysym == "Left" or event.keysym == "Right"):
             self.display.shift(event.keysym)
             self.chars.shift(event.keysym)
+        elif (event.keysym == "Return"):
+            self.save(self.chars.charData)
 
-    def onStep(self): pass
+    # writes a file in current directory
+    def save(self, d):
+        f = open("charData.txt", "w")
+        f.write(str(d))
+        f.close
+
+    def onStep(self):
+        # Make aliases
+        self.instructions.numCells = self.display.numCells
+        self.instructions.activeCell = self.display.activeCell
+        self.instructions.completedCells = self.display.completedCells
+        self.instructions.isDrawing = self.trackpad.isDrawing
+
     
     def onDraw(self, canvas):
         self.drawHeader(canvas)
         self.trackpad.draw(canvas)
         self.display.draw(canvas)
         self.chars.draw(canvas)
+        self.instructions.draw(canvas)
 
     def drawHeader(self, canvas):
         cx = self.width / 2
@@ -75,13 +103,14 @@ class MainWindow(Animation):
     def onQuit(self): pass
 
 
-class DisplayCharacters(object):
+class CharactersDisplay(object):
 
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
         self.width = self.width - self.margin * 2
         self.activeColor = "orange"
         self.completedColor = "green"
+        self.darkGrey = "#4A4A4A"
         self.initCells()
 
     def initCells(self):
@@ -144,11 +173,7 @@ class DisplayCharacters(object):
                             fill=color, width=width, capstyle="projecting")
 
 
-class DisplayData(DisplayCharacters):
-
-    # Place to store char data
-    def initData(self):
-        self.char = dict()
+class DataDisplay(CharactersDisplay):
 
     # override
     def shift(self, keysym):
@@ -172,11 +197,18 @@ class DisplayData(DisplayCharacters):
             return True
         elif (self.activeCell == self.numCells - 1):  # rightmost active
             self.completedCells.append(self.activeCell)
-            self.char[self.targets[activeCell]] = self.data
+            self.addData(self.activeCell)
             self.activeCell = None
         else:
             self.completedCells.append(self.activeCell)
+            self.addData(self.activeCell)
             self.activeCell += 1
+
+    # Writes current touchData to charData
+    def addData(self, activeCell):
+        target = self.targets[activeCell]       # character string
+        self.charData[target] = copy.deepcopy(self.touchData)   
+
 
     # override (draw data instead of target)
     def drawCells(self, canvas):
@@ -192,12 +224,71 @@ class DisplayData(DisplayCharacters):
             elif (i in self.completedCells):
                 self.drawHighlightBox(canvas, x0, y0, x1, y1, 
                                       self.completedColor)
+                self.drawData(canvas, x0, y0, x1, y1, self.targets[i])
 
-    def drawData(self, canvas, x0, y0, x1, y1):
+    def drawData(self, canvas, x0, y0, x1, y1, character):
         margin = (x1 - x0) / 8      # margin for data cells = 1/8 width
+        width = height = (x1 - x0) - margin * 2
+        for (x, y, time) in self.charData[character]:
+            cx = x0 + margin + x * width
+            cy = y0 + margin + height - y * height
+            self.drawDot(canvas, cx, cy, 3, self.darkGrey)
+
+    def drawDot(self, canvas, cx, cy, r, color='black'):
+        x0 = cx - r
+        x1 = cx + r
+        y0 = cy - r
+        y1 = cy + r
+        canvas.create_oval(x0, y0, x1, y1, fill=color, width=0)
 
 
+# Keeps track of state and displays appropriate user instruction
+class InstructionsDisplay(object):
 
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
+    def draw(self, canvas):
+        self.drawTitle(canvas)
+        self.drawInstructions(canvas)
+
+    def default(self):
+        msg = "Draw the orange-highlighted character"
+        return msg
+
+    def drawTitle(self, canvas):
+        cx = self.x + self.width / 2
+        cy = self.y + self.margin / 2
+        msg = "Instructions"
+        canvas.create_text(cx, cy, anchor="center", text=msg,
+                           font="Arial 22 bold")
+
+    def drawInstructions(self, canvas):
+        msg = []
+        msg.append(self.default())
+        msg.append(self.spacebar())
+        msg.append(self.arrow())
+        msg.append(self.save())
+        msg = '\n'.join(msg)    # put each instruction on its own line
+        y = self.y + self.margin * 2
+        canvas.create_text(self.x, y, anchor="nw", text=msg, font="Arial 18")
+
+    def spacebar(self):
+        variable = "start" if self.isDrawing == False else "stop"
+        msg = "Press space to " + variable + " drawing."
+        return msg
+
+    def arrow(self):
+        msg = "Press right arrow to confirm this character.\n"
+        msg += "Press left arrow to go to previous character."
+        return msg
+
+    def save(self):
+        # final character is done
+        if ((self.numCells - 1) in self.completedCells):
+            return "Press return to save"
+        else:
+            return ""
 
 
 
@@ -229,7 +320,7 @@ class DataCollectionTrackpad(multitouch.Trackpad):
         r = 10
         self.drawDot(canvas, self.x + 2 * r, self.y + 2 * r, r, color)
 
-    def drawDot(self, canvas, cx, cy, r, color='darkgrey'):
+    def drawDot(self, canvas, cx, cy, r, color="#4A4A4A"):
         x0 = cx - r
         x1 = cx + r
         y0 = cy - r
