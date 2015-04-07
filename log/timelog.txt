@@ -111,5 +111,17 @@ Sun Apr  5 23:41:06 EDT 2015
 -write file working
 Mon Apr  6 01:13:04 EDT 2015
 
+Mon Apr  6 15:55:41 EDT 2015
+-got save function to work
+Mon Apr  6 16:20:10 EDT 2015
+
+Mon Apr  6 20:35:54 EDT 2015
+-better save char and save dialogue
+Mon Apr  6 21:03:42 EDT 2015
+
+Mon Apr  6 23:29:08 EDT 2015
+-added multiple character sets
+-data collection program is essentially complete
+Tue Apr  7 00:26:10 EDT 2015
 
 

@@ -2,23 +2,53 @@
 dataCollection.py
 ~~~~~~~~~~~~~~~
 
+Program that collects trackpad character data. 
+
+Enter the desired characters to be collected in MainWindow.initCharacterSets(). 
+Note that the program is only designed to collect 7 characters per set
+(for sake of Tkinter latency). There can be unlimited number of sets.
+
+When all sets have data entered, the user is prompted to press s to save.
+The data is saved in the /data directory and is given a name based on the
+time saved.
+
+The final output data consists of a list of dictionaries--each dictionary
+corresponding with the character set number. Each dictionary has 7 keys,
+corresponding to the characters in that particular set.
 
 """
 
 import multitouch
 import string
 import copy
+import os
 from eventBasedAnimation import Animation
+from time import localtime, strftime
 
 
 
 class MainWindow(Animation):
 
     def onInit(self):
+        self.initCharacterSets()
         self.initTrackpad()
         self.initCharactersDisplay()
         self.initDataDisplay()
         self.initInstructionsDisplay()
+        self.saveDialogueTimer = 0
+        self.data = list()      # empty container for user data
+
+    # Character sets must have length 7
+    def initCharacterSets(self):
+        self.characterSets = [
+            ["A", "B", "C", "D", "E", "F", "7"],
+            ["0", "1", "2", "3", "4", "5", "6"],
+            ["8", "9", "A", "B", "C", "D", "E"]
+            ]
+        for charSet in self.characterSets:
+            assert(len(charSet) == 7)
+        self.currentCharacterSet = 0
+
 
     def initTrackpad(self):
         self.trackpad = DataCollectionTrackpad()
@@ -27,12 +57,15 @@ class MainWindow(Animation):
         self.trackpad.isDrawing = False
     
     def initCharactersDisplay(self):
+        # First target set is first set in characterSets
         self.display = CharactersDisplay(
-            x=25, y=50, width=self.width, height=125, margin=self.margin)
+            x=25, y=50, width=self.width, height=125, margin=self.margin,
+            targets=self.characterSets[self.currentCharacterSet])
 
     def initDataDisplay(self):
         self.chars = DataDisplay(
-            x=25, y=225, width=self.width, height=125, margin=self.margin)
+            x=25, y=225, width=self.width, height=125, margin=self.margin,
+            targets=self.characterSets[self.currentCharacterSet])
         self.chars.touchData = self.trackpad.touchData   # alias for raw data
         self.chars.charData = dict()    # dict for char:touchData values
 
@@ -60,29 +93,75 @@ class MainWindow(Animation):
         elif (event.keysym == "Left" or event.keysym == "Right"):
             self.display.shift(event.keysym)
             self.chars.shift(event.keysym)
-        elif (event.keysym == "Return"):
-            self.save(self.chars.charData)
+        elif (event.keysym == "Up"):
+            if (self.trackpad.isDrawing == True):   # stop trackpad input
+                self.trackpad.isDrawing = False
+                self.trackpad.stop()
+            self.chars.saveChar()
+        elif (event.keysym == "Down"):
+            self.chars.deleteChar()
+        elif (event.keysym == "s"):
+            # test if all cells completed
+            if ((self.display.numCells - 1) in self.display.completedCells):
+                self.save(self.data)
+        elif (event.keysym == "Return"):    # next character set
+            # test if all cells completed
+            if ((self.display.numCells - 1) in self.display.completedCells):
+                self.nextSet()
 
     # writes a file in current directory
     def save(self, d):
-        f = open("charData.txt", "w")
+        self.data.append(self.chars.charData)   # add last data set to output
+        filename = self.time() + ".txt"
+        if (filename in os.listdir("data/")):
+            print "Error, file already exists"
+            return False
+        f = open("data/" + filename, "w")
         f.write(str(d))
         f.close
+        self.saveSuccess()
+
+
+    # returns string in MMDDYY_HHMMSS format (month/day/year_hour/min/sec)
+    def time(self):
+        return strftime("%m%d%y_%H%M%S", localtime())
+
+    # Stores current self.chars.charData in self.data and swaps in next charSet
+    def nextSet(self):
+        self.data.append(self.chars.charData) 
+        if (self.currentCharacterSet == len(self.characterSets) - 1):
+            # already on last set, ready to save
+            pass
+        else:   # reinitialize with next set
+            self.currentCharacterSet += 1
+            self.initCharactersDisplay()
+            self.initDataDisplay()
+
+
 
     def onStep(self):
-        # Make aliases
+        # Send information so instructions can draw appropriately
         self.instructions.numCells = self.display.numCells
         self.instructions.activeCell = self.display.activeCell
         self.instructions.completedCells = self.display.completedCells
         self.instructions.isDrawing = self.trackpad.isDrawing
+        self.instructions.currentCharacterSet = self.currentCharacterSet
+        self.instructions.totalSets = len(self.characterSets)
+        if (self.saveDialogueTimer > 0):
+            self.saveDialogueTimer -= 1
 
-    
+
+    # Display save success dialogue for some time
+    def saveSuccess(self):
+        self.saveDialogueTimer = 30
+
     def onDraw(self, canvas):
         self.drawHeader(canvas)
         self.trackpad.draw(canvas)
         self.display.draw(canvas)
         self.chars.draw(canvas)
         self.instructions.draw(canvas)
+        self.drawSaveDialogue(canvas)
 
     def drawHeader(self, canvas):
         cx = self.width / 2
@@ -90,7 +169,23 @@ class MainWindow(Animation):
         title = "Data Collection"
         canvas.create_text(cx, cy, anchor="center", text=title,
                            font="Arial 26 bold", fill="black")
+        self.drawSetProgress(canvas)
 
+    def drawSetProgress(self, canvas):
+        x = y = self.margin
+        msg = ("Set " + str(self.currentCharacterSet + 1) + " of " +
+                str(len(self.characterSets)))
+        canvas.create_text(x, y, anchor="w", text=msg, font="Arial 18")
+
+
+    def drawSaveDialogue(self, canvas):
+        if (self.saveDialogueTimer == 0):   # don't draw
+            return
+        x = self.width - self.margin * 2
+        y = self.height - self.margin
+        msg = "Save successful!\nPress ctrl+r to enter more data"
+        canvas.create_text(x, y, text=msg, anchor="se", 
+                           font="Arial 22 bold", fill="green")
 
     def onMouseMove(self, event): pass
     
@@ -117,7 +212,6 @@ class CharactersDisplay(object):
         self.numCells = 7
         self.activeCell = 0         # currently drawing (highlight orange)
         self.completedCells = []    # done drawing (highlight green)
-        self.targets = string.ascii_uppercase[0:self.numCells] # filler
         self.cellWidth = self.cellHeight = self.height
         self.cellMargin = (self.width + self.margin - 
                             self.numCells * self.cellWidth) / self.numCells
@@ -175,40 +269,17 @@ class CharactersDisplay(object):
 
 class DataDisplay(CharactersDisplay):
 
-    # override
-    def shift(self, keysym):
-        if (keysym == "Left"):
-            self.shiftLeft()
-        else:
-            self.shiftRight()
+    # Adds current touchData to activeCell dictionary value
+    def saveChar(self):
+        target = self.targets[self.activeCell]       # character string
+        self.charData[target] = copy.deepcopy(self.touchData)  
 
-    def shiftLeft(self):
-        if (self.activeCell == None):   # reached end, need to go backwards
-            self.activeCell = self.numCells - 1
-            self.completedCells.pop()
-        elif (self.activeCell == 0):  # leftmost
-            return
-        else:
-            self.activeCell -= 1
-            self.completedCells.pop()   # remove rightmost from completed
-
-    def shiftRight(self):
-        if (self.activeCell == None):   # completed set
-            return True
-        elif (self.activeCell == self.numCells - 1):  # rightmost active
-            self.completedCells.append(self.activeCell)
-            self.addData(self.activeCell)
-            self.activeCell = None
-        else:
-            self.completedCells.append(self.activeCell)
-            self.addData(self.activeCell)
-            self.activeCell += 1
-
-    # Writes current touchData to charData
-    def addData(self, activeCell):
-        target = self.targets[activeCell]       # character string
-        self.charData[target] = copy.deepcopy(self.touchData)   
-
+    # Clears activeCell dictionary value
+    def deleteChar(self):
+        target = self.targets[self.activeCell]      # character string
+        if (target not in self.charData.keys()):    # character doesn't exist
+            return False
+        del self.charData[target]
 
     # override (draw data instead of target)
     def drawCells(self, canvas):
@@ -221,12 +292,15 @@ class DataDisplay(CharactersDisplay):
             canvas.create_rectangle(x0, y0, x1, y1, fill="lightgrey", width=0)
             if (i == self.activeCell):
                 self.drawHighlightBox(canvas, x0, y0, x1, y1, self.activeColor)
+                self.drawData(canvas, x0, y0, x1, y1, self.targets[i])
             elif (i in self.completedCells):
                 self.drawHighlightBox(canvas, x0, y0, x1, y1, 
                                       self.completedColor)
                 self.drawData(canvas, x0, y0, x1, y1, self.targets[i])
 
     def drawData(self, canvas, x0, y0, x1, y1, character):
+        if (character not in self.charData.keys()):
+            return
         margin = (x1 - x0) / 8      # margin for data cells = 1/8 width
         width = height = (x1 - x0) - margin * 2
         for (x, y, time) in self.charData[character]:
@@ -268,10 +342,11 @@ class InstructionsDisplay(object):
         msg.append(self.default())
         msg.append(self.spacebar())
         msg.append(self.arrow())
-        msg.append(self.save())
         msg = '\n'.join(msg)    # put each instruction on its own line
         y = self.y + self.margin * 2
         canvas.create_text(self.x, y, anchor="nw", text=msg, font="Arial 18")
+        self.drawSave(canvas)
+        self.drawNextSet(canvas)
 
     def spacebar(self):
         variable = "start" if self.isDrawing == False else "stop"
@@ -279,16 +354,34 @@ class InstructionsDisplay(object):
         return msg
 
     def arrow(self):
-        msg = "Press right arrow to confirm this character.\n"
-        msg += "Press left arrow to go to previous character."
+        msg = "Press up arrow to confirm this character.\n"
+        msg += "Press down arrow to delete this character.\n"
+        msg += "Press left arrow to go to previous character.\n"
+        msg += "Press right arrow to go to next character."
         return msg
 
-    def save(self):
-        # final character is done
-        if ((self.numCells - 1) in self.completedCells):
-            return "Press return to save"
+    def drawNextSet(self, canvas):
+        # This set done
+        if ((self.numCells - 1) in self.completedCells and
+            self.currentCharacterSet != self.totalSets - 1):
+            msg = "Press return for next set"
         else:
-            return ""
+            return
+        y = self.y + self.height - 2 * self.margin
+        canvas.create_text(self.x, y, anchor="w", text=msg,
+                           fill="orange", font="Arial 18 bold")
+
+
+    def drawSave(self, canvas):
+        # final character in final set is done 
+        if ((self.numCells - 1) in self.completedCells and
+            self.currentCharacterSet == self.totalSets - 1):
+            msg = "Press s to save"
+        else:
+            return
+        y = self.y + self.height - 1 * self.margin
+        canvas.create_text(self.x, y, anchor="w", text=msg,
+                           fill="orange", font="Arial 18 bold")
 
 
 
