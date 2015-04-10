@@ -18,18 +18,26 @@ corresponding to the characters in that particular set.
 
 """
 
-import multitouch
+
+# Default libraries
 import string
 import copy
 import os
-from eventBasedAnimation import Animation
 from time import localtime, strftime
+
+# 15-112 libraries
+from eventBasedAnimation import Animation
+
+# Custom libraries
+import multitouch
+import fileIO
 
 
 
 class MainWindow(Animation):
 
     def onInit(self):
+        self.windowTitle = "Data Collection"
         self.initCharacterSets()
         self.initTrackpad()
         self.initCharactersDisplay()
@@ -41,9 +49,9 @@ class MainWindow(Animation):
     # Character sets must have length 7
     def initCharacterSets(self):
         self.characterSets = [
-            ["A", "B", "C", "D", "E", "F", "7"],
-            ["0", "1", "2", "3", "4", "5", "6"],
-            ["8", "9", "A", "B", "C", "D", "E"]
+            ["A", "B", "C", "D", "E", "F", "7"]
+#            ["0", "1", "2", "3", "4", "5", "6"],
+ #           ["8", "9", "A", "B", "C", "D", "E"]
             ]
         for charSet in self.characterSets:
             assert(len(charSet) == 7)
@@ -116,9 +124,8 @@ class MainWindow(Animation):
         if (filename in os.listdir("data/")):
             print "Error, file already exists"
             return False
-        f = open("data/" + filename, "w")
-        f.write(str(d))
-        f.close
+        path = "data/" + filename
+        fileIO.writeTo(path, d)
         self.saveSuccess()
 
 
