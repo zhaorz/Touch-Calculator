@@ -10,6 +10,51 @@ import testCanvas
 import fileIO
 
 
+#############################  feature creation ################################
+"""
+Raw data --> strokes --> vector strokes --> 3D vector addition --> [x, y, z]
+Raw data enters as a list of (x, y, timestamp) elements
+Output is a list of 3 elements, the endpoint of the vector sum of the character.
+Dimensions are handled by shifting 1 dimension for each stroke, and adding the
+x and y data to those two dimensions in the 3D output.
+"""
+
+def process3D(points):
+    vectorStrokes = vectorizeCharacter(normalize(points))
+    origin = [0.0, 0.0, 0.0]
+    numDimensions = 3       # x, y, and z
+    d1, d2 = 0, 1           # start at x and y
+    for vectorStroke in vectorStrokes:
+        for vector in vectorStroke:
+            dx, dy = vector
+            origin[d1] += dx
+            origin[d2] += dy
+        # shift to adjacent plane
+        d1 = (d1 + 1) % numDimensions
+        d2 = (d2 + 1) % numDimensions
+    return origin
+
+def testProcess3D():
+    # output process3D for 7 characters
+    # all 7 characters are A's
+    print "Testing process3D()... "
+    allData = fileIO.read("testData/AAAAAAA.txt")
+    data = allData[0]
+    for key in data.keys():
+        print process3D(data[key])
+    print "Passed!"
+
+def testProcess3DOnSet():
+    # output process3D for 7 arbitrary characters
+    print "Testing process3D()... "
+    allData = fileIO.openRecent("data")
+    data = allData[0]   # only take first set
+    for key in data.keys():
+        print str(key) + ": " + str(process3D(data[key]))
+    print "Passed!"
+
+
+
 
 ###################################  vector ####################################
 
@@ -59,9 +104,6 @@ def testVectorSum():
         assert(almostEqual(vectorEndPoint[0], strokeEndPoint[0], 0.000001))
         assert(almostEqual(vectorEndPoint[1], strokeEndPoint[1], 0.000001))
     print "Passed!"
-
-
-
 
 
 ############################## stroke separation ###############################

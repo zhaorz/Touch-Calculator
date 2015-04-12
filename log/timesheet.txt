@@ -136,4 +136,7 @@ Sat Apr 11 23:30:14 EDT 2015
 -vector stuff
 Sun Apr 12 02:17:46 EDT 2015
 
+Sun Apr 12 17:47:54 EDT 2015
+-process3D working, separation between ABCDEF is looking really good!
+Sun Apr 12 18:06:30 EDT 2015
 
