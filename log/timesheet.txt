@@ -132,4 +132,8 @@ Thu Apr  9 20:55:01 EDT 2015
 -fileIO, normalization, testCanvas refactor
 Thu Apr  9 22:39:04 EDT 2015
 
+Sat Apr 11 23:30:14 EDT 2015
+-vector stuff
+Sun Apr 12 02:17:46 EDT 2015
+
 

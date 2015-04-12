@@ -98,4 +98,4 @@ def secondsToDays(seconds):
     SS = "%.2d" % minutesRemainder
     return DD + ':' + HH + ':' + MM + ':' + SS
 
-print "Total time:", displayTime("timelog.txt")
+print "Total time:", displayTime("timesheet.txt")

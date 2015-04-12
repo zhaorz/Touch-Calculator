@@ -10,34 +10,115 @@ import testCanvas
 import fileIO
 
 
-# returns direction d from (x0, y0) to (x1, y1) with 0 <= d < 2pi
-def direction((x0, y0), (x1, y1)):
-    x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
-    if (x1 > x0 and y1 >= y0):      # first quadrant
-        return math.atan(abs(y1 - y0) / abs(x1 - x0))
-    elif (x1 < x0 and y1 >= y0):    # second quadrant
-        return math.atan(abs(y1 - y0) / abs(x1 - x0)) + math.pi / 2
-    elif (x1 < x0 and y1 < y0):     # third quadrant
-        return math.atan(abs(y1 - y0) / abs(x1 - x0)) + math.pi
-    elif (x1 > x0 and y1 < y0):     # fourth quadrant
-        return math.atan(abs(y1 - y0) / abs(x1 - x0)) + math.pi * 3 / 2
-    elif (x1 == x0):                # vertically stacked
-        sign = -1 if ((y1 - y0) < 0) else 1
-        return sign * math.pi / 2
+
+###################################  vector ####################################
+
+
+# Converts list of points to list of distances between consecutive points
+# input is a list of (x, y, timestamp) tuples
+# i.e.  [(x0, y0), (x1, y1), ... , (x(n), y(n))] --> 
+#       [(x1 - x0, y1 - y0), ... , (x(n) - x(n-1), y(n) - y(n-1))]
+def vector(points):
+    vectors = []
+    for i in xrange(len(points) - 1):
+        (x0, y0) = points[    i][:2]
+        (x1, y1) = points[i + 1][:2]
+        vectors.append((x1 - x0, y1 - y0))
+    return vectors
+
+def vectorizeCharacter(points):
+    strokes = splitToStrokes(points)
+    vectors = []
+    for stroke in strokes:
+        vectors += [vector(stroke)]
+    return vectors
+
+# 2D sum of a list of vectors
+def vectorSum(origin, vectors):
+    for (x, y) in vectors:
+        origin[0] += x
+        origin[1] += y
+    return origin
+
+# Data consists of single strokes
+# test that the vector sum is the same as endpoint - startpoint
+def testVectorSum():
+    print "Testing vectorSum()... ",
+    allData = fileIO.read("testData/vectorSumTestData.txt")
+    data = allData[0]   # first dictionary
+    for key in data.keys():
+        strokes = splitToStrokes(data[key])
+        vectorStrokes = vectorizeCharacter(data[key])
+        # only use one stroke
+        stroke = strokes[0]
+        vector = vectorStrokes[0]
+        start = stroke[0]
+        end = stroke[-1]
+        vectorEndPoint = vectorSum([0.0, 0.0], vector)
+        strokeEndPoint = [end[0] - start[0], end[1] - start[1]]
+        assert(almostEqual(vectorEndPoint[0], strokeEndPoint[0], 0.000001))
+        assert(almostEqual(vectorEndPoint[1], strokeEndPoint[1], 0.000001))
+    print "Passed!"
+
+
+
+
+
+############################## stroke separation ###############################
+
+
+# Take an array containing raw data of touch points and split
+# into individual strokes (in order). Returns a 2D array consiting
+# of the strokes, where each stroke contains touch points.
+# points is a tuple (x, y, timestamp)
+def splitToStrokes(points):
+    if (points == []):
+        return [[]]
+    strokes = []
+    newStroke = []
+    for i in xrange(len(points)):
+        # begin a new stroke
+        if (newStroke == []):
+            newStroke.append(points[i])
+        # previous point belongs to same stroke
+        elif (isSameStroke(newStroke[-1], points[i]) == True):
+            newStroke.append(points[i])      # only include x and y
+        # start a new stroke
+        else:
+            strokes.append(newStroke)
+            newStroke = [points[i]]
+    if (newStroke != []):   # add last stroke if necessary
+        strokes.append(newStroke)
+    return strokes
+
+# True if the two datapoints belong on the same stroke, False otherwise
+def isSameStroke((x1, y1, timestamp1), (x2, y2, timestamp2)):
+    epsilon = 0.08
+    if (abs(timestamp1 - timestamp2) > epsilon):
+        return False
     else:
-        return None # fails?
-        
+        return True
 
 
+def testSplitToStrokes():
+    print "Testing splitToStrokes()... ",
+    # This file only contains one dictionary with 7 keys
+    allData = fileIO.read("testData/ABCDEF7.txt")
+    firstDictionary = allData[0]
+    strokes = {"A": 2, "B": 2, "C": 1, "D": 2, "E": 4, "F": 3, "7": 1}
+    for char in strokes.keys():
+        charData = firstDictionary[char]
+        strokeData = splitToStrokes(charData)
+        assert(len(strokeData) == strokes[char])
+    print "Passed!"
+
+# from 15-112 hw1 starter code
+# https://www.cs.cmu.edu/~112/notes/hw1.html
+def almostEqual(d1, d2, epsilon=10**-3):
+    return abs(d1 - d2) < epsilon
 
 
-
-
-
-
-
-
-###################### normalize ###########################
+################################## normalize ##################################
 
 
 # takes array of points and maps it to a 1.0 by 1.0 space
@@ -71,13 +152,16 @@ def findCorners(points):
             maxY = y
     return ((minX, minY), (maxX, maxY))
 
-# returns data of first character in dictionary of most recent file
+# returns data of the given character in dictionary of most recent file
 # for testing
-def loadFirstCharacter(directory="data"):
+def loadCharacter(char=None, directory="data"):
     allData = fileIO.openRecent(directory)
     firstDictionary = allData[0]
-    firstKey = sorted(firstDictionary.keys())[0]
-    return firstDictionary[firstKey]
+    if (char == None):      # no key given, just return first element
+        firstKey = sorted(firstDictionary.keys())[0]
+        return firstDictionary[firstKey]
+    elif (char in firstDictionary.keys()):        # data exists
+        return firstDictionary[char]
 
 
 # used for testing
