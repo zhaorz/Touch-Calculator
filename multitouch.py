@@ -2,18 +2,18 @@
 multitouch.py
 ~~~~~~~~~~~~~~~
 
-A customized wrapper for source code found at
+Access raw touchpad data using Apple's MultitouchSupport private framework.
+To start data collection, create a Trackpad() instance and call its start()
+method. To stop, call stop(). Data for a single start-stop cycle is stored in
+Trackpad's touchData list. See touch_callback() for the types of data stored.
+
+Source code for everything except touch_callback(), start(), and stop() from
 http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
-
-Wrapped code into classes to use as an importable module.
-
+The source was modified to be importable.
 """
 
 
-import time
 import ctypes
-import threading
-from ctypes.util import find_library
 
 
 class MTPoint(ctypes.Structure):
@@ -51,8 +51,7 @@ class Trackpad(object):
 
     # Initializes contents of private framework MultitouchSupport
     def __init__(self):
-        self.touchData = []  # holds data from one call of stroke()
-        self.strokeData = []
+        self.touchData = []  # holds data from start() method call
 
         self.CFArrayRef = ctypes.c_void_p
         self.CFMutableArrayRef = ctypes.c_void_p
@@ -113,29 +112,16 @@ class Trackpad(object):
             self.MTDeviceStop(device)
 
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
-        self.fingers = []
-        for i in xrange(n_fingers):
-            self.fingers.append(data_ptr[i])
-            # Only send first finger's data
-            for finger in self.fingers[:1]:
-                pos = finger.normalized.position
-                p = (pos.x, pos.y, timestamp)
-                self.touchData.append(p)    # add point to return array
-        #self.touches[:] = [(frame, timestamp, self.fingers)]
+        data = data_ptr[0]      # only use the first finger
+        pos = data.normalized.position
+        p = (pos.x, pos.y, timestamp)
+        self.touchData.append(p)    # add point to return array
         return 0
 
     def start(self):
         del self.touchData[:]   # reset data
         self.touch_callback = self.MTContactCallbackFunction(self.touch_callback)
-        self.touches_lock = threading.Lock()
         self.devs = self.init_multitouch(self.touch_callback)
 
     def stop(self):
         self.stop_multitouch(self.devs)
-
-
-
-
-
-
-

@@ -140,3 +140,12 @@ Sun Apr 12 17:47:54 EDT 2015
 -process3D working, separation between ABCDEF is looking really good!
 Sun Apr 12 18:06:30 EDT 2015
 
+Sun Apr 12 22:50:39 EDT 2015
+-research different ML methods
+Sun Apr 12 23:21:23 EDT 2015
+
+Tue Apr 14 12:35:06 EDT 2015
+-refactored multitouch, reduced module dependency to just ctypes
+Tue Apr 14 13:25:51 EDT 2015
+
+

@@ -15,7 +15,6 @@ time saved.
 The final output data consists of a list of dictionaries--each dictionary
 corresponding with the character set number. Each dictionary has 7 keys,
 corresponding to the characters in that particular set.
-
 """
 
 
