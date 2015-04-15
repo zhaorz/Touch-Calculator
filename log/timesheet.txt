@@ -148,4 +148,6 @@ Tue Apr 14 12:35:06 EDT 2015
 -refactored multitouch, reduced module dependency to just ctypes
 Tue Apr 14 13:25:51 EDT 2015
 
-
+Tue Apr 14 16:00:06 EDT 2015
+-started knn
+Tue Apr 14 16:27:14 EDT 2015

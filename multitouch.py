@@ -1,6 +1,7 @@
 """
 multitouch.py
 ~~~~~~~~~~~~~~~
+Richard Zhao
 
 Access raw touchpad data using Apple's MultitouchSupport private framework.
 To start data collection, create a Trackpad() instance and call its start()
