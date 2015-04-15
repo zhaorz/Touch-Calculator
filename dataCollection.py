@@ -48,8 +48,8 @@ class MainWindow(Animation):
     # Character sets must have length 7
     def initCharacterSets(self):
         self.characterSets = [
-            ["A", "B", "C", "D", "E", "F", "7"]
-#            ["0", "1", "2", "3", "4", "5", "6"],
+            ["A", "B", "C", "D", "E", "F", "7"],
+            ["0", "1", "2", "3", "4", "5", "6"]
  #           ["8", "9", "A", "B", "C", "D", "E"]
             ]
         for charSet in self.characterSets:

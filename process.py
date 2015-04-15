@@ -38,7 +38,7 @@ def testProcess3D():
     # output process3D for 7 characters
     # all 7 characters are A's
     print "Testing process3D()... "
-    allData = fileIO.read("testData/AAAAAAA.txt")
+    allData = fileIO.read("testData/christian.txt")
     data = allData[0]
     for key in data.keys():
         print process3D(data[key])
