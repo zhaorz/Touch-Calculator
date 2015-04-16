@@ -22,7 +22,6 @@ corresponding to the characters in that particular set.
 import string
 import copy
 import os
-from time import localtime, strftime
 
 # 15-112 libraries
 from eventBasedAnimation import Animation
@@ -48,8 +47,8 @@ class MainWindow(Animation):
     # Character sets must have length 7
     def initCharacterSets(self):
         self.characterSets = [
-            ["A", "B", "C", "D", "E", "F", "7"],
-            ["0", "1", "2", "3", "4", "5", "6"]
+            ["A", "B", "C", "D", "E", "F", "7"]
+ #           ["0", "1", "2", "3", "4", "5", "6"]
  #           ["8", "9", "A", "B", "C", "D", "E"]
             ]
         for charSet in self.characterSets:
@@ -119,18 +118,13 @@ class MainWindow(Animation):
     # writes a file in current directory
     def save(self, d):
         self.data.append(self.chars.charData)   # add last data set to output
-        filename = self.time() + ".txt"
+        filename = fileIO.timeStr() + ".txt"
         if (filename in os.listdir("data/")):
             print "Error, file already exists"
             return False
         path = "data/" + filename
         fileIO.writeTo(path, d)
         self.saveSuccess()
-
-
-    # returns string in MMDDYY_HHMMSS format (month/day/year_hour/min/sec)
-    def time(self):
-        return strftime("%m%d%y_%H%M%S", localtime())
 
     # Stores current self.chars.charData in self.data and swaps in next charSet
     def nextSet(self):

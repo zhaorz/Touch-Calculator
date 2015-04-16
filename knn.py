@@ -26,7 +26,6 @@ def testEuclideanDistance():
 def almostEqual(d1, d2, epsilon=10**-3):
     return abs(d1 - d2) < epsilon
 
-
 def allNeighbors(model, instance, n):
     """Returns a list of (sym, distance) tuples of the model set, where
     n is the dimenstionality of the instance used to calculate distance and
@@ -46,7 +45,6 @@ def kNearestNeighbors(neighbors, k):
     sortedNeighbors = sorted(neighbors, lambda a, b: cmp(a[1], b[1]))
     return sortedNeighbors[:k]
 
-
 def testKNearestNeighbors():
     print "Testing kNearestNeighbors()... ",
     neighbors = [('A', 1.5), ('B', 6.0), ('C', 5.0), ('D', 3.3)]
@@ -54,8 +52,44 @@ def testKNearestNeighbors():
     print "Passed!"
 
 
+def vote(neighbors):
+    """Returns dictionary of the proportion of each instance in a list of
+    (instance, distance) tuples."""
+    total = 0
+    count = dict()
+    # Count all instances
+    for (instance, distance) in neighbors:
+        total += 1
+        if (instance in count):
+            count[instance] += 1
+        else:
+            count[instance] = 1
+    # Divide each count by total to get proportion
+    for instance in count.keys():
+        count[instance] = float(count[instance]) / total
+    return count
+
+def testVote():
+    print "Testing vote()... ",
+    neighbors = [
+        ('A', 1), ('A', 1), ('A', 1), ('A', 1), ('A', 1), ('A', 1), ('A', 1),
+        ('B', 1), ('B', 1), ('B', 1), ('B', 1),
+        ('C', 1)
+        ]
+    votes = vote(neighbors)
+    assert(almostEqual(votes['A'], float(7) / 12))
+    assert(almostEqual(votes['B'], float(4) / 12))
+    assert(almostEqual(votes['C'], float(1) / 12))
+    print "Passed!"
 
 
+def kNN(model, instance, k):
+    """Returns a dictionary of vote proportions for the kth nearest neighbors
+    of the instance in the model"""
+    n = len(instance)
+    neighbors = allNeighbors(model, instance, n)
+    kNearest = kNearestNeighbors(neighbors, k)
+    return vote(kNearest)
 
 
 

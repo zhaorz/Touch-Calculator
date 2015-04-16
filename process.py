@@ -19,10 +19,14 @@ Dimensions are handled by shifting 1 dimension for each stroke, and adding the
 x and y data to those two dimensions in the 3D output.
 """
 
-def process3D(points):
+# Raw data -> vector feature
+# output type: list [x, y, z, ... ]
+def vectorFeature(points, dimensions):
+    if (dimensions < 2):
+        print "Must have at least 2 dimensions"
+        return -1
     vectorStrokes = vectorizeCharacter(normalize(points))
-    origin = [0.0, 0.0, 0.0]
-    numDimensions = 3       # x, y, and z
+    origin = [0.0 for _ in xrange(dimensions)]
     d1, d2 = 0, 1           # start at x and y
     for vectorStroke in vectorStrokes:
         for vector in vectorStroke:
@@ -30,27 +34,27 @@ def process3D(points):
             origin[d1] += dx
             origin[d2] += dy
         # shift to adjacent plane
-        d1 = (d1 + 1) % numDimensions
-        d2 = (d2 + 1) % numDimensions
+        d1 = (d1 + 1) % dimensions
+        d2 = (d2 + 1) % dimensions
     return origin
 
-def testProcess3D():
+def testVectorFeature():
     # output process3D for 7 characters
     # all 7 characters are A's
-    print "Testing process3D()... "
-    allData = fileIO.read("testData/christian.txt")
+    print "Testing vectorFeature()... "
+    allData = fileIO.read("testData/AAAAAAA.txt")
     data = allData[0]
     for key in data.keys():
-        print process3D(data[key])
+        print vectorFeature(data[key], 3)
     print "Passed!"
 
-def testProcess3DOnSet():
-    # output process3D for 7 arbitrary characters
-    print "Testing process3D()... "
+def testVectorFeatureOnSet():
+    # output vectorFeature() for 7 arbitrary characters
+    print "Testing vectorFeature()... "
     allData = fileIO.openRecent("data")
     data = allData[0]   # only take first set
     for key in data.keys():
-        print str(key) + ": " + str(process3D(data[key]))
+        print str(key) + ": " + str(vectorFeature(data[key], 3))
     print "Passed!"
 
 
