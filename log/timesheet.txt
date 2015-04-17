@@ -165,3 +165,8 @@ Thu Apr 16 15:01:36 EDT 2015
 -knn, fileIO revisions, created Model class
 Thu Apr 16 16:45:55 EDT 2015
 
+Fri Apr 17 15:15:52 EDT 2015
+-rewrote main to do recognition
+-test_model_3 works ok, need to make better stroke separation
+Fri Apr 17 19:04:15 EDT 2015
+

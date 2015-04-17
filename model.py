@@ -39,7 +39,13 @@ class Model(object):
         """Creates file if first save, overwrites if file aready exists."""
         fileIO.writeTo(self.directory + os.sep + self.name, self.data)
 
-    def extend(self, rawDataFile):
+    def load(self, modelName):
+        """Opens modelName, checks that dimensions correspond and updates 
+        data"""
+        newModelData = fileIO.read(modelName)
+        self.data.extend(newModelData)
+
+    def extendData(self, rawDataFile):
         """Processes data in rawDataFile using process.vectorFeature() on each
         element of the raw data. Raw data is a list of dictionaries."""
         processedData = []
@@ -53,7 +59,7 @@ class Model(object):
         self.sources.append(rawDataFile)    # update sources list
 
     def kNearestNeighborProportions(self, instance, k):
-        """Performs a kNN on the model data and returns a list of the vote
+        """Performs a kNN on the model data and returns a dictionary of the vote
         proportions for the k nearest instances. instance should be the same
         type as an element of raw data."""
         instanceFeature = process.vectorFeature(instance, self.dimensions)

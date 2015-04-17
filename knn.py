@@ -53,7 +53,7 @@ def testKNearestNeighbors():
 
 
 def vote(neighbors):
-    """Returns dictionary of the proportion of each instance in a list of
+    """Returns dictionary of the proportion of each instance in form
     (instance, distance) tuples."""
     total = 0
     count = dict()
@@ -91,7 +91,30 @@ def kNN(model, instance, k):
     kNearest = kNearestNeighbors(neighbors, k)
     return vote(kNearest)
 
+def topNClasses(voteProportions, n):
+    """Returns a sorted descending list of the top n classes in a vote."""
+    votes = []
+    for key in voteProportions.keys():              # put votes into a list
+        votes.append((key, voteProportions[key]))
+    # sort votes by comparing vote proportion (index 1)
+    votes = sorted(votes, lambda a, b: cmp(a[1], b[1]))
+    votes = votes[::-1]     # reverse to get descending order
+    return votes[:n]        # return the n highest
 
+def testTopNClasses():
+    print "Testing topNClasses()... ",
+    votes = {
+        'A': 0.6,
+        'B': 0.3,
+        'C': 0.05,
+        'D': 0.025,
+        'E': 0.015,
+        'F': 0.007,
+        'G': 0.003
+        }
+    assert(topNClasses(votes, 4) == [('A', 0.6), ('B', 0.3), 
+                                    ('C', 0.05), ('D', 0.025)])
+    print "Passed!"
 
 
 

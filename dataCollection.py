@@ -47,9 +47,11 @@ class MainWindow(Animation):
     # Character sets must have length 7
     def initCharacterSets(self):
         self.characterSets = [
-            ["A", "B", "C", "D", "E", "F", "7"]
- #           ["0", "1", "2", "3", "4", "5", "6"]
- #           ["8", "9", "A", "B", "C", "D", "E"]
+            ["A", "B", "C", "D", "E", "F", "7"],
+            ["0", "1", "2", "3", "4", "5", "6"],
+            ["8", "9", "A", "B", "C", "D", "E"],
+            ["F", "0", "1", "2", "3", "4", "5"],
+            ["6", "7", "8", "9", " ", ",", "."]
             ]
         for charSet in self.characterSets:
             assert(len(charSet) == 7)
@@ -404,7 +406,7 @@ class DataCollectionTrackpad(multitouch.Trackpad):
         r = 6
         for (normx, normy, timestamp) in self.touchData:
             x = left + normx * self.width
-            y = top + self. height - normy * self.height
+            y = top + self.height - normy * self.height
             self.drawDot(canvas, x, y, r)
 
     # Green/Red dot corresponding to self.isDrawing
