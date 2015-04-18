@@ -53,8 +53,6 @@ class MainWindow(Animation):
     def onMouse(self, event):
         self.recognition.onMouse(event)
 
-    def onMouseRelease(self, event):
-        self.recognition.onMouseRelease(event)
 
 
     def onMouseMove(self, event): pass
@@ -113,6 +111,8 @@ class Recognition(object):
         k = 10      # use 10 nearest points
         self.proportions = self.knnModel.kNearestNeighborProportions(self.instanceData, k)
         self.updateLabels()
+        for button in self.buttons:
+            button.step()
 
     def updateLabels(self):
         """Finds the top n matches in self.proportions and sets the correct
@@ -125,12 +125,7 @@ class Recognition(object):
 
     def onMouse(self, event):
         for button in self.buttons:
-            if (button.intersect(event.x, event.y)):
-                button.isClicked = True
-
-    def onMouseRelease(self, event):
-        for button in self.buttons:
-            button.isClicked = False
+            button.intersect(event.x, event.y)
 
 
 
@@ -151,7 +146,7 @@ class Button(object):
         self.activeColor = "#d5e5f8"    # active color: light blue
         self.label = ""
         self.subLabel = ""
-        self.isClicked = False
+        self.clickTimer = 0
         self.__dict__.update(kwargs)
 
     def draw(self, canvas):
@@ -159,7 +154,7 @@ class Button(object):
         x1 = x0 + self.width
         y0 = self.y
         y1 = y0 + self.height
-        color = self.bg if self.isClicked == False else self.activeColor
+        color = self.bg if self.clickTimer == 0 else self.activeColor
         canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
         cx = x0 + self.width / 2
         cy = y0 + self.height / 2
@@ -174,9 +169,17 @@ class Button(object):
     def intersect(self, x, y):
         if ((self.x < x and x < self.x + self.width) and
             (self.y < y and y < self.y + self.height)):
-            return True
-        else:
-            return False
+            self.clicked(1)
+
+    def clicked(self, time):
+        """Reset click timer"""
+        self.clickTimer = time
+
+    def step(self):
+        """Count down click timer."""
+        if (self.clickTimer > 0):
+            self.clickTimer -= 1
+
 
 
 
@@ -246,7 +249,9 @@ class MainTrackpad(multitouch.Trackpad):
 width = 700
 height = 400
 margin = 25
-mainWindow = MainWindow(width=width, height=height, margin=margin)
+timerDelay = 64
+mainWindow = MainWindow(
+    width=width, height=height, margin=margin, timerDelay=timerDelay)
 mainWindow.run()
 
 

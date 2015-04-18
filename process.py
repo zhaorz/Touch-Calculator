@@ -30,7 +30,6 @@ def vectorFeature(points, dimensions):
     d1, d2 = 0, 1           # start at x and y
     for vectorStroke in vectorStrokes:
         for vector in vectorStroke:
-            dx, dy = vector
             origin[d1] += dx
             origin[d2] += dy
         # shift to adjacent plane
@@ -63,24 +62,70 @@ def testVectorFeatureOnSet():
 ###################################  vector ####################################
 
 
-# Converts list of points to list of distances between consecutive points
-# input is a list of (x, y, timestamp) tuples
-# i.e.  [(x0, y0), (x1, y1), ... , (x(n), y(n))] --> 
-#       [(x1 - x0, y1 - y0), ... , (x(n) - x(n-1), y(n) - y(n-1))]
 def vector(points):
+    """vector([(x0, y0), (x1, y1), ... , (x(n), y(n))]) returns
+    [[x1 - x0, y1 - y0], ... , (x(n) - x(n-1), y(n) - y(n-1)]]
+    theta is the angle between two adjacent points.
+    Input is a list of (x, y, timestamp) tuples."""
     vectors = []
     for i in xrange(len(points) - 1):
         (x0, y0) = points[    i][:2]
         (x1, y1) = points[i + 1][:2]
-        vectors.append((x1 - x0, y1 - y0))
+        vectors.append([x1 - x0, y1 - y0])
     return vectors
+
+def direction((x0, y0), (x1, y1)):
+    """Returns the direction from (x0, y0) to (x1, y1) with 0 <= theta < 2pi"""
+    x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
+    if (x1 > x0 and y1 >= y0):      # first quadrant
+        return math.atan((y1 - y0) / (x1 - x0))
+    elif (x1 < x0 and y1 >= y0):    # second quadrant
+        return math.pi - abs(math.atan((y1 - y0) / (x1 - x0)))
+    elif (x1 < x0 and y1 < y0):     # third quadrant
+        return math.pi + abs(math.atan((y1 - y0) / (x1 - x0)))
+    elif (x1 > x0 and y1 < y0):     # fourth quadrant
+        return math.pi * 2 - abs(math.atan((y1 - y0) / (x1 - x0)))
+    elif (x1 == x0):                # vertically stacked
+        sign = -1 if ((y1 - y0) < 0) else 1
+        return sign * math.pi / 2
+    else:
+        return None # fail
+
+def length((x, y)):
+    return math.sqrt(x ** 2 + y ** 2)
+
+def dotProduct((x0, y0), (x1, y1)):
+    return sum(x0 * x1 + y0 * y1)
+
+def angle((x0, y0), (x1, y1)):
+    pass
 
 def vectorizeCharacter(points):
     strokes = splitToStrokes(points)
     vectors = []
     for stroke in strokes:
-        vectors += [vector(stroke)]
+        vectors.append([vector(stroke)])
     return vectors
+
+
+def vectorSplitStroke(stroke, epsilon=math.pi/3):
+    """Stroke is a list of (dx, dy, theta) tuples. Returns a list that contains
+    the original stroke split at its maximum delta theta point, if the maximum
+    delta theta exceeds epsilon. Default is 60 degrees."""
+
+    dthetas = []
+    n = 6               # number of vectors between 2 observation points
+    for i in xrange(len(stroke) - n):
+        (dx1, dy1, theta1) = stroke[i]
+        (dx2, dy2, theta2) = stroke[i + n]
+
+
+
+
+
+
+
+
 
 # 2D sum of a list of vectors
 def vectorSum(origin, vectors):
