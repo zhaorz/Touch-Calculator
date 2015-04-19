@@ -12,34 +12,28 @@ of form (x, y, time).
 
 
 import eventBasedAnimation
-from time import sleep
 from random import randint
 
 
-class TestWindow(eventBasedAnimation.Animation):
+class TestWindowPoints(eventBasedAnimation.Animation):
+    """TestWindowPoints(points).run() creates a window that draws all a list
+    of points."""
+
+    def __init__(self, points):
+        super(TestWindow, self).__init__()
+        self.points = points
 
     def onInit(self):
-        self.windowTitle = "Test Canvas"
-        self.drawWidth = self.width - self.margin * 2
-        self.drawHeight = self.height - self.margin * 2
-        self.darkGrey = "#4A4A4A"
+        self.windowTitle = "Test Canvas - points"
     
     def onDraw(self, canvas):
-        self.drawBackground(canvas)
-        self.drawPoints(canvas)
+        self.drawPoints(canvas, self.points)
 
-    def drawBackground(self, canvas):
-        x0 = self.margin
-        x1 = self.width - self.margin
-        y0 = self.margin
-        y1 = self.height - self.margin
-        canvas.create_rectangle(x0, y0, x1, y1, fill="lightgrey", width=0)
-
-    def drawPoints(self, canvas):
-        for (x, y, time) in self.points:
-            cx = self.margin + x * self.drawWidth
-            cy = self.height - self.margin - y * self.drawHeight
-            self.drawDot(canvas, cx, cy, 5, self.darkGrey)
+    def drawPoints(self, canvas, points, color="darkgrey"):
+        for (x, y, time) in points:
+            cx = x * self.width
+            cy = self.height - y * self.height
+            self.drawDot(canvas, cx, cy, 5, color)
 
     def drawDot(self, canvas, cx, cy, r, color="black"):
         x0 = cx - r
@@ -47,3 +41,19 @@ class TestWindow(eventBasedAnimation.Animation):
         y0 = cy - r
         y1 = cy + r
         canvas.create_oval(x0, y0, x1, y1, fill=color, width=0)
+
+
+class TestWindowStrokes(TestWindowPoints):
+    """TestWindowStrokes(strokes).run() creates a window that draws each
+    stroke in strokes in a different color. Each strokes is a list of points."""
+
+    def __init__(self, strokes):
+        super(TestWindow, self).__init__()
+        self.strokes = strokes
+        colors = ["red", "orange", "green", "blue", "purple", "darkgrey"]
+
+    def onDraw(self, canvas):
+        for i in xrange(len(self.strokes)):
+            color = colors[i % len(colors)]
+            points = self.strokes[i]
+            drawPoints(canvas, points, color)

@@ -98,54 +98,125 @@ def vector(points):
         vectors.append([x1 - x0, y1 - y0])
     return vectors
 
-def direction((x0, y0), (x1, y1)):
-    """Returns the direction from (x0, y0) to (x1, y1) with 0 <= theta < 2pi"""
-    x0, y0, x1, y1 = float(x0), float(y0), float(x1), float(y1)
-    if (x1 > x0 and y1 >= y0):      # first quadrant
-        return math.atan((y1 - y0) / (x1 - x0))
-    elif (x1 < x0 and y1 >= y0):    # second quadrant
-        return math.pi - abs(math.atan((y1 - y0) / (x1 - x0)))
-    elif (x1 < x0 and y1 < y0):     # third quadrant
-        return math.pi + abs(math.atan((y1 - y0) / (x1 - x0)))
-    elif (x1 > x0 and y1 < y0):     # fourth quadrant
-        return math.pi * 2 - abs(math.atan((y1 - y0) / (x1 - x0)))
-    elif (x1 == x0):                # vertically stacked
-        sign = -1 if ((y1 - y0) < 0) else 1
-        return sign * math.pi / 2
-    else:
-        return None # fail
+def magnitude((x0, y0), (x1, y1)):
+    return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
 
-def length((x, y)):
-    return math.sqrt(x ** 2 + y ** 2)
+def trimPoints(points, epsilon=0.02):
+    """Input is a normalized list of points that form one stroke.
+    Returns a list with points that are within epsilon distance from their
+    preceeding points removed."""
+    trimmedPoints = [points[0]]     # start with first point
+    prev = 0
+    for nxt in xrange(1, len(points)):
+        (x0, y0) = points[prev][:2]
+        (x1, y1) = points[ nxt][:2]
+        # points are sufficiently separated: add point and update prev
+        if (magnitude((x0, y0), (x1, y1)) > epsilon):
+            trimmedPoints.append(points[nxt])
+            prev = nxt
+    return trimmedPoints
 
-def dotProduct((x0, y0), (x1, y1)):
-    return sum(x0 * x1 + y0 * y1)
 
-def angle((x0, y0), (x1, y1)):
-    pass
+def testTrimPoints():
+    print "Testing trimPoints()... ",
+    points = fileIO.read("testData/AAAAAAA.txt")[0]['A']
+    trimmed = trimPoints(points)
+    print "Initial length", len(points), "Final length:", len(trimmed)
+    testCanvas.TestWindow(trimmed).run()
+
+
+
+
+
+def length(v):
+    """Length of a vector in form [x, y, ... , z]."""
+    return (sum(a ** 2 for a in v)) ** 0.5
+
+def testLength():
+    print "Testing length()... ",
+    assert(almostEqual(length([1,1,1]), (3)**0.5))
+    assert(almostEqual(length([2,2,2]), (12)**0.5))
+    print "Passed!"
+
+def dotProduct(v1, v2):
+    """Sum product for the components of v1 and v2. v1 and v2 should have 
+    same dimensions."""
+    if (len(v1) != len(v2)):
+        return None
+    return sum(a * b for a,b in zip(v1, v2))
+
+def testDotProduct():
+    print "Testing dotProduct()... ",
+    assert(dotProduct([3,4,5],[2,1,2]) == 6 + 4 + 10)
+    assert(dotProduct([0,0,0],[2,1,2]) == 0)
+    print "Passed!"
+
+def angle(v1, v2):
+    """Angle between two vectors of the same dimensions. Return value is between
+    0 and pi"""
+    try:
+        return math.acos(dotProduct(v1, v2) / (length(v1) * length(v2)))
+    except:     # if one of the vectors has length 0
+        return 0.0
+
+def testAngle():
+    print "Testing angle()... ",
+    assert(almostEqual(angle([1,0],[0,1]), math.pi / 2))
+    assert(almostEqual(angle([1,0],[1,0]), 0.0))
+    assert(almostEqual(angle([1,0],[-1,0]), math.pi))
+    assert(almostEqual(angle([1,0],[0,0]), 0.0))
+    print "Passed!"
+
+
+
 
 def vectorizeCharacter(points):
     strokes = splitToStrokes(points)
     vectors = []
     for stroke in strokes:
-        vectors.append(vector(stroke))
+        trimmedStroke = trimPoints(stroke)
+        vectors.append(vector(trimmedStroke))
     return vectors
 
 
-def vectorSplitStroke(stroke, epsilon=math.pi/3):
-    """Stroke is a list of (dx, dy, theta) tuples. Returns a list that contains
-    the original stroke split at its maximum delta theta point, if the maximum
-    delta theta exceeds epsilon. Default is 60 degrees."""
+def vectorSplitStroke(stroke, n=4, epsilon=math.pi/3):
+    """Stroke is a list of [x, y] vector tuples. Returns a list that contains
+    the original stroke split at its maximum angle point, if the maximum
+    angle exceeds epsilon. Default is 60 degrees. n is the number of vectors
+    between 2 observation points."""
 
-    dthetas = []
-    n = 6               # number of vectors between 2 observation points
-    for i in xrange(len(stroke) - n):
-        (dx1, dy1, theta1) = stroke[i]
-        (dx2, dy2, theta2) = stroke[i + n]
+    theta = []
+    for i in xrange(1, len(stroke) - n):
+        theta.append(angle(stroke[i], stroke[i + n]))
+    maxAngle = max(theta)
+    if (maxAngle > epsilon):
+        # indecies in theta correspond to index + n / 2 in stroke
+        splitIndex = theta.index(maxAngle) + n / 2
+        return splitStroke(stroke, splitIndex)
+    else:
+        return [stroke]
+
+def splitStroke(stroke, i):
+    """Returns a list containing the stroke split at index i."""
+    return [stroke[:i], stroke[i:]]
+
+def testSplitStroke():
+    print "Testing splitStroke()... ",
+    assert(splitStroke([0,1,2,3,4,5], 3) == [[0,1,2],[3,4,5]])
+    print "Passed!"
 
 
-
-
+def testVectorSplitStroke():
+    allData = fileIO.read("testData/AAAAAAA.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        vectorStrokes = vectorizeCharacter(charData)
+        splitStrokes = []
+        for stroke in vectorStrokes:
+            splitStrokes.extend(vectorSplitStroke(stroke))
+        print key, len(splitStrokes)
+    
 
 
 

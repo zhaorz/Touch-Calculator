@@ -26,7 +26,7 @@ def read(filename):
 # Specialized for the data directory, where filenames are creation times
 def openRecent(directory):
     filename = bottomFile(directory)
-    return read(directory + os.sep + filename)
+    return read(filename)
 
 # Returns last filename in a sorted list of all filenames in a directory
 def bottomFile(directory):
