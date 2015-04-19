@@ -105,6 +105,8 @@ def trimPoints(points, epsilon=0.02):
     """Input is a normalized list of points that form one stroke.
     Returns a list with points that are within epsilon distance from their
     preceeding points removed."""
+    if (points == []):
+        return []
     trimmedPoints = [points[0]]     # start with first point
     prev = 0
     for nxt in xrange(1, len(points)):
@@ -314,6 +316,8 @@ def normalize(points):
     ((minX, minY), (maxX, maxY)) = findCorners(points)
     width = maxX - minX
     height = maxY - minY
+    width = 1.0 if width == 0.0 else width
+    height = 1.0 if height == 0.0 else height
     normalizedPoints = []
     for i in xrange(len(points)):
         (x, y, time) = points[i]

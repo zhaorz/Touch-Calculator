@@ -37,13 +37,23 @@ class Model(object):
 
     def save(self):
         """Creates file if first save, overwrites if file aready exists."""
-        fileIO.writeTo(self.directory + os.sep + self.name, self.data)
+        saveData = dict()
+        saveData["name"] = self.name
+        saveData["dimensions"] = self.dimensions
+        saveData["data"] = self.data
+        saveData["sources"] = self.sources
+        fileIO.writeTo(self.directory + os.sep + self.name, saveData)
 
     def load(self, modelName):
         """Opens modelName, checks that dimensions correspond and updates 
         data"""
         newModelData = fileIO.read(modelName)
-        self.data.extend(newModelData)
+        print "Loading model:", newModelData["name"]
+        if (newModelData["dimensions"] != self.dimensions):
+            print "Error: imput model must have same dimensions"
+            return -1
+        self.sources.extend(newModelData["sources"])
+        self.data.extend(newModelData["data"])
 
     def extendData(self, rawDataFile):
         """Processes data in rawDataFile using process.vectorFeature() on each

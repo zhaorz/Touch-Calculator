@@ -90,8 +90,8 @@ class Recognition(object):
 
     def initModel(self):
         """Initializes a Model class for knn"""
-        self.knnModel = model.Model("knnModel", 3)        # 3 dimension
-        self.knnModel.load("model/test_model_3")        # load test model
+        self.knnModel = model.Model("knnModel", 4)        
+        self.knnModel.load("model/test_model_5")        # load test model
 
     def draw(self, canvas):
         for button in self.buttons:
@@ -122,6 +122,11 @@ class Recognition(object):
             label, subLabel = labels[i]
             self.buttons[i].label = label
             self.buttons[i].subLabel = subLabel
+        # reset remaining labels
+        for i in xrange(len(labels), self.n):
+            self.buttons[i].label = ""
+            self.buttons[i].subLabel = ""
+
 
     def onMouse(self, event):
         for button in self.buttons:
