@@ -27,15 +27,39 @@ def vectorFeature(points, dimensions):
         return -1
     vectorStrokes = vectorizeCharacter(normalize(points))
     origin = [0.0 for _ in xrange(dimensions)]
-    d1, d2 = 0, 1           # start at x and y
+    k = 0   # starting dimension is x
     for vectorStroke in vectorStrokes:
         for vector in vectorStroke:
-            origin[d1] += dx
-            origin[d2] += dy
+            addVectorDimension(vector, origin, k)
         # shift to adjacent plane
-        d1 = (d1 + 1) % dimensions
-        d2 = (d2 + 1) % dimensions
+        k = (k + 1) % dimensions
     return origin
+
+def addVectorDimension(v, origin, k):
+    """v and origin are vectors of arbitrary dimensions with origin having at
+    least as many dimensions as v. k is the index in origin at which addition
+    of v's components begin. A shift of one dimension to the right occurs
+    after each addition, for all components of v."""
+    if (len(v) > len(origin)):
+        print "Error: v cannot have greater dimensionality than the origin."
+        return -1
+    for vIndex in xrange(len(v)):
+        originIndex = (vIndex + k) % len(origin)
+        origin[originIndex] += v[vIndex]
+    return None
+
+def testAddVectorDimension():
+    print "Testing addVectorDimension()... ",
+    origin = [0, 0, 0]
+    addVectorDimension([1, 1], origin, 0)
+    assert(origin == [1, 1, 0])
+    addVectorDimension([1, 1], origin, 1)
+    assert(origin == [1, 2, 1])
+    addVectorDimension([-1, -2], origin, 2)
+    assert(origin == [-1, 2, 0])
+    assert(addVectorDimension([0, 0, 0, 0], origin, 1) == -1)
+    print "Passed!"
+
 
 def testVectorFeature():
     # output process3D for 7 characters
@@ -104,7 +128,7 @@ def vectorizeCharacter(points):
     strokes = splitToStrokes(points)
     vectors = []
     for stroke in strokes:
-        vectors.append([vector(stroke)])
+        vectors.append(vector(stroke))
     return vectors
 
 
