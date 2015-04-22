@@ -76,7 +76,7 @@ class Recognition(object):
         self.initButtons()
         self.initModel()
         self.instanceData = []          # data to be classified
-        self.feature = process.Feature()
+        self.processor = process.Feature()
         self.proportions = dict()
 
     def initButtons(self):
@@ -91,8 +91,8 @@ class Recognition(object):
 
     def initModel(self):
         """Initializes a Model class for knn"""
-        self.knnModel = model.Model("knnModel", 3)        
-        self.knnModel.load("model/test_model_7")        # load test model
+        self.knnModel = model.Model("knnModel", 4)        
+        self.knnModel.load("model/test_model_9")        # load test model
 
     def draw(self, canvas):
         for button in self.buttons:
@@ -110,8 +110,8 @@ class Recognition(object):
     def step(self):
         """Perform knn on the current instanceData"""
         k = 10      # use 10 nearest points
-        self.feature.update(self.instanceData)
-        instance = self.feature.vFeature
+        self.processor.update(self.instanceData)
+        instance = self.processor.feature
         self.proportions = self.knnModel.kNearestNeighborProportions(instance, k)
         self.updateLabels()
         for button in self.buttons:

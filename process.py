@@ -33,13 +33,19 @@ class Feature(object):
 
     Attributes:
         rawDataPoints (list): Initial raw data.
-        dimensions (int): Number of dimensions used for vector sum.
+        vecDimensions (int): Number of dimensions used for vector sum.
+        feature (list): Output feature of processing.
 
     """
-    def __init__(self, points=[], dimensions=3):
+    def __init__(self, points=[], vecDimensions=3):
         self.rawDataPoints = points
-        self.dimensions = 3
-        self.vFeature = self.process()
+        self.vecDimensions = 3
+        self.dimensions = self.vecDimensions + 1
+        self.vecFeature = [0.0 for _ in xrange(self.vecDimensions)]
+        self.lenFeature = 0.0
+        self.feature = self.vecFeature + [self.lenFeature]
+        self.feature = self.normalizeVector(self.feature)
+        self.process()
 
     def process(self):
         """Data processing pipeline.
@@ -49,16 +55,18 @@ class Feature(object):
 
         Args: None
 
-        Returns:
-            Vector feature with length self.dimensions
+        Returns: None
 
         """
-        normalizedPoints = self.normalize(self.rawDataPoints)
+        normalizedPoints = self.normalizePoints(self.rawDataPoints)
         rawStrokes = self.primativeSplit(normalizedPoints)
         trimmedStrokes = [self.trimPoints(stroke) for stroke in rawStrokes]
         vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
         vectorSplit = self.vectorSplitCharacter(vectorStrokes)
-        return self.vectorFeature(vectorSplit)
+        self.vecFeature = self.vectorFeature(vectorSplit)
+        self.lenFeature = self.lengthFeature(vectorSplit)
+        self.feature = self.vecFeature + [self.lenFeature]
+        self.feature = self.normalizeVector(self.feature)
 
     def update(self, rawData):
         """Reprocesses new data.
@@ -70,9 +78,24 @@ class Feature(object):
 
         """
         self.rawDataPoints = rawData
-        self.vFeature = self.process()
+        self.process()
 
-    def normalize(self, points):
+    def normalizeVector(self, vector):
+        """Applies sigmoid function to all components of the vector.
+
+        Args:
+            vector (list): Arbitrary-dimension vector.
+
+        Returns:
+            list: Return value of sigmoid for each component in vector.
+
+        """
+        normalized = []
+        for x in vector:
+            normalized.append(sigmoid(x))
+        return normalized
+
+    def normalizePoints(self, points):
         """Maps points to a 1.0 by 1.0 space.
 
         Args:
@@ -304,21 +327,37 @@ class Feature(object):
                 contains vectors, which are lists.
 
         Returns:
-            origin (list): Vector with length = self.dimensions
+            origin (list): Vector with length = self.vecDimensions
 
         """
-        if (self.dimensions < 2):
+        if (self.vecDimensions < 2):
             print "Must have at least 2 dimensions"
             return -1
-        origin = [0.0 for _ in xrange(self.dimensions)]
+        origin = [0.0 for _ in xrange(self.vecDimensions)]
         k = 0   # starting dimension is x
         for vectorStroke in vectorStrokes:
             for vector in vectorStroke:
                 self.addVectorDimension(vector, origin, k)
             # shift to adjacent plane
-            k = (k + 1) % self.dimensions
+            k = (k + 1) % self.vecDimensions
         return origin
 
+    def lengthFeature(self, vectorStrokes):
+        """Creates a single feature corresponding to total nomralized length.
+
+        Args:
+            vectorStrokes (3D list): List elements are strokes. Each stroke
+                contains vectors, which are lists.
+
+        Returns:
+            float: A scalar normalized length.
+
+        """
+        l = 0.0
+        for vectorStroke in vectorStrokes:
+            for vector in vectorStroke:
+                l += length(vector)
+        return l
 
 
 ################################
@@ -348,3 +387,15 @@ def angle(v1, v2):
         return math.acos(dotProduct(v1, v2) / (length(v1) * length(v2)))
     except:     # if one of the vectors has length 0
         return 0.0
+
+def sigmoid(x):
+    """Normalization functions
+
+    Args:
+        x (float): Input number. Domain is all real numbers.
+
+    Returns:
+        float: Between -1 and 1.
+
+    """
+    return 2.0 / (1.0 + math.e ** (-x)) - 1.0

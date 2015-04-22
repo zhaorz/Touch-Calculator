@@ -26,7 +26,7 @@ def kNN(modelData, instance, k):
     of the instance in the modelData.
     This is the main function called by other files."""
     n = len(instance)
-    neighbors = allNeighbors(modelDataData, instance, n)
+    neighbors = allNeighbors(modelData, instance, n)
     kNearest = kNearestNeighbors(neighbors, k)
     return vote(kNearest)
 

@@ -85,7 +85,7 @@ class Model(object):
             for key in d.keys():
                 # process raw data into a vector feature
                 processor.update(d[key])
-                feature = processor.vFeature
+                feature = processor.feature
                 processedData.append((key, feature))
         self.data.extend(processedData)
         self.sources.append(rawDataFile)    # update sources list
