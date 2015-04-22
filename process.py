@@ -114,7 +114,7 @@ def trimPoints(points, epsilon=0.02):
         (x1, y1) = points[ nxt][:2]
         # points are sufficiently separated: add point and update prev
         if (magnitude((x0, y0), (x1, y1)) > epsilon):
-            trimmedPoints.append(points[nxt])
+            trimmedPoints.append(points[nxt][:2])
             prev = nxt
     return trimmedPoints
 
@@ -123,8 +123,9 @@ def testTrimPoints():
     print "Testing trimPoints()... ",
     points = fileIO.read("testData/AAAAAAA.txt")[0]['A']
     trimmed = trimPoints(points)
+    print trimmed
     print "Initial length", len(points), "Final length:", len(trimmed)
-    testCanvas.TestWindow(trimmed).run()
+    testCanvas.TestWindowPoints(trimmed).run()
 
 
 

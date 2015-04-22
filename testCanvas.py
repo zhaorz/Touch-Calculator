@@ -20,7 +20,7 @@ class TestWindowPoints(eventBasedAnimation.Animation):
     of points."""
 
     def __init__(self, points):
-        super(TestWindow, self).__init__()
+        super(TestWindowPoints, self).__init__()
         self.points = points
 
     def onInit(self):
@@ -30,7 +30,8 @@ class TestWindowPoints(eventBasedAnimation.Animation):
         self.drawPoints(canvas, self.points)
 
     def drawPoints(self, canvas, points, color="darkgrey"):
-        for (x, y, time) in points:
+        for point in points:
+            x, y = point[:2]
             cx = x * self.width
             cy = self.height - y * self.height
             self.drawDot(canvas, cx, cy, 5, color)
