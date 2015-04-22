@@ -13,6 +13,7 @@ import multitouch
 import model
 from time import sleep
 import knn
+import process
 
 
 
@@ -45,8 +46,7 @@ class MainWindow(Animation):
     def onStep(self):
         self.recognition.instanceData = self.trackpad.touchData
         self.recognition.step()
-        sleep(0.1)
-
+        
     
 
 
@@ -76,6 +76,7 @@ class Recognition(object):
         self.initButtons()
         self.initModel()
         self.instanceData = []          # data to be classified
+        self.feature = process.Feature()
         self.proportions = dict()
 
     def initButtons(self):
@@ -109,7 +110,9 @@ class Recognition(object):
     def step(self):
         """Perform knn on the current instanceData"""
         k = 10      # use 10 nearest points
-        self.proportions = self.knnModel.kNearestNeighborProportions(self.instanceData, k)
+        self.feature.update(self.instanceData)
+        instance = self.feature.vFeature
+        self.proportions = self.knnModel.kNearestNeighborProportions(instance, k)
         self.updateLabels()
         for button in self.buttons:
             button.step()

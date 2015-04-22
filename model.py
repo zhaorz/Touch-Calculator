@@ -60,19 +60,20 @@ class Model(object):
         element of the raw data. Raw data is a list of dictionaries."""
         processedData = []
         rawData = fileIO.read(rawDataFile)
+        processor = process.Feature()
         for d in rawData:
             for key in d.keys():
                 # process raw data into a vector feature
-                feature = process.vectorFeature(d[key], self.dimensions)
+                processor.update(d[key])
+                feature = processor.vFeature
                 processedData.append((key, feature))
         self.data.extend(processedData)
         self.sources.append(rawDataFile)    # update sources list
 
-    def kNearestNeighborProportions(self, instance, k):
+    def kNearestNeighborProportions(self, instanceFeature, k):
         """Performs a kNN on the model data and returns a dictionary of the vote
         proportions for the k nearest instances. instance should be the same
         type as an element of raw data."""
-        instanceFeature = process.vectorFeature(instance, self.dimensions)
         return knn.kNN(self.data, instanceFeature, k)
 
 

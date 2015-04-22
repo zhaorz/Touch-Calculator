@@ -15,7 +15,8 @@ class Feature(object):
     """This class handles feature extraction of raw touchpad data.
 
     Args:
-        points (list): Raw data from touchpad in (x, y, timestamp) tuples.
+        points (list, optional): Raw data from touchpad in (x, y, timestamp)
+            tuples. Defaults to empty list.
         dimensions (int, optional): Number of dimensions used for vector sum.
             Defaults to 3.
 
@@ -24,7 +25,7 @@ class Feature(object):
         dimensions (int): Number of dimensions used for vector sum.
 
     """
-    def __init__(self, points, dimensions=3):
+    def __init__(self, points=[], dimensions=3):
         self.rawDataPoints = points
         self.dimensions = 3
         self.vFeature = self.process()
@@ -46,6 +47,18 @@ class Feature(object):
         trimmedStrokes = [self.trimPoints(stroke) for stroke in rawStrokes]
         vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
         return self.vectorFeature(vectorStrokes)
+
+    def update(self, rawData):
+        """Reprocesses new data.
+
+        Args:
+            rawData (list): Raw data from touchpad in (x, y, timestamp) tuples.
+
+        Returns: None
+
+        """
+        self.rawDataPoints = rawData
+        self.vFeature = self.process()
 
     def normalize(self, points):
         """Maps points to a 1.0 by 1.0 space.
@@ -282,6 +295,33 @@ class Feature(object):
 
 
 
+################################
+# Misc functions
+################################
+
+
+
+def magnitude((x0, y0), (x1, y1)):
+    return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
+
+def length(v):
+    """Length of a vector in form [x, y, ... , z]."""
+    return (sum(a ** 2 for a in v)) ** 0.5
+
+def dotProduct(v1, v2):
+    """Sum product for the components of v1 and v2. v1 and v2 should have 
+    same dimensions."""
+    if (len(v1) != len(v2)):
+        return None
+    return sum(a * b for a,b in zip(v1, v2))
+
+def angle(v1, v2):
+    """Angle between two vectors of the same dimensions. Return value is between
+    0 and pi"""
+    try:
+        return math.acos(dotProduct(v1, v2) / (length(v1) * length(v2)))
+    except:     # if one of the vectors has length 0
+        return 0.0
 
 
 
@@ -293,47 +333,6 @@ class Feature(object):
 
 
 
-
-
-
-
-#############################  feature creation ################################
-"""
-Raw data --> strokes --> vector strokes --> 3D vector addition --> [x, y, z]
-Raw data enters as a list of (x, y, timestamp) elements
-Output is a list of 3 elements, the endpoint of the vector sum of the character.
-Dimensions are handled by shifting 1 dimension for each stroke, and adding the
-x and y data to those two dimensions in the 3D output.
-"""
-
-# Raw data -> vector feature
-# output type: list [x, y, z, ... ]
-def vectorFeature(points, dimensions):
-    if (dimensions < 2):
-        print "Must have at least 2 dimensions"
-        return -1
-    vectorStrokes = vectorizeCharacter(normalize(points))
-    origin = [0.0 for _ in xrange(dimensions)]
-    k = 0   # starting dimension is x
-    for vectorStroke in vectorStrokes:
-        for vector in vectorStroke:
-            addVectorDimension(vector, origin, k)
-        # shift to adjacent plane
-        k = (k + 1) % dimensions
-    return origin
-
-def addVectorDimension(v, origin, k):
-    """v and origin are vectors of arbitrary dimensions with origin having at
-    least as many dimensions as v. k is the index in origin at which addition
-    of v's components begin. A shift of one dimension to the right occurs
-    after each addition, for all components of v."""
-    if (len(v) > len(origin)):
-        print "Error: v cannot have greater dimensionality than the origin."
-        return -1
-    for vIndex in xrange(len(v)):
-        originIndex = (vIndex + k) % len(origin)
-        origin[originIndex] += v[vIndex]
-    return None
 
 def testAddVectorDimension():
     print "Testing addVectorDimension()... ",
@@ -373,9 +372,6 @@ def testVectorFeatureOnSet():
 ###################################  vector ####################################
 
 
-def magnitude((x0, y0), (x1, y1)):
-    return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
-
 
 def testTrimPoints():
     print "Testing trimPoints()... ",
@@ -389,9 +385,6 @@ def testTrimPoints():
 
 
 
-def length(v):
-    """Length of a vector in form [x, y, ... , z]."""
-    return (sum(a ** 2 for a in v)) ** 0.5
 
 def testLength():
     print "Testing length()... ",
@@ -399,12 +392,6 @@ def testLength():
     assert(almostEqual(length([2,2,2]), (12)**0.5))
     print "Passed!"
 
-def dotProduct(v1, v2):
-    """Sum product for the components of v1 and v2. v1 and v2 should have 
-    same dimensions."""
-    if (len(v1) != len(v2)):
-        return None
-    return sum(a * b for a,b in zip(v1, v2))
 
 def testDotProduct():
     print "Testing dotProduct()... ",
@@ -412,13 +399,6 @@ def testDotProduct():
     assert(dotProduct([0,0,0],[2,1,2]) == 0)
     print "Passed!"
 
-def angle(v1, v2):
-    """Angle between two vectors of the same dimensions. Return value is between
-    0 and pi"""
-    try:
-        return math.acos(dotProduct(v1, v2) / (length(v1) * length(v2)))
-    except:     # if one of the vectors has length 0
-        return 0.0
 
 def testAngle():
     print "Testing angle()... ",
@@ -484,51 +464,6 @@ def testSplitToStrokes():
 # https://www.cs.cmu.edu/~112/notes/hw1.html
 def almostEqual(d1, d2, epsilon=10**-3):
     return abs(d1 - d2) < epsilon
-
-
-################################## normalize ##################################
-
-
-
-# returns data of the given character in dictionary of most recent file
-# for testing
-def loadCharacter(char=None, directory="data"):
-    allData = fileIO.openRecent(directory)
-    firstDictionary = allData[0]
-    if (char == None):      # no key given, just return first element
-        firstKey = sorted(firstDictionary.keys())[0]
-        return firstDictionary[firstKey]
-    elif (char in firstDictionary.keys()):        # data exists
-        return firstDictionary[char]
-
-
-# used for testing
-def drawPoints(points):
-    width = 600
-    height = 600
-    margin = 50
-    window = testCanvas.TestWindow(
-        width=width, height=height, margin=margin, points=points)
-    window.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
