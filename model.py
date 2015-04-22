@@ -1,14 +1,26 @@
 """
 model.py
 ~~~~~~~~~~~~~~~
+Handles data sets used to implement kNN.
 
-Handles addition of new data points to existing knn models.
+Each Model instance keeps track of a set of tuples that relate an instance
+type to a feature vector. New instances can be added from raw data files.
+Additionally, old models can be loaded into new ones. Models can also be saved.
 
-Model instances contain data associated to it's raw data sources. Models contain
-methods that implement knn.
+The main program can call the kNearestNeighborProportions() method to obtain
+a dictionary of vote proportions corresponding to the data in the model. kNN
+implementation is still handled in knn.py.
 
+Example:
 
-All models stored in /model
+    $ python model.py
+    >>> model2 = Model("test_model_2", 3)
+    >>>
+    >>> model2.load("model/test_model_1")
+    >>>
+    >>> instance = [ 0.432, 0.192, 0.416 ]
+    >>> print model2.kNearestNeighborProportions(instance, 5)
+    >>> { 'A': 0.8 , 'B': 0.2 }
 
 """
 
@@ -18,12 +30,20 @@ import fileIO
 import process
 
 
-
 class Model(object):
     """Object that handles a knn character recognition model. 
-    Initialize with a name and the number of dimensions of feature vectors.
-    The data model is stored in self.data."""
+    
+    Args:
+        name (str): String used for saving the model.
+        dimensions (int): Number of deimensions of feature vectors.
+        directory (str, optional): Name of save directory. Defaults to "model"
 
+    Attributes:
+        data (list): Elements are tuples (instance, feature) where instance
+            is the type/classification and feature is a feature vector.
+        sources (list): Elements are str corresponding with the raw data files.
+
+    """
     def __init__(self, name, dimensions, directory="model"):
         self.name = name
         self.dimensions = dimensions
@@ -72,33 +92,5 @@ class Model(object):
 
     def kNearestNeighborProportions(self, instanceFeature, k):
         """Performs a kNN on the model data and returns a dictionary of the vote
-        proportions for the k nearest instances. instance should be the same
-        type as an element of raw data."""
+        proportions for the k nearest instances."""
         return knn.kNN(self.data, instanceFeature, k)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
