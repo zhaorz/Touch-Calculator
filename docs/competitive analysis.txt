@@ -1,13 +1,51 @@
+MyScript Stack
+
+Keyboard app for Apple iPhone. 
+
+Features:
+ - Return key
+ - Backspace key
+ - Space key
+ - Language change
+ - Clean design
+
+Anti-Features:
+ - Doesn’t show recognition confidence for single letters.
+
+https://itunes.apple.com/us/app/myscript-stack-handwriting/id914007100?mt=8
+
+
+
 Apple’s Chinese Character Trackpad Stroke Input
 
-Notes:
-The UI is crazy good. Window shaped like the trackpad. Left side has backspace/space/punctuation. Right side has top 4 recommendations. Obviously extremely accurate. No idea about their implementation. UI strokes look smooth, a little blue point appears where your finger lands.
+Features:
+ - Excellent UI
+    - Window shaped like the trackpad. 
+    - Left side has backspace/space/punctuation. 
+    - Right side has top 4 recommendations. 
+ - Extremely accurate. No idea about their implementation. 
+ - UI strokes look smooth, a little blue point appears where your finger lands.
 
-Analysis:
-Doesn’t seem to exist for English alphabet. No personalization possible.
+Anti-Features:
+ - Not focused for English alphabet
+ - No personalization possible.
 
 
 
+MyScript MathPad
+
+Handwrite complex equations and renders them in LaTeX.
+
+Features:
+ - Exportable to LaTeX or MathML
+ - Recognizes 200 characters and operators
+ - Scratch-out gesture to delete symbols
+ - Redo, undo
+
+Anti-Features:
+ - No zoom
+ - No ability to select from predictions
+ - No ability to learn
 
 
 Online Japanese Character Recognition Using Trajectory-Based Normalization and Direction Feature Extraction
