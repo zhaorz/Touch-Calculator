@@ -1,21 +1,32 @@
 """
 knn.py
 ~~~~~~~~~~~~~~~
+Kth Nearest Neighbors implementation.
 
-Kth Nearest Neighbors.
-
-Call kNN(model, instance, k) on an existing model of training data to classify
+This module contains functions that can be used for kNN classification.
+Call kNN(modelData, instance, k) on an existing modelData of training data to classify
 a new instance based on the k nearest neighbors.
+
+Example:
+    
+    $ python knn.py
+    >>> import model
+    >>> m1 = Model("m1", 3)
+    >>> m1.load("model/test_model_1")
+    >>>
+    >>> instance = [ 0.432, 0.192, 0.416 ]
+    >>> print kNN(m1.data, instance, 5)
+    >>> { 'A': 0.8 , 'B': 0.2 }
 
 """
 
 
-def kNN(model, instance, k):
+def kNN(modelData, instance, k):
     """Returns a dictionary of vote proportions for the kth nearest neighbors
-    of the instance in the model.
+    of the instance in the modelData.
     This is the main function called by other files."""
     n = len(instance)
-    neighbors = allNeighbors(model, instance, n)
+    neighbors = allNeighbors(modelDataData, instance, n)
     kNearest = kNearestNeighbors(neighbors, k)
     return vote(kNearest)
 
@@ -25,13 +36,13 @@ def euclideanDistance(a, b, n):
     d = sum((a[i] - b[i]) ** 2 for i in xrange(n))
     return d ** 0.5
 
-def allNeighbors(model, instance, n):
-    """Returns a list of (sym, distance) tuples of the model set, where
+def allNeighbors(modelData, instance, n):
+    """Returns a list of (sym, distance) tuples of the modelData set, where
     n is the dimenstionality of the instance used to calculate distance and
-    sym is the classification of the model data.
-    The model should be a list of tuples (sym, data)."""
+    sym is the classification of the modelData data.
+    The modelData should be a list of tuples (sym, data)."""
     neighbors = []
-    for (sym, data) in model:
+    for (sym, data) in modelData:
         distance = euclideanDistance(instance, data, n)
         neighbors.append((sym, distance))
     return neighbors
