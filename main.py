@@ -21,7 +21,7 @@ class MainWindow(Animation):
 
     def onInit(self):
         self.windowTitle = "Character Recognition"
-        self.trackpad = MainTrackpad(0, 0, self.width, self.height)
+        self.trackpad = multitouch.VisualTrackpad(0, 0, self.width, self.height)
         self.recognition = Recognition(560, 0, 140, self.height, 4)
 
 
@@ -92,7 +92,7 @@ class Recognition(object):
     def initModel(self):
         """Initializes a Model class for knn"""
         self.knnModel = model.Model("knnModel", 3)        
-        self.knnModel.load("model/test_model_6")        # load test model
+        self.knnModel.load("model/test_model_7")        # load test model
 
     def draw(self, canvas):
         for button in self.buttons:
@@ -187,66 +187,6 @@ class Button(object):
         """Count down click timer."""
         if (self.clickTimer > 0):
             self.clickTimer -= 1
-
-
-
-
-class MainTrackpad(multitouch.Trackpad):
-    """MainTrackpad(x, y, width, height)"""
-
-    def __init__(self, x, y, width, height):
-        super(MainTrackpad, self).__init__()        # call parent __init__
-        self.x = x
-        self.y = y
-        self.width = width
-        self.height = height
-        self.isDrawing = False
-        self.fg = "#666666"             # foreground color: medium grey
-        self.bg = "#e5e6e6"             # background color: light grey
-        self.highlight = "#72bdf6"      # highlight color: bright blue
-
-
-    def draw(self, canvas):
-        x0 = self.x
-        y0 = self.y
-        x1 = self.x + self.width
-        y1 = self.y + self.height
-        canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
-        self.drawToggle(canvas)
-        self.drawData(canvas)
-
-    def drawData(self, canvas):
-        r = 5
-        """
-        # draw the most recent point larger and highlighted
-        if (self.touchData != []):
-            (normx0, normy0, time0) = self.touchData[-1]       # most recent point
-            x0 = self.x + normx0 * self.width
-            y0 = self.y + self.height - normy0 * self.height
-            self.drawDot(canvas, x0, y0, r * 2, self.highlight)
-        """
-        for (normx, normy, timestamp) in self.touchData:
-            x = self.x + normx * self.width
-            y = self.y + self.height - normy * self.height
-            self.drawDot(canvas, x, y, r, self.fg)
-
-
-    def drawToggle(self, canvas):
-        """draws a dot when drawing is active"""
-        if (self.isDrawing == False):
-            return
-        else:
-            color = self.highlight
-        r = 10
-        self.drawDot(canvas, self.x + 2 * r, self.y + 2 * r, r, color)
-
-    def drawDot(self, canvas, cx, cy, r, color):
-        x0 = cx - r
-        x1 = cx + r
-        y0 = cy - r
-        y1 = cy + r
-        canvas.create_oval(x0, y0, x1, y1, fill=color, width=0)
-
 
 
 

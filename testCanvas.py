@@ -1,7 +1,6 @@
 """
 testCanvas.py
 ~~~~~~~~~~~~~~~
-
 Basic implementation of eventBasedAnimation to help with testing.
 
 testCanvas class should be initialized with a single keyword argument

@@ -59,10 +59,7 @@ class MainWindow(Animation):
 
 
     def initTrackpad(self):
-        self.trackpad = DataCollectionTrackpad()
-        self.trackpad.x, self.trackpad.y = 25, 375
-        self.trackpad.width, self.trackpad.height = 415, 300
-        self.trackpad.isDrawing = False
+        self.trackpad = multitouch.VisualTrackpad(25, 375, 415, 300)
     
     def initCharactersDisplay(self):
         # First target set is first set in characterSets
@@ -384,45 +381,6 @@ class InstructionsDisplay(object):
         y = self.y + self.height - 1 * self.margin
         canvas.create_text(self.x, y, anchor="w", text=msg,
                            fill="orange", font="Arial 18 bold")
-
-
-
-# Input trackpad data and draws it
-class DataCollectionTrackpad(multitouch.Trackpad):
-
-    def draw(self, canvas):
-        x0 = self.x
-        y0 = self.y
-        x1 = self.x + self.width
-        y1 = self.y + self.height
-        canvas.create_rectangle(x0, y0, x1, y1, fill="lightgrey", width=0)
-        self.drawToggle(canvas)
-        self.drawData(canvas)
-
-    # draws points in self.touchData in real time
-    def drawData(self, canvas):
-        left = self.x
-        top = self.y
-        r = 6
-        for (normx, normy, timestamp) in self.touchData:
-            x = left + normx * self.width
-            y = top + self.height - normy * self.height
-            self.drawDot(canvas, x, y, r)
-
-    # Green/Red dot corresponding to self.isDrawing
-    def drawToggle(self, canvas):
-        color = 'green' if (self.isDrawing == True) else 'red'
-        r = 10
-        self.drawDot(canvas, self.x + 2 * r, self.y + 2 * r, r, color)
-
-    def drawDot(self, canvas, cx, cy, r, color="#4A4A4A"):
-        x0 = cx - r
-        x1 = cx + r
-        y0 = cy - r
-        y1 = cy + r
-        canvas.create_oval(x0, y0, x1, y1, fill=color, width=0)
-
-
 
 
 
