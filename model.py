@@ -50,6 +50,16 @@ class Model(object):
         self.directory = directory
         self.data = []
         self.sources = []   # keep track of origin of raw data
+        self.initModel()    # attempt to load name
+
+    def initModel(self):
+        if (self.name in os.listdir(self.directory)):
+            # Try loading existing
+            if (self.load(self.directory + os.sep + self.name) != -1):
+                print "Load of " + str(self.name) + " successful."
+                return
+            else:
+                print "Load failed."
 
     def __len__(self):
         """Override default len() function by return length of data list"""
