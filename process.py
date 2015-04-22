@@ -10,6 +10,293 @@ import testCanvas
 import fileIO
 
 
+
+class Feature(object):
+    """This class handles feature extraction of raw touchpad data.
+
+    Args:
+        points (list): Raw data from touchpad in (x, y, timestamp) tuples.
+        dimensions (int, optional): Number of dimensions used for vector sum.
+            Defaults to 3.
+
+    Attributes:
+        rawDataPoints (list): Initial raw data.
+        dimensions (int): Number of dimensions used for vector sum.
+
+    """
+    def __init__(self, points, dimensions=3):
+        self.rawDataPoints = points
+        self.dimensions = 3
+        self.vFeature = self.process()
+
+    def process(self):
+        """Data processing pipeline.
+
+        Normalization -> primative stroke splitting -> stroke trimming ->
+        -> stroke vectorization -> feature creation
+
+        Args: None
+
+        Returns:
+            Vector feature with length self.dimensions
+
+        """
+        normalizedPoints = self.normalize(self.rawDataPoints)
+        rawStrokes = self.primativeSplit(normalizedPoints)
+        trimmedStrokes = [self.trimPoints(stroke) for stroke in rawStrokes]
+        vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
+        return self.vectorFeature(vectorStrokes)
+
+    def normalize(self, points):
+        """Maps points to a 1.0 by 1.0 space.
+
+        Args:
+            points (list): Points in the form (x, y, timestamp)
+
+        Returns:
+            normalizedPoints (list): The normalized points. Points are still
+                in (x, y, timestamp) form.
+
+        """
+        if (points == []):
+            return points
+        ((minX, minY), (maxX, maxY)) = self.findCorners(points)
+        width, height = maxX - minX, maxY - minY
+        width = 1.0 if width == 0.0 else width      # for vert/horz input
+        height = 1.0 if height == 0.0 else height
+        normalizedPoints = []
+        for (x, y, timestamp) in points:
+            x -= minX
+            y -= minY
+            x *= 1.0 / width
+            y *= 1.0 / height
+            normalizedPoints.append((x, y, timestamp))
+        return normalizedPoints
+
+    def findCorners(self, points):
+        """Calculate the bottom left and top right corners of raw data.
+
+        Args:
+            points (list): Points in the form (x, y, timestamp)
+        
+        Returns:
+            (float, float), (float, float)  
+
+        """                   
+        minX = minY = maxX = maxY = None
+        for (x, y, time) in points:
+            if (minX == None or x < minX):
+                minX = x
+            if (maxX == None or x > maxX):
+                maxX = x
+            if (minY == None or y < minY):
+                minY = y
+            if (maxY == None or y > maxY):
+                maxY = y
+        return ((minX, minY), (maxX, maxY))
+
+    def primativeSplit(self, points):
+        """Splits raw data into strokes based on timestamp values.
+
+        Raw data from the multitouch.Trackpad class comes with the system
+        allocated timestamp as the third tuples value. Constructs intermediate
+        lists and keeps track of time separation between adjacent points.
+
+        Args:
+            points (list): A normalized list of (x, y, timestamp) tuples.
+
+        Returns:
+            [stroke, ... ] (2D list): Each element is a list of 
+                (x, y, timestamp) tuples.
+
+        """
+        if (points == []):
+            return [[]]
+        strokes = []
+        newStroke = []
+        for i in xrange(len(points)):
+            # begin a new stroke
+            if (newStroke == []):
+                newStroke.append(points[i])
+            # previous point belongs to same stroke
+            elif (self.isSameStroke(newStroke[-1], points[i]) == True):
+                newStroke.append(points[i])      # only include x and y
+            # start a new stroke
+            else:
+                strokes.append(newStroke)
+                newStroke = [points[i]]
+        if (newStroke != []):   # add last stroke if necessary
+            strokes.append(newStroke)
+        return strokes
+
+    # True if the two datapoints belong on the same stroke, False otherwise
+    def isSameStroke(self, (x1, y1, t1), (x2, y2, t2), epsilon=0.08):
+        """Checks if two points belong on the same stroke.
+
+        Uses timestamp data allocated by the system. Timestamp data does not
+        seem to correspond with system time. Instead, points placed by the 
+        same finger seem to have a timestamp separation of around 0.08.
+
+        Args:
+            x1, y1, t1 (float), (float), (float): Data for point 1. x and y
+                are positional coordinates. t is the timestamp.
+            x2, y2, t2 (float), (float), (float): Data for point 2, see above.
+            epsilon (float, optional): Value that determines stroke membership.
+                Defaults to 0.08.
+
+        Returns:
+            bool: True if the two points belong on the same stroke.
+                False otherwise.
+
+        """
+        if (abs(t1 - t2) <= epsilon):
+            return True
+        else:
+            return False
+
+    def trimPoints(self, points, epsilon=0.02):
+        """Removes points in a stroke that are too close.
+
+        This is meant to improve angle calculation of the vectors that
+        arise from points.
+
+        Args:
+            points (list): Normalized (x, y, timestamp) points from one stroke.
+            epsilon (float, optional): Normalized distance cutoff. 
+                Default is 0.02.
+
+        Returns:
+            trimmedPoints (list): Points of form (x, y) with timestamp removed
+                and any neighbors deemed too close removed.
+
+        """
+        if (points == []):
+            return []
+        trimmedPoints = [points[0]]     # start with first point
+        prev = 0                        # keep track of previous point index
+        for nxt in xrange(1, len(points)):
+            (x0, y0) = points[prev][:2]
+            (x1, y1) = points[ nxt][:2]
+            # points are sufficiently separated: add point and update prev
+            if (magnitude((x0, y0), (x1, y1)) > epsilon):
+                trimmedPoints.append(points[nxt][:2])
+                prev = nxt
+        return trimmedPoints
+
+    def vector(self, points):
+        """Vectorizes points as the component-wise distance between neighbors.
+
+        Args:
+            points (list): Normalized and trimmed (x, y) tuples.
+
+        Returns:
+            List of vectors where each vector is a 2-element list.
+
+            {
+                [(x0, y0), (x1, y1), ... , (x(n), y(n))]
+                --> [[x1 - x0, y1 - y0], ... , (x(n) - x(n-1), y(n) - y(n-1)]]
+            }
+
+        """
+        vectors = []
+        for i in xrange(len(points) - 1):
+            (x0, y0) = points[    i][:2]
+            (x1, y1) = points[i + 1][:2]
+            vectors.append([x1 - x0, y1 - y0])
+        return vectors
+
+    def vectorSplitStroke(self, stroke, n=4, epsilon=math.pi/3):
+        """Split a stroke at it's greatest angle, if the angle exceeds a cutoff.
+
+        Args:
+            stroke (list): Elements are [x, y] vectors.
+            n (int, optional): Distance between 2 observation vectors.
+            epsilon (float, optional): Angle in radians of cutoff angle.
+
+        Returns:
+            [substroke1, substroke2] if the greatest angle surpasses cutoff.
+
+            [stroke] if not.
+
+        """
+        theta = []
+        for i in xrange(1, len(stroke) - n):
+            theta.append(angle(stroke[i], stroke[i + n]))
+        maxAngle = max(theta)
+        if (maxAngle > epsilon):
+            # indecies in theta correspond to index + n / 2 in stroke
+            splitIndex = theta.index(maxAngle) + n / 2
+            return self.splitStroke(stroke, splitIndex)
+        else:
+            return [stroke]
+
+    def splitList(self, L, i):
+        """Splits a list at index i. Returns a list containing the elements
+        after splitting."""
+        return [L[:i], L[i:]]
+
+    def addVectorDimension(self, v, origin, k):
+        """Adds components of a vector to a given starting index in origin.
+
+        Destructively modifies the origin vector.
+
+        Args:
+            v (list): Vector of arbitrary dimensions. [x, y, ... ]
+            origin (list): Vector with at least as many dimensions as v.
+            k (int): Index in origin at which addition of v's components begins.
+
+        Returns: None
+
+        """
+        if (len(v) > len(origin)):
+            print "Error: v cannot have greater dimensionality than the origin."
+            return -1
+        for vIndex in xrange(len(v)):
+            originIndex = (vIndex + k) % len(origin)
+            origin[originIndex] += v[vIndex]
+        return None
+
+    def vectorFeature(self, vectorStrokes):
+        """Creates a vector feature from processed strokes.
+
+        Args:
+            vectorStrokes (3D list): List elements are strokes. Each stroke
+                contains vectors, which are lists.
+
+        Returns:
+            origin (list): Vector with length = self.dimensions
+
+        """
+        if (self.dimensions < 2):
+            print "Must have at least 2 dimensions"
+            return -1
+        origin = [0.0 for _ in xrange(self.dimensions)]
+        k = 0   # starting dimension is x
+        for vectorStroke in vectorStrokes:
+            for vector in vectorStroke:
+                self.addVectorDimension(vector, origin, k)
+            # shift to adjacent plane
+            k = (k + 1) % self.dimensions
+        return origin
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #############################  feature creation ################################
 """
 Raw data --> strokes --> vector strokes --> 3D vector addition --> [x, y, z]
@@ -86,37 +373,8 @@ def testVectorFeatureOnSet():
 ###################################  vector ####################################
 
 
-def vector(points):
-    """vector([(x0, y0), (x1, y1), ... , (x(n), y(n))]) returns
-    [[x1 - x0, y1 - y0], ... , (x(n) - x(n-1), y(n) - y(n-1)]]
-    theta is the angle between two adjacent points.
-    Input is a list of (x, y, timestamp) tuples."""
-    vectors = []
-    for i in xrange(len(points) - 1):
-        (x0, y0) = points[    i][:2]
-        (x1, y1) = points[i + 1][:2]
-        vectors.append([x1 - x0, y1 - y0])
-    return vectors
-
 def magnitude((x0, y0), (x1, y1)):
     return ((x1 - x0) ** 2 + (y1 - y0) ** 2) ** 0.5
-
-def trimPoints(points, epsilon=0.02):
-    """Input is a normalized list of points that form one stroke.
-    Returns a list with points that are within epsilon distance from their
-    preceeding points removed."""
-    if (points == []):
-        return []
-    trimmedPoints = [points[0]]     # start with first point
-    prev = 0
-    for nxt in xrange(1, len(points)):
-        (x0, y0) = points[prev][:2]
-        (x1, y1) = points[ nxt][:2]
-        # points are sufficiently separated: add point and update prev
-        if (magnitude((x0, y0), (x1, y1)) > epsilon):
-            trimmedPoints.append(points[nxt][:2])
-            prev = nxt
-    return trimmedPoints
 
 
 def testTrimPoints():
@@ -182,26 +440,6 @@ def vectorizeCharacter(points):
     return vectors
 
 
-def vectorSplitStroke(stroke, n=4, epsilon=math.pi/3):
-    """Stroke is a list of [x, y] vector tuples. Returns a list that contains
-    the original stroke split at its maximum angle point, if the maximum
-    angle exceeds epsilon. Default is 60 degrees. n is the number of vectors
-    between 2 observation points."""
-
-    theta = []
-    for i in xrange(1, len(stroke) - n):
-        theta.append(angle(stroke[i], stroke[i + n]))
-    maxAngle = max(theta)
-    if (maxAngle > epsilon):
-        # indecies in theta correspond to index + n / 2 in stroke
-        splitIndex = theta.index(maxAngle) + n / 2
-        return splitStroke(stroke, splitIndex)
-    else:
-        return [stroke]
-
-def splitStroke(stroke, i):
-    """Returns a list containing the stroke split at index i."""
-    return [stroke[:i], stroke[i:]]
 
 def testSplitStroke():
     print "Testing splitStroke()... ",
@@ -225,68 +463,9 @@ def testVectorSplitStroke():
 
 
 
-# 2D sum of a list of vectors
-def vectorSum(origin, vectors):
-    for (x, y) in vectors:
-        origin[0] += x
-        origin[1] += y
-    return origin
-
-# Data consists of single strokes
-# test that the vector sum is the same as endpoint - startpoint
-def testVectorSum():
-    print "Testing vectorSum()... ",
-    allData = fileIO.read("testData/vectorSumTestData.txt")
-    data = allData[0]   # first dictionary
-    for key in data.keys():
-        strokes = splitToStrokes(data[key])
-        vectorStrokes = vectorizeCharacter(data[key])
-        # only use one stroke
-        stroke = strokes[0]
-        vector = vectorStrokes[0]
-        start = stroke[0]
-        end = stroke[-1]
-        vectorEndPoint = vectorSum([0.0, 0.0], vector)
-        strokeEndPoint = [end[0] - start[0], end[1] - start[1]]
-        assert(almostEqual(vectorEndPoint[0], strokeEndPoint[0], 0.000001))
-        assert(almostEqual(vectorEndPoint[1], strokeEndPoint[1], 0.000001))
-    print "Passed!"
-
 
 ############################## stroke separation ###############################
 
-
-# Take an array containing raw data of touch points and split
-# into individual strokes (in order). Returns a 2D array consiting
-# of the strokes, where each stroke contains touch points.
-# points is a tuple (x, y, timestamp)
-def splitToStrokes(points):
-    if (points == []):
-        return [[]]
-    strokes = []
-    newStroke = []
-    for i in xrange(len(points)):
-        # begin a new stroke
-        if (newStroke == []):
-            newStroke.append(points[i])
-        # previous point belongs to same stroke
-        elif (isSameStroke(newStroke[-1], points[i]) == True):
-            newStroke.append(points[i])      # only include x and y
-        # start a new stroke
-        else:
-            strokes.append(newStroke)
-            newStroke = [points[i]]
-    if (newStroke != []):   # add last stroke if necessary
-        strokes.append(newStroke)
-    return strokes
-
-# True if the two datapoints belong on the same stroke, False otherwise
-def isSameStroke((x1, y1, timestamp1), (x2, y2, timestamp2)):
-    epsilon = 0.08
-    if (abs(timestamp1 - timestamp2) > epsilon):
-        return False
-    else:
-        return True
 
 
 def testSplitToStrokes():
@@ -310,38 +489,6 @@ def almostEqual(d1, d2, epsilon=10**-3):
 ################################## normalize ##################################
 
 
-# takes array of points and maps it to a 1.0 by 1.0 space
-def normalize(points):
-    if (points == []):
-        return points
-    ((minX, minY), (maxX, maxY)) = findCorners(points)
-    width = maxX - minX
-    height = maxY - minY
-    width = 1.0 if width == 0.0 else width
-    height = 1.0 if height == 0.0 else height
-    normalizedPoints = []
-    for i in xrange(len(points)):
-        (x, y, time) = points[i]
-        x -= minX
-        y -= minY
-        x *= 1.0 / width
-        y *= 1.0 / height
-        normalizedPoints.append((x, y, time))
-    return normalizedPoints
-
-# finds bottom left and top right corners of a list of points
-def findCorners(points):
-    minX = minY = maxX = maxY = None
-    for (x, y, time) in points:
-        if (minX == None or x < minX):
-            minX = x
-        if (maxX == None or x > maxX):
-            maxX = x
-        if (minY == None or y < minY):
-            minY = y
-        if (maxY == None or y > maxY):
-            maxY = y
-    return ((minX, minY), (maxX, maxY))
 
 # returns data of the given character in dictionary of most recent file
 # for testing
