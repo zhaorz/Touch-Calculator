@@ -1,7 +1,18 @@
 """
 process.py
 ~~~~~~~~~~~~~~~
+Handles feature extraction from raw touch data.
 
+The Feature class provides methods for normalization, trimming, stroke
+splitting, and vector feature creation.
+
+Example:
+
+    $ python process.py 
+    >>> processor = Feature()
+    >>> processor.update(rawData)
+    >>> print processor.vFeature
+    >>> [ 0.991239123, 0.7273723721, 0.0212312309 ]
 
 """
 
@@ -46,7 +57,8 @@ class Feature(object):
         rawStrokes = self.primativeSplit(normalizedPoints)
         trimmedStrokes = [self.trimPoints(stroke) for stroke in rawStrokes]
         vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
-        return self.vectorFeature(vectorStrokes)
+        vectorSplit = self.vectorSplitCharacter(vectorStrokes)
+        return self.vectorFeature(vectorSplit)
 
     def update(self, rawData):
         """Reprocesses new data.
@@ -218,7 +230,22 @@ class Feature(object):
             vectors.append([x1 - x0, y1 - y0])
         return vectors
 
-    def vectorSplitStroke(self, stroke, n=4, epsilon=math.pi/3):
+    def vectorSplitCharacter(self, strokes):
+        """Apply a vector split to each stroke in a list of strokes.
+
+        Args:
+            strokes (3D list): Elements are lists of vectors.
+
+        Returns:
+            3D list of at least the same number of strokes.
+
+        """
+        vectorSplitStrokes = []
+        for stroke in strokes:
+            vectorSplitStrokes.extend(self.vectorSplit(stroke))
+        return vectorSplitStrokes
+
+    def vectorSplit(self, stroke, n=4, epsilon=math.pi/3):
         """Split a stroke at it's greatest angle, if the angle exceeds a cutoff.
 
         Args:
@@ -235,11 +262,11 @@ class Feature(object):
         theta = []
         for i in xrange(1, len(stroke) - n):
             theta.append(angle(stroke[i], stroke[i + n]))
-        maxAngle = max(theta)
+        maxAngle = max(theta) if theta != [] else 0.0
         if (maxAngle > epsilon):
             # indecies in theta correspond to index + n / 2 in stroke
             splitIndex = theta.index(maxAngle) + n / 2
-            return self.splitStroke(stroke, splitIndex)
+            return self.splitList(stroke, splitIndex)
         else:
             return [stroke]
 
@@ -294,7 +321,6 @@ class Feature(object):
 
 
 
-
 ################################
 # Misc functions
 ################################
@@ -322,149 +348,3 @@ def angle(v1, v2):
         return math.acos(dotProduct(v1, v2) / (length(v1) * length(v2)))
     except:     # if one of the vectors has length 0
         return 0.0
-
-
-
-
-
-
-
-
-
-
-
-
-def testAddVectorDimension():
-    print "Testing addVectorDimension()... ",
-    origin = [0, 0, 0]
-    addVectorDimension([1, 1], origin, 0)
-    assert(origin == [1, 1, 0])
-    addVectorDimension([1, 1], origin, 1)
-    assert(origin == [1, 2, 1])
-    addVectorDimension([-1, -2], origin, 2)
-    assert(origin == [-1, 2, 0])
-    assert(addVectorDimension([0, 0, 0, 0], origin, 1) == -1)
-    print "Passed!"
-
-
-def testVectorFeature():
-    # output process3D for 7 characters
-    # all 7 characters are A's
-    print "Testing vectorFeature()... "
-    allData = fileIO.read("testData/AAAAAAA.txt")
-    data = allData[0]
-    for key in data.keys():
-        print vectorFeature(data[key], 3)
-    print "Passed!"
-
-def testVectorFeatureOnSet():
-    # output vectorFeature() for 7 arbitrary characters
-    print "Testing vectorFeature()... "
-    allData = fileIO.openRecent("data")
-    data = allData[0]   # only take first set
-    for key in data.keys():
-        print str(key) + ": " + str(vectorFeature(data[key], 3))
-    print "Passed!"
-
-
-
-
-###################################  vector ####################################
-
-
-
-def testTrimPoints():
-    print "Testing trimPoints()... ",
-    points = fileIO.read("testData/AAAAAAA.txt")[0]['A']
-    trimmed = trimPoints(points)
-    print trimmed
-    print "Initial length", len(points), "Final length:", len(trimmed)
-    testCanvas.TestWindowPoints(trimmed).run()
-
-
-
-
-
-
-def testLength():
-    print "Testing length()... ",
-    assert(almostEqual(length([1,1,1]), (3)**0.5))
-    assert(almostEqual(length([2,2,2]), (12)**0.5))
-    print "Passed!"
-
-
-def testDotProduct():
-    print "Testing dotProduct()... ",
-    assert(dotProduct([3,4,5],[2,1,2]) == 6 + 4 + 10)
-    assert(dotProduct([0,0,0],[2,1,2]) == 0)
-    print "Passed!"
-
-
-def testAngle():
-    print "Testing angle()... ",
-    assert(almostEqual(angle([1,0],[0,1]), math.pi / 2))
-    assert(almostEqual(angle([1,0],[1,0]), 0.0))
-    assert(almostEqual(angle([1,0],[-1,0]), math.pi))
-    assert(almostEqual(angle([1,0],[0,0]), 0.0))
-    print "Passed!"
-
-
-
-
-def vectorizeCharacter(points):
-    strokes = splitToStrokes(points)
-    vectors = []
-    for stroke in strokes:
-        trimmedStroke = trimPoints(stroke)
-        vectors.append(vector(trimmedStroke))
-    return vectors
-
-
-
-def testSplitStroke():
-    print "Testing splitStroke()... ",
-    assert(splitStroke([0,1,2,3,4,5], 3) == [[0,1,2],[3,4,5]])
-    print "Passed!"
-
-
-def testVectorSplitStroke():
-    allData = fileIO.read("testData/AAAAAAA.txt")
-    d = allData[0]
-    for key in d.keys():
-        charData = d[key]
-        vectorStrokes = vectorizeCharacter(charData)
-        splitStrokes = []
-        for stroke in vectorStrokes:
-            splitStrokes.extend(vectorSplitStroke(stroke))
-        print key, len(splitStrokes)
-    
-
-
-
-
-
-
-############################## stroke separation ###############################
-
-
-
-def testSplitToStrokes():
-    print "Testing splitToStrokes()... ",
-    # This file only contains one dictionary with 7 keys
-    allData = fileIO.read("testData/ABCDEF7.txt")
-    firstDictionary = allData[0]
-    strokes = {"A": 2, "B": 2, "C": 1, "D": 2, "E": 4, "F": 3, "7": 1}
-    for char in strokes.keys():
-        charData = firstDictionary[char]
-        strokeData = splitToStrokes(charData)
-        assert(len(strokeData) == strokes[char])
-    print "Passed!"
-
-# from 15-112 hw1 starter code
-# https://www.cs.cmu.edu/~112/notes/hw1.html
-def almostEqual(d1, d2, epsilon=10**-3):
-    return abs(d1 - d2) < epsilon
-
-
-
-

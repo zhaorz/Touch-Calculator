@@ -91,8 +91,8 @@ class Recognition(object):
 
     def initModel(self):
         """Initializes a Model class for knn"""
-        self.knnModel = model.Model("knnModel", 4)        
-        self.knnModel.load("model/test_model_5")        # load test model
+        self.knnModel = model.Model("knnModel", 3)        
+        self.knnModel.load("model/test_model_6")        # load test model
 
     def draw(self, canvas):
         for button in self.buttons:
