@@ -41,10 +41,6 @@ class Feature(object):
         self.rawDataPoints = points
         self.vecDimensions = 3
         self.dimensions = self.vecDimensions + 1
-        self.vecFeature = [0.0 for _ in xrange(self.vecDimensions)]
-        self.lenFeature = 0.0
-        self.feature = self.vecFeature + [self.lenFeature]
-        self.feature = self.normalizeVector(self.feature)
         self.process()
 
     def process(self):
@@ -65,8 +61,8 @@ class Feature(object):
         vectorSplit = self.vectorSplitCharacter(vectorStrokes)
         self.vecFeature = self.vectorFeature(vectorSplit)
         self.lenFeature = self.lengthFeature(vectorSplit)
-        self.feature = self.vecFeature + [self.lenFeature]
-        self.feature = self.normalizeVector(self.feature)
+        self.feature = self.vecFeature + [sigmoid(self.lenFeature)]
+        #self.feature = self.normalizeVector(self.feature)
 
     def update(self, rawData):
         """Reprocesses new data.
