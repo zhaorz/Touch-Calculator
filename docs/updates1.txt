@@ -1,0 +1,51 @@
+1b6e44b - Wed Apr 22 19:39:50 2015 -0400 : Extended competitive analysis.txt
+5e32958 - Wed Apr 22 16:03:58 2015 -0400 : Added data
+637e80d - Wed Apr 22 15:36:44 2015 -0400 : Improved main load function
+d0e52f5 - Wed Apr 22 15:32:34 2015 -0400 : Changed model load function
+bbdecb9 - Wed Apr 22 15:23:54 2015 -0400 : Added length feature
+2017130 - Wed Apr 22 12:32:33 2015 -0400 : Documented knn.py
+940fd03 - Wed Apr 22 12:22:26 2015 -0400 : Docmentation of model.py
+ca84330 - Wed Apr 22 11:14:50 2015 -0400 : Beta feature branch
+2a8f28d - Wed Apr 22 10:14:37 2015 -0400 : Refactored all trackpad drawing to multitouch.py
+02248bd - Wed Apr 22 10:00:27 2015 -0400 : Refactored process.py test cases
+7e49200 - Wed Apr 22 00:51:44 2015 -0400 : Major process.py refactoring
+c0bea11 - Wed Apr 22 00:26:59 2015 -0400 : Major refactoring process.py
+a82c6a9 - Tue Apr 21 23:10:28 2015 -0400 : Modified testCanvas to draw different types of (x, y, [...]) tuples
+b9df701 - Tue Apr 21 22:48:44 2015 -0400 : Refactored knn.py tests to tests.py
+03d3457 - Tue Apr 21 22:40:19 2015 -0400 : Added todo list
+1e07843 - Tue Apr 21 16:21:08 2015 -0400 : removed ideas.txt
+d6f902c - Tue Apr 21 16:09:44 2015 -0400 : removed vector.py
+eff227e - Sun Apr 19 16:46:01 2015 -0400 : Stroke splitting at hard angles, improved model save/load, main at d = 4
+6c1dd61 - Sun Apr 19 16:21:46 2015 -0400 : Added vector angle based stroke splitting
+5d91ae5 - Sun Apr 19 12:50:46 2015 -0400 : Process fixed for arbitrary feature length
+3831f80 - Sat Apr 18 17:38:46 2015 -0400 : Fixed buttons in main, started refactoring process
+1a5dd30 - Fri Apr 17 19:05:34 2015 -0400 : Added main
+dfe3d52 - Thu Apr 16 16:47:08 2015 -0400 : Created model class, cleaned up old files, some refactoring
+ee64de8 - Wed Apr 15 02:50:23 2015 -0400 : Readme
+e102bc5 - Wed Apr 15 02:42:26 2015 -0400 : Added docs
+ddb5262 - Tue Apr 14 20:09:43 2015 -0400 : Revised multitouch
+4ccde5a - Tue Apr 14 13:27:35 2015 -0400 : Cleaned up multitouch, reduced module dependency to ctypes
+fe8f301 - Sun Apr 12 18:07:21 2015 -0400 : 3D processing working
+44226e4 - Sun Apr 12 02:18:32 2015 -0400 : Vector functions, tests
+711975e - Thu Apr 9 22:39:57 2015 -0400 : fileIO, normalization, testCanvas refactor
+241aa87 - Thu Apr 9 16:19:39 2015 -0400 : Started working on processing code
+b755f85 - Tue Apr 7 00:27:29 2015 -0400 : Data collection program operational
+50d09b7 - Mon Apr 6 01:14:10 2015 -0400 : Data collection: added save feature, instructions
+283181c - Sun Apr 5 19:14:34 2015 -0400 : Data collection program started, refactoring
+275a555 - Fri Apr 3 00:39:10 2015 -0400 : Added dimensionalize
+2915b91 - Sun Mar 15 16:11:06 2015 -0400 : Additions to main, featureDetection, sample data
+b74dcc8 - Sat Mar 14 19:45:49 2015 -0400 : concavity feature detector, bug fixes
+89721f5 - Sat Mar 14 18:04:06 2015 -0400 : Added feature detection tests, testCanvas, fixed bugs in feature detection
+0c261c8 - Sat Mar 14 12:56:27 2015 -0400 : Modified multitouch, added featuredetection file
+eca22d1 - Tue Mar 10 19:39:05 2015 -0400 : Created gui, modified trackpad class
+58690a7 - Tue Mar 10 18:18:53 2015 -0400 : Restructured directory
+aaf649f - Tue Mar 10 18:18:19 2015 -0400 : Added custom trackpad class and restructured directory
+999e756 - Tue Mar 10 18:16:05 2015 -0400 : Added customized trackpad class
+fb53f0f - Mon Mar 9 19:51:54 2015 -0400 : Added trackpad files
+7875258 - Mon Feb 23 11:44:29 2015 -0500 : Updated timelog
+162b78c - Fri Feb 20 21:12:40 2015 -0500 : added time calculating script
+8403fa8 - Fri Feb 20 00:49:32 2015 -0500 : Added trackpad practice
+2793517 - Thu Feb 19 10:10:52 2015 -0500 : Added new directories
+3c4b05f - Thu Feb 19 10:09:40 2015 -0500 : Added Kivy practice and misc practice
+93b2b72 - Wed Feb 18 12:35:26 2015 -0500 : Added changelog and timelog
+d94899e - Wed Feb 18 12:28:11 2015 -0500 : Initial commit

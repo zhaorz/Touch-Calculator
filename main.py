@@ -23,6 +23,7 @@ class MainWindow(Animation):
         self.windowTitle = "Character Recognition"
         self.trackpad = multitouch.VisualTrackpad(0, 0, self.width, self.height)
         self.recognition = Recognition(560, 0, 140, self.height, 4)
+        #self.settings = Panel(0, 0, 140, self.height, 4)
 
 
 
@@ -40,6 +41,7 @@ class MainWindow(Animation):
     def onDraw(self, canvas):
         self.trackpad.draw(canvas)
         self.recognition.draw(canvas)
+        #self.settings.draw(canvas)
 
 
 
@@ -61,37 +63,24 @@ class MainWindow(Animation):
     def onQuit(self): pass
 
 
+class Panel(object):
 
-
-class Recognition(object):
-    """Recognition(x, y, width, height, n)
-    n is the number of suggestion boxes"""
-
-    def __init__(self, x, y, width, height, n):
+    def __init__(self, x, y, width, height, numPanels):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.n = n
+        self.numPanels = numPanels
         self.initButtons()
-        self.initModel()
-        self.instanceData = []          # data to be classified
-        self.processor = process.Feature()
-        self.proportions = dict()
-
+    
     def initButtons(self):
-        """Initializes n suggestion boxes"""
         self.buttons = []
         x0 = self.x
         width = self.width
-        height = self.height / self.n
-        for i in xrange(self.n):
+        height = self.height / self.numPanels
+        for i in xrange(self.numPanels):
             y0 = height * i
             self.buttons.append(Button(x0, y0, width, height))
-
-    def initModel(self):
-        """Initializes a Model class for knn"""
-        self.knnModel = model.Model("test_model_10", 4)        
 
     def draw(self, canvas):
         for button in self.buttons:
@@ -101,10 +90,33 @@ class Recognition(object):
     def drawLines(self, canvas):
         """Draws separators"""
         x0, x1 = self.x, self.x + self.width
-        buttonHeight = self.height / self.n
-        for i in xrange(1, self.n):
+        buttonHeight = self.height / self.numPanels
+        for i in xrange(1, self.numPanels):
             y = buttonHeight * i
             canvas.create_line(x0, y, x1, y, fill="lightgrey")
+    
+    def onMouse(self, event):
+        for button in self.buttons:
+            button.intersect(event.x, event.y)
+
+
+
+
+
+class Recognition(Panel):
+    """Recognition(x, y, width, height, n)
+    n is the number of suggestion boxes"""
+
+    def __init__(self, x, y, width, height, numPanels):
+        super(Recognition, self).__init__(x, y, width, height, numPanels)
+        self.initModel()
+        self.instanceData = []          # data to be classified
+        self.processor = process.Feature()
+        self.proportions = dict()
+
+    def initModel(self):
+        """Initializes a Model class for knn"""
+        self.knnModel = model.Model("test_model_11", 5)        
 
     def step(self):
         """Perform knn on the current instanceData"""
@@ -119,20 +131,15 @@ class Recognition(object):
     def updateLabels(self):
         """Finds the top n matches in self.proportions and sets the correct
         box labeling."""
-        labels = knn.topNClasses(self.proportions, self.n)
+        labels = knn.topNClasses(self.proportions, self.numPanels)
         for i in xrange(len(labels)):
             label, subLabel = labels[i]
             self.buttons[i].label = label
             self.buttons[i].subLabel = subLabel
         # reset remaining labels
-        for i in xrange(len(labels), self.n):
+        for i in xrange(len(labels), self.numPanels):
             self.buttons[i].label = ""
             self.buttons[i].subLabel = ""
-
-
-    def onMouse(self, event):
-        for button in self.buttons:
-            button.intersect(event.x, event.y)
 
 
 

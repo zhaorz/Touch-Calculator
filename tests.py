@@ -6,6 +6,9 @@ Contains test code for other files, along with non-critical code.
 """
 
 
+import fileIO
+
+
 ###################################
 # knn.py
 ###################################
@@ -160,6 +163,42 @@ def testAngle():
     assert(almostEqual(process.angle([1,0],[0,0]), 0.0))
     print "Passed!"
 
+def testCurvatureFeature():
+    print "Testing curvatureFeature()... "
+    processor = process.Feature()
+    print "Testing straight lines..."
+    allData = fileIO.read("testData/straightLines.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        rawStrokes = processor.primativeSplit(normalizedPoints)
+        trimmedStrokes = [processor.trimPoints(stroke) for stroke in rawStrokes]
+        vectorStrokes = [processor.vector(stroke) for stroke in trimmedStrokes]
+        vectorSplit = processor.vectorSplitCharacter(vectorStrokes)
+        print "    " + key + ": " + str(processor.curvatureFeature(vectorSplit))
+    print "Testing ABCDEF7..."
+    allData = fileIO.read("testData/ABCDEF7.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        rawStrokes = processor.primativeSplit(normalizedPoints)
+        trimmedStrokes = [processor.trimPoints(stroke) for stroke in rawStrokes]
+        vectorStrokes = [processor.vector(stroke) for stroke in trimmedStrokes]
+        vectorSplit = processor.vectorSplitCharacter(vectorStrokes)
+        print "    " + key + ": " + str(processor.curvatureFeature(vectorSplit))
+    print "Testing 0U32896..."
+    allData = fileIO.read("testData/0U32896.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        rawStrokes = processor.primativeSplit(normalizedPoints)
+        trimmedStrokes = [processor.trimPoints(stroke) for stroke in rawStrokes]
+        vectorStrokes = [processor.vector(stroke) for stroke in trimmedStrokes]
+        vectorSplit = processor.vectorSplitCharacter(vectorStrokes)
+        print "    " + key + ": " + str(processor.curvatureFeature(vectorSplit))
 
 
 

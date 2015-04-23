@@ -40,7 +40,7 @@ class Feature(object):
     def __init__(self, points=[], vecDimensions=3):
         self.rawDataPoints = points
         self.vecDimensions = 3
-        self.dimensions = self.vecDimensions + 1
+        self.dimensions = self.vecDimensions + 2
         self.process()
 
     def process(self):
@@ -61,7 +61,9 @@ class Feature(object):
         vectorSplit = self.vectorSplitCharacter(vectorStrokes)
         self.vecFeature = self.vectorFeature(vectorSplit)
         self.lenFeature = self.lengthFeature(vectorSplit)
-        self.feature = self.vecFeature + [sigmoid(self.lenFeature)]
+        self.curvFeature = self.curvatureFeature(vectorSplit)
+        self.feature = (self.vecFeature + [sigmoid(self.lenFeature)] + 
+            [sigmoid(self.curvFeature)])
         #self.feature = self.normalizeVector(self.feature)
 
     def update(self, rawData):
@@ -293,6 +295,30 @@ class Feature(object):
         """Splits a list at index i. Returns a list containing the elements
         after splitting."""
         return [L[:i], L[i:]]
+
+    def curvatureFeature(self, strokes):
+        """Calculates overall curvature of a list of strokes.
+
+        Weights each angle by multiplying by the magnitude of the vector
+        squared. This is to prevent extremely small deviations from
+        incorrectly inflating the value.
+
+        Args:
+            strokes (3D list): Each element is a stroke. Each stroke is a list
+                of vectors.
+
+        Returns:
+            float: The sum of the changes in angles among all the vectors.
+
+        """
+        theta = 0.0
+        weightedTheta = 0.0
+        for stroke in strokes:
+            for i in xrange(len(stroke) - 1):
+                a = abs(angle(stroke[i], stroke[i + 1]))
+                l = length(stroke[i])
+                weightedTheta += a * l ** 2
+        return weightedTheta * 100.0
 
     def addVectorDimension(self, v, origin, k):
         """Adds components of a vector to a given starting index in origin.
