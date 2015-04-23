@@ -23,7 +23,7 @@ class MainWindow(Animation):
         self.windowTitle = "Character Recognition"
         self.trackpad = multitouch.VisualTrackpad(0, 0, self.width, self.height)
         self.recognition = Recognition(560, 0, 140, self.height, 4)
-        #self.settings = Panel(0, 0, 140, self.height, 4)
+        self.settings = Settings(0, 0, 140, self.height, 4)
 
 
 
@@ -41,7 +41,7 @@ class MainWindow(Animation):
     def onDraw(self, canvas):
         self.trackpad.draw(canvas)
         self.recognition.draw(canvas)
-        #self.settings.draw(canvas)
+        self.settings.draw(canvas)
 
 
 
@@ -98,6 +98,27 @@ class Panel(object):
     def onMouse(self, event):
         for button in self.buttons:
             button.intersect(event.x, event.y)
+
+
+class Settings(Panel):
+
+    def __init__(self, x, y, width, height, numPanels):
+        super(Settings, self).__init__(x, y, width, height, numPanels)
+        self.initButtonLabels()
+
+    def initButtonLabels(self):
+        self.buttons[0].label = "clear"
+        self.buttons[1].label = "_"
+
+    def draw(self, canvas):
+        super(Settings, self).draw(canvas)
+        self.drawDivider(canvas)
+
+    def drawDivider(self, canvas):
+        x = self.x + self.width
+        y0 = self.y
+        y1 = y0 + self.height
+        canvas.create_line(x, y0, x, y1, fill="lightgrey", width=2)
 
 
 

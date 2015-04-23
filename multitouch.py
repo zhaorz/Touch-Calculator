@@ -144,6 +144,7 @@ class VisualTrackpad(Trackpad):
         isDrawing (bool): True if currently receiving input, False otherwise.
         fg (str): foreground color
         bg (str): background color
+        active (str): active trackpad color
         highlight (str): highlight color
 
     """
@@ -154,8 +155,9 @@ class VisualTrackpad(Trackpad):
         self.width = width
         self.height = height
         self.isDrawing = False
-        self.fg = "#666666"             
-        self.bg = "#e5e6e6"            
+        self.fg = "#666666"
+        self.bg = "#e5e6e6"
+        self.active = "#cae2ed"
         self.highlight = "#72bdf6"     
 
     def draw(self, canvas):
@@ -163,8 +165,8 @@ class VisualTrackpad(Trackpad):
         y0 = self.y
         x1 = self.x + self.width
         y1 = self.y + self.height
-        canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
-        self.drawToggle(canvas)
+        color = self.bg if self.isDrawing == False else self.active
+        canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
         self.drawData(canvas)
 
     def drawData(self, canvas):
@@ -181,15 +183,6 @@ class VisualTrackpad(Trackpad):
             x = self.x + normx * self.width
             y = self.y + self.height - normy * self.height
             self.drawDot(canvas, x, y, r, self.fg)
-
-    def drawToggle(self, canvas):
-        """draws a dot when drawing is active"""
-        if (self.isDrawing == False):
-            return
-        else:
-            color = self.highlight
-        r = 10
-        self.drawDot(canvas, self.x + 2 * r, self.y + 2 * r, r, color)
 
     def drawDot(self, canvas, cx, cy, r, color):
         x0 = cx - r
