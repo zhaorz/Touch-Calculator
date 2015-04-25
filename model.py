@@ -7,7 +7,7 @@ Each Model instance keeps track of a set of tuples that relate an instance
 type to a feature vector. New instances can be added from raw data files.
 Additionally, old models can be loaded into new ones. Models can also be saved.
 
-The main program can call the kNearestNeighborProportions() method to obtain
+The main program can call the modelKNN() method to obtain
 a dictionary of vote proportions corresponding to the data in the model. kNN
 implementation is still handled in knn.py.
 
@@ -19,7 +19,7 @@ Example:
     >>> model2.load("model/test_model_1")
     >>>
     >>> instance = [ 0.432, 0.192, 0.416 ]
-    >>> print model2.kNearestNeighborProportions(instance, 5)
+    >>> print model2.modelKNN(instance, 5)
     >>> { 'A': 0.8 , 'B': 0.2 }
 
 """
@@ -100,7 +100,7 @@ class Model(object):
         self.data.extend(processedData)
         self.sources.append(rawDataFile)    # update sources list
 
-    def kNearestNeighborProportions(self, instanceFeature, k):
+    def modelKNN(self, instanceFeature, k):
         """Performs a kNN on the model data and returns a dictionary of the vote
         proportions for the k nearest instances."""
         return knn.kNN(self.data, instanceFeature, k)

@@ -21,8 +21,8 @@ class MainWindow(Animation):
 
     def onInit(self):
         self.windowTitle = "Character Recognition"
-        self.trackpad = multitouch.VisualTrackpad(140, 0, 560, self.height)
-        self.recognition = Recognition(700, 0, 140, self.height, 4)
+        self.trackpad = RecognitionTrackpad(140, 0, 560, self.height)
+        self.recognition = Panel(700, 0, 140, self.height, 4)
         self.settings = Settings(0, 0, 140, self.height, 4)
 
 
@@ -46,9 +46,31 @@ class MainWindow(Animation):
 
 
     def onStep(self):
-        self.recognition.instanceData = self.trackpad.touchData
-        self.recognition.step()
-        
+        self.trackpad.step()
+        self.updateButtonLabels(self.trackpad.results, self.recognition)
+    
+
+
+    def updateButtonLabels(self, newLabels, panel):
+        """Finds the correct labels in newLabels and updates panel buttons.
+
+        Args:
+            newLabels (dict): Dictionary of label:confidence pairs.
+            panel (Panel): The panel whose buttons are being updated.
+
+        Returns: None
+
+        """
+        labels = knn.topNClasses(newLabels, self.recognition.numPanels)
+        for i in xrange(len(labels)):
+            label, subLabel = labels[i]
+            panel.buttons[i].label = label
+            panel.buttons[i].subLabel = subLabel
+        # reset remaining labels
+        for i in xrange(len(labels), self.recognition.numPanels):
+            panel.buttons[i].label = ""
+            panel.buttons[i].subLabel = ""
+
     
 
 
@@ -61,6 +83,22 @@ class MainWindow(Animation):
     def onMouseDrag(self, event): pass
     def onKeyRelease(self, event): pass
     def onQuit(self): pass
+
+
+class RecognitionTrackpad(multitouch.VisualTrackpad):
+
+    def __init__(self, x, y, width, height):
+        super(RecognitionTrackpad, self).__init__(x, y, width, height)
+        self.processor = process.Feature()
+        self.recogModel = model.Model("test_model_11", 5)
+        self.results = dict()
+
+    def step(self):
+        """Perform knn on the current instanceData"""
+        k = 10      # use 10 nearest points
+        self.processor.update(self.touchData)
+        instance = self.processor.feature
+        self.results = self.recogModel.modelKNN(instance, k)
 
 
 class Panel(object):
@@ -124,46 +162,7 @@ class Settings(Panel):
 
 
 
-class Recognition(Panel):
-    """Recognition(x, y, width, height, n)
-    n is the number of suggestion boxes"""
-
-    def __init__(self, x, y, width, height, numPanels):
-        super(Recognition, self).__init__(x, y, width, height, numPanels)
-        self.initModel()
-        self.instanceData = []          # data to be classified
-        self.processor = process.Feature()
-        self.proportions = dict()
-
-    def initModel(self):
-        """Initializes a Model class for knn"""
-        self.knnModel = model.Model("test_model_11", 5)        
-
-    def step(self):
-        """Perform knn on the current instanceData"""
-        k = 10      # use 10 nearest points
-        self.processor.update(self.instanceData)
-        instance = self.processor.feature
-        self.proportions = self.knnModel.kNearestNeighborProportions(instance, k)
-        self.updateLabels()
-        for button in self.buttons:
-            button.step()
-
-    def updateLabels(self):
-        """Finds the top n matches in self.proportions and sets the correct
-        box labeling."""
-        labels = knn.topNClasses(self.proportions, self.numPanels)
-        for i in xrange(len(labels)):
-            label, subLabel = labels[i]
-            self.buttons[i].label = label
-            self.buttons[i].subLabel = subLabel
-        # reset remaining labels
-        for i in xrange(len(labels), self.numPanels):
-            self.buttons[i].label = ""
-            self.buttons[i].subLabel = ""
-
-
-
+    
 
 
 

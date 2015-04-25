@@ -31,8 +31,9 @@ class Feature(object):
         dimensions (int, optional): Number of dimensions used for vector sum.
             Defaults to 3.
 
-    Attributes:
+    Public Attributes:
         rawDataPoints (list): Initial raw data.
+        rawStrokes (list): Primative stroke separation.
         vecDimensions (int): Number of dimensions used for vector sum.
         feature (list): Output feature of processing.
 
@@ -55,8 +56,8 @@ class Feature(object):
 
         """
         normalizedPoints = self.normalizePoints(self.rawDataPoints)
-        rawStrokes = self.primativeSplit(normalizedPoints)
-        trimmedStrokes = [self.trimPoints(stroke) for stroke in rawStrokes]
+        self.rawStrokes = self.primativeSplit(normalizedPoints)
+        trimmedStrokes = [self.trimPoints(stroke) for stroke in self.rawStrokes]
         vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
         vectorSplit = self.vectorSplitCharacter(vectorStrokes)
         self.vecFeature = self.vectorFeature(vectorSplit)

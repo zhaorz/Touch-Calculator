@@ -221,5 +221,8 @@ Wed Apr 22 22:00:40 EDT 2015
 Thu Apr 23 01:08:44 EDT 2015
 
 Fri Apr 24 22:43:40 EDT 2015
+-main window resizing
 Fri Apr 24 23:14:54 EDT 2015
+
+Sat Apr 25 16:02:32 EDT 2015
 
