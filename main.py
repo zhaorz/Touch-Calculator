@@ -21,8 +21,8 @@ class MainWindow(Animation):
 
     def onInit(self):
         self.windowTitle = "Character Recognition"
-        self.trackpad = multitouch.VisualTrackpad(0, 0, self.width, self.height)
-        self.recognition = Recognition(560, 0, 140, self.height, 4)
+        self.trackpad = multitouch.VisualTrackpad(140, 0, 560, self.height)
+        self.recognition = Recognition(700, 0, 140, self.height, 4)
         self.settings = Settings(0, 0, 140, self.height, 4)
 
 
@@ -221,7 +221,7 @@ class Button(object):
 
 
 
-width = 700
+width = 840
 height = 400
 margin = 25
 timerDelay = 64
