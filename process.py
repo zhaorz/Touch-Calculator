@@ -311,7 +311,6 @@ class Feature(object):
             float: The sum of the changes in angles among all the vectors.
 
         """
-        theta = 0.0
         weightedTheta = 0.0
         for stroke in strokes:
             for i in xrange(len(stroke) - 1):

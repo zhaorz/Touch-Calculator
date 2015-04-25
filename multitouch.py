@@ -184,6 +184,19 @@ class VisualTrackpad(Trackpad):
             y = self.y + self.height - normy * self.height
             self.drawDot(canvas, x, y, r, self.fg)
 
+    def drawDataLine(self, canvas):
+        for i in xrange(len(self.touchData) - 1):
+            (normx0, normy0, time0) = self.touchData[i]
+            (normx1, normy1, time1) = self.touchData[i + 1]
+            x0 = self.x + normx0 * self.width
+            y0 = self.y + self.height - normy0 * self.height
+            x1 = self.x + normx1 * self.width
+            y1 = self.y + self.height - normy1 * self.height
+            canvas.create_line(x0, y0, x1, y1, fill=self.fg, width=5)
+
+
+
+
     def drawDot(self, canvas, cx, cy, r, color):
         x0 = cx - r
         x1 = cx + r
