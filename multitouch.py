@@ -194,12 +194,18 @@ class VisualTrackpad(Trackpad):
             y1 = self.y + self.height - normy1 * self.height
             canvas.create_line(x0, y0, x1, y1, fill=self.fg, width=5)
 
-
-
-
     def drawDot(self, canvas, cx, cy, r, color):
         x0 = cx - r
         x1 = cx + r
         y0 = cy - r
         y1 = cy + r
         canvas.create_oval(x0, y0, x1, y1, fill=color, width=0)
+
+    def start(self):
+        super(VisualTrackpad, self).start()
+        self.isDrawing = True
+
+    def stop(self):
+        super(VisualTrackpad, self).stop()
+        self.isDrawing = False
+

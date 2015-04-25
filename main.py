@@ -15,6 +15,8 @@ import time
 import knn
 import process
 
+import mouse
+
 
 
 class MainWindow(Animation):
@@ -24,10 +26,13 @@ class MainWindow(Animation):
         self.trackpad = RecognitionTrackpad(140, 0, 560, self.height)
         self.recognition = Panel(700, 0, 140, self.height, 4)
         self.settings = Settings(0, 0, 140, self.height, 4)
+        self.trackpad.start()
 
 
 
     def onKey(self, event):
+        return
+
         if (event.keysym == "space"):
             if (self.trackpad.isDrawing == False):
                 self.trackpad.isDrawing = True
@@ -52,6 +57,12 @@ class MainWindow(Animation):
         self.settings.step()
         self.recognition.step()
         self.updateButtonClick()
+        self.controlMouse()
+
+    def controlMouse(self):
+        mouse.mouseMove(10, 50)     # reset position
+        mouse.hideCursor()
+
 
     def updateButtonClick(self):
         touchPoint = self.trackpad.clickAreaData
@@ -70,6 +81,8 @@ class MainWindow(Animation):
         panel = self.settings if normx < 0.5 else self.recognition
         button = int((1 - normy) * panel.numPanels)
         panel.buttons[button].highlight(0)
+        if (panel == self.settings and button == 0):     # clear button
+            self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         panel = self.settings if normx < 0.5 else self.recognition
@@ -104,7 +117,12 @@ class MainWindow(Animation):
     def onMouseMove(self, event): pass
     def onMouseDrag(self, event): pass
     def onKeyRelease(self, event): pass
-    def onQuit(self): pass
+
+    def onQuit(self):
+        if (self.trackpad.isDrawing == True):
+            self.trackpad.stop()
+        mouse.showCursor()
+
 
 
 class RecognitionTrackpad(multitouch.VisualTrackpad):
@@ -137,7 +155,9 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         instance = self.processor.feature
         self.results = self.recogModel.modelKNN(instance, k)
 
-
+    def reset(self):
+        del self.touchData[:]
+        self.clickAreaData = None
 
 
 
