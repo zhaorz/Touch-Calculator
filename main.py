@@ -11,7 +11,7 @@ from eventBasedAnimation import Animation
 
 import multitouch
 import model
-from time import sleep
+import time
 import knn
 import process
 
@@ -43,13 +43,38 @@ class MainWindow(Animation):
         self.recognition.draw(canvas)
         self.settings.draw(canvas)
 
+    
 
 
     def onStep(self):
         self.trackpad.step()
         self.updateButtonLabels(self.trackpad.results, self.recognition)
-    
+        self.settings.step()
+        self.recognition.step()
+        self.updateButtonClick()
 
+    def updateButtonClick(self):
+        touchPoint = self.trackpad.clickAreaData
+        if (touchPoint != None):
+            touchTime = touchPoint[2]
+            currentTime = time.time()
+            if (abs(touchTime - currentTime) > 0.05):
+                print "Clicked", touchPoint
+                self.trackpad.clickAreaData = None
+                self.click(touchPoint[:2])
+            else:
+                print "Hover", touchPoint
+                self.hover(touchPoint[:2])
+
+    def click(self, (normx, normy)):
+        panel = self.settings if normx < 0.5 else self.recognition
+        button = int((1 - normy) * panel.numPanels)
+        panel.buttons[button].highlight(0)
+
+    def hover(self, (normx, normy)):
+        panel = self.settings if normx < 0.5 else self.recognition
+        button = int((1 - normy) * panel.numPanels)
+        panel.buttons[button].highlight(1)
 
     def updateButtonLabels(self, newLabels, panel):
         """Finds the correct labels in newLabels and updates panel buttons.
@@ -71,11 +96,8 @@ class MainWindow(Animation):
             panel.buttons[i].label = ""
             panel.buttons[i].subLabel = ""
 
-    
-
-
-    def onMouse(self, event):
-        self.recognition.onMouse(event)
+ 
+    def onMouse(self, event): pass
 
 
 
@@ -92,6 +114,21 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         self.processor = process.Feature()
         self.recogModel = model.Model("test_model_11", 5)
         self.results = dict()
+        self.clicked = None
+        self.hover = None
+        self.bounds = 1.0 / 6.0      # area of click area on each side
+        self.clickAreaData = None
+
+    # Override the callback function
+    def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
+        data = data_ptr[0]      # only use the first finger
+        pos = data.normalized.position
+        p = (pos.x, pos.y, timestamp)
+        if (pos.x > self.bounds and pos.x < 1.0 - self.bounds):
+            self.touchData.append(p)    
+        else:
+            self.clickAreaData = (p[:2] + (time.time(),))
+        return 0
 
     def step(self):
         """Perform knn on the current instanceData"""
@@ -99,6 +136,9 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         self.processor.update(self.touchData)
         instance = self.processor.feature
         self.results = self.recogModel.modelKNN(instance, k)
+
+
+
 
 
 class Panel(object):
@@ -133,9 +173,9 @@ class Panel(object):
             y = buttonHeight * i
             canvas.create_line(x0, y, x1, y, fill="lightgrey")
     
-    def onMouse(self, event):
+    def step(self):
         for button in self.buttons:
-            button.intersect(event.x, event.y)
+            button.step()
 
 
 class Settings(Panel):
@@ -161,11 +201,6 @@ class Settings(Panel):
 
 
 
-
-    
-
-
-
 class Button(object):
     """Button(x, y, width, height[, **kws])"""
 
@@ -177,7 +212,8 @@ class Button(object):
         self.margin = self.width / 10
         self.fg = "#1a1a1a"             # foreground color: dark grey
         self.bg = "#e5e6e6"             # background color: light grey
-        self.activeColor = "#d5e5f8"    # active color: light blue
+        # self.activeColor = "#d5e5f8"    # active color: light blue
+        self.activeColor = "green"
         self.label = ""
         self.subLabel = ""
         self.clickTimer = 0
@@ -203,9 +239,10 @@ class Button(object):
     def intersect(self, x, y):
         if ((self.x < x and x < self.x + self.width) and
             (self.y < y and y < self.y + self.height)):
-            self.clicked(1)
+            print "clicked!"
+            self.highlight(1)
 
-    def clicked(self, time):
+    def highlight(self, time):
         """Reset click timer"""
         self.clickTimer = time
 
