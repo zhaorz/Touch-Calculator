@@ -1,6 +1,11 @@
 """
 classifier.py
 ~~~~~~~~~~~~~~~
+The Classifier class handles touch input and recognition using kNN. The only
+input device used is the trackpad. Selecting suggested characters, clearing
+input, etc. are handled by tapping the sides of the trackpad, which are mapped
+to buttons in the GUI.
+
 
 
 """
@@ -9,47 +14,46 @@ classifier.py
 # 15-112 module
 from eventBasedAnimation import Animation
 
-import multitouch
-import model
+# Standard Libraries
 import time
+
+# Packaged files 
 import knn
-import process
-
+import model
 import mouse
+import process
+import multitouch
 
 
 
-class MainWindow(Animation):
+class Classifier(Animation):
+
 
     def onInit(self):
         self.windowTitle = "Character Recognition"
-        self.trackpad = RecognitionTrackpad(140, 0, 560, self.height)
-        self.recognition = Panel(700, 0, 140, self.height, 4)
-        self.settings = Settings(0, 0, 140, self.height, 4)
+        self.trackpad = RecognitionTrackpad(
+            self.panelSize,                     # x
+            0,                                  # y
+            self.width - 2 * self.panelSize,    # width
+            self.height)                        # height
+        self.recognition = Panel(
+            self.width - self.panelSize,        # x
+            0,                                  # y
+            self.panelSize,                     # width
+            self.height,                        # height
+            4)                                  # numPanels
+        self.settings = Settings(
+            0,                                  # x
+            0,                                  # y
+            self.panelSize,                     # width
+            self.height,                        # height
+            4)                                  # numPanels
         self.trackpad.start()
-
-
-
-    def onKey(self, event):
-        return
-
-        if (event.keysym == "space"):
-            if (self.trackpad.isDrawing == False):
-                self.trackpad.isDrawing = True
-                self.trackpad.start()
-            else:
-                self.trackpad.isDrawing = False
-                self.trackpad.stop()
-
-
 
     def onDraw(self, canvas):
         self.trackpad.draw(canvas)
         self.recognition.draw(canvas)
-        self.settings.draw(canvas)
-
-    
-
+        self.settings.draw(canvas) 
 
     def onStep(self):
         self.trackpad.step()
@@ -62,7 +66,6 @@ class MainWindow(Animation):
     def controlMouse(self):
         mouse.mouseMove(10, 50)     # reset position
         mouse.hideCursor()
-
 
     def updateButtonClick(self):
         touchPoint = self.trackpad.clickAreaData
@@ -126,14 +129,37 @@ class MainWindow(Animation):
 
 
 class RecognitionTrackpad(multitouch.VisualTrackpad):
+    """VisualTrackpad that includes data for touch clicking.
 
+    Main caller uses results of knn to update recognition panel.
+    Main caller uses self.clickAreaData to calculate touch clicks.
+
+    Args:
+        x (int): Left canvas coordinate (in pixels).
+        y (int): Top canvas coordinate.
+        width (int): Width of the visual trackpad.
+        height (int): Height of the visual trackpad.
+
+    Attributes:
+        isDrawing (bool): True if currently receiving input, False otherwise.
+        fg (str): foreground color
+        bg (str): background color
+        active (str): active trackpad color
+        highlight (str): highlight color
+        results (dict): Contains sym:proportion for the kth Nearest Neighbors.
+        bounds (float): the proportion of the trackpad that constitutes a
+            touch click.
+        clickAreaData (tuple):
+            x (float): Normalized x position.
+            y (float): Normalized y position.
+            time (float): System time.
+
+    """
     def __init__(self, x, y, width, height):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
         self.processor = process.Feature()
         self.recogModel = model.Model("test_model_11", 5)
         self.results = dict()
-        self.clicked = None
-        self.hover = None
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
 
@@ -275,37 +301,11 @@ class Button(object):
 
 
 
-
-
-width = 840
-height = 400
-margin = 25
-timerDelay = 64
-mainWindow = MainWindow(
-    width=width, height=height, margin=margin, timerDelay=timerDelay)
-mainWindow.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == "__main__":
+    width = 840
+    height = 400
+    panelSize = 140
+    timerDelay = 64
+    mainWindow = Classifier(
+        width=width, height=height, panelSize=panelSize, timerDelay=timerDelay)
+    mainWindow.run()
