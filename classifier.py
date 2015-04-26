@@ -38,15 +38,15 @@ class Classifier(object):
         y (int): Y position in main frame.
         width (int): Width in pixels.
         height (int): Height in pixels.
-        panelSize (int): Pixel size of each of the two panels.
 
     Attributes:
         result (str or None): The character picked by the user.
+        panelSize (int): Pixel size of each of the two panels.
 
     """
-    def __init__(self, x, y, width, height, panelSize):
+    def __init__(self, x, y, width, height):
         self.x, self.y, self.width, self.height = x, y, width, height
-        self.panelSize = panelSize
+        self.panelSize = self.width / 6
         self.trackpad = RecognitionTrackpad(
             self.panelSize,                     # x
             0,                                  # y
@@ -336,12 +336,11 @@ class Button(object):
 
 
 if __name__ == "__main__":
-    width = 840
-    height = 400
-    panelSize = 140
+    width = 700
+    height = 300
     class ClassifierWindow(Animation):
         def onInit(self):
-            self.classifier = Classifier(0, 0, width, height, panelSize)
+            self.classifier = Classifier(0, 0, width, height)
         def onDraw(self, canvas):
             self.classifier.draw(canvas)
         def onStep(self):
