@@ -15,6 +15,7 @@ The source was modified to be importable.
 
 
 import ctypes
+import time
 
 
 class MTPoint(ctypes.Structure):
@@ -53,6 +54,7 @@ class Trackpad(object):
     # Initializes contents of private framework MultitouchSupport
     def __init__(self):
         self.touchData = []  # holds data from start() method call
+        self.lastTouch = None
 
         self.CFArrayRef = ctypes.c_void_p
         self.CFMutableArrayRef = ctypes.c_void_p
@@ -115,12 +117,13 @@ class Trackpad(object):
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
         data = data_ptr[0]      # only use the first finger
         pos = data.normalized.position
-        p = (pos.x, pos.y, timestamp)
-        self.touchData.append(p)    # add point to return array
+        self.touchData.append(pos.x, pos.y, timestamp)
+        self.lastTouch = (pos.x, pos.y, time.time())
         return 0
 
     def start(self):
         del self.touchData[:]   # reset data
+        self.lastTouch = None
         self.touch_callback = self.MTContactCallbackFunction(self.touch_callback)
         self.devs = self.init_multitouch(self.touch_callback)
 
@@ -146,6 +149,7 @@ class VisualTrackpad(Trackpad):
         bg (str): background color
         active (str): active trackpad color
         highlight (str): highlight color
+        lineWidth (int): Drawing width of line.
 
     """
     def __init__(self, x, y, width, height):
@@ -160,6 +164,7 @@ class VisualTrackpad(Trackpad):
         # self.active = "#cae2ed"
         self.active = self.bg
         self.highlight = "#72bdf6"     
+        self.lineWidth = self.height / 60
 
     def draw(self, canvas):
         x0 = self.x
@@ -168,7 +173,9 @@ class VisualTrackpad(Trackpad):
         y1 = self.y + self.height
         color = self.bg if self.isDrawing == False else self.active
         canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
-        self.drawData(canvas)
+        self.drawLastTouch(canvas)
+        self.drawDataLine(canvas)
+        # self.drawData(canvas)
 
     def drawData(self, canvas):
         r = 5
@@ -189,11 +196,25 @@ class VisualTrackpad(Trackpad):
         for i in xrange(len(self.touchData) - 1):
             (normx0, normy0, time0) = self.touchData[i]
             (normx1, normy1, time1) = self.touchData[i + 1]
+            if (abs(time1 - time0) > 0.08):
+                continue
             x0 = self.x + normx0 * self.width
             y0 = self.y + self.height - normy0 * self.height
             x1 = self.x + normx1 * self.width
             y1 = self.y + self.height - normy1 * self.height
-            canvas.create_line(x0, y0, x1, y1, fill=self.fg, width=5)
+            canvas.create_line(x0, y0, x1, y1, fill=self.fg, 
+                width=self.lineWidth, capstyle="round")
+
+    def drawLastTouch(self, canvas):
+        """Draws a blue highlight where finger is."""
+        if (self.lastTouch == None):
+            return
+        (normx, normy, t0) = self.lastTouch
+        if (abs(time.time() - t0) < 0.05):
+            x = self.x + normx * self.width
+            y = self.y + self.height - normy * self.height
+            r = self.lineWidth * 3 / 2 
+            self.drawDot(canvas, x, y, r, self.highlight)
 
     def drawDot(self, canvas, cx, cy, r, color):
         x0 = cx - r

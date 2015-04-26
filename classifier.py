@@ -165,22 +165,22 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         bg (str): background color
         active (str): active trackpad color
         highlight (str): highlight color
-        results (dict): Contains sym:proportion for the kth Nearest Neighbors.
         bounds (float): the proportion of the trackpad that constitutes a
             touch click.
         clickAreaData (3 - tuple):
             x (float): Normalized x position.
             y (float): Normalized y position.
             time (float): System time.
+        results (dict): Contains sym:proportion for the kth Nearest Neighbors.
 
     """
     def __init__(self, x, y, width, height):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
         self.processor = process.Feature()
         self.recogModel = model.Model("test_model_11", 5)
-        self.results = dict()
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
+        self.results = dict()
 
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
         """Overrides touch_callback() in Parent.
@@ -193,8 +193,9 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         p = (pos.x, pos.y, timestamp)
         if (pos.x > self.bounds and pos.x < 1.0 - self.bounds):
             self.touchData.append(p)    
+            self.lastTouch = p[:2] + (time.time(),)
         else:
-            self.clickAreaData = (p[:2] + (time.time(),))
+            self.clickAreaData = p[:2] + (time.time(),)
         return 0
 
     def step(self):
