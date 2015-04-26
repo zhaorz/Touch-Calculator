@@ -88,12 +88,10 @@ class Classifier(object):
         panel = self.settings if normx < 0.5 else self.recognition
         button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(0)
-        if (panel == self.settings and button == 0):     # clear button
-            self.result = ""
-            self.trackpad.reset()
-            return
         self.result = panel.buttons[button].label
         print self.result
+        # if (self.result != "clear"):        # clear is handled by main
+            # self.trackpad.reset()
         self.trackpad.reset()
 
     def hover(self, (normx, normy)):
@@ -177,7 +175,7 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
     def __init__(self, x, y, width, height):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
         self.processor = process.Feature()
-        self.recogModel = model.Model("test_model_11", 5)
+        self.recogModel = model.Model("test_model_12", 5)
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
         self.results = dict()
@@ -269,7 +267,8 @@ class Settings(Panel):
 
     def initButtonLabels(self):
         self.buttons[0].label = "clear"
-        self.buttons[1].label = "_"
+        # self.buttons[1].label = "_"
+        self.buttons[3].label = "="
 
     def draw(self, canvas):
         super(Settings, self).draw(canvas)

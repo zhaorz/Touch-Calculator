@@ -244,3 +244,5 @@ Sun Apr 26 02:00:33 EDT 2015
 -Drawing smooth lines in multitouch, drawing last touch point.
 Sun Apr 26 03:57:00 EDT 2015
 
+Sun Apr 26 15:21:33 EDT 2015
+

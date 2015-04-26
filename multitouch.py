@@ -117,7 +117,7 @@ class Trackpad(object):
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
         data = data_ptr[0]      # only use the first finger
         pos = data.normalized.position
-        self.touchData.append(pos.x, pos.y, timestamp)
+        self.touchData.append((pos.x, pos.y, timestamp))
         self.lastTouch = (pos.x, pos.y, time.time())
         return 0
 

@@ -47,12 +47,17 @@ class MainWindow(Animation):
     # Character sets must have length 7
     def initCharacterSets(self):
         self.characterSets = [
-            ["0", "U", "3", "2", "8", "9", "6"]
+            # ["0", "U", "3", "2", "8", "9", "6"]
             # ["A", "B", "C", "D", "E", "F", "7"]
             # ["0", "1", "2", "3", "4", "5", "6"],
             # ["8", "9", "A", "B", "C", "D", "E"],
             # ["F", "0", "1", "2", "3", "4", "5"],
             # ["6", "7", "8", "9", " ", ",", "."]
+            ['*', '/', '+', '-', '^', '(', ')'],
+            ['*', '/', '+', '-', '^', '(', ')'],
+            ['*', '/', '+', '-', '^', '(', ')'],
+            ['*', '/', '+', '-', '^', '(', ')'],
+            ['*', '/', '+', '-', '^', '(', ')']
             ]
         for charSet in self.characterSets:
             assert(len(charSet) == 7)
@@ -61,6 +66,8 @@ class MainWindow(Animation):
 
     def initTrackpad(self):
         self.trackpad = multitouch.VisualTrackpad(25, 375, 415, 300)
+        self.trackpad.active = "#cae2ed"
+
     
     def initCharactersDisplay(self):
         # First target set is first set in characterSets
