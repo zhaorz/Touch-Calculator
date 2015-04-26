@@ -157,7 +157,8 @@ class VisualTrackpad(Trackpad):
         self.isDrawing = False
         self.fg = "#666666"
         self.bg = "#e5e6e6"
-        self.active = "#cae2ed"
+        # self.active = "#cae2ed"
+        self.active = self.bg
         self.highlight = "#72bdf6"     
 
     def draw(self, canvas):

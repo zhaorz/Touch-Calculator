@@ -26,11 +26,27 @@ import multitouch
 
 
 
-class Classifier(Animation):
+class Classifier(object):
+    """Frame that includes trackpad input and recognition tools.
 
+    The draw() and step() methods must be called for proper functionality.
+    Mouse is anchored by default at top left corner of the frame.
+    Button clicks are handled by the click() method.
 
-    def onInit(self):
-        self.windowTitle = "Character Recognition"
+    Args:
+        x (int): X position in main frame.
+        y (int): Y position in main frame.
+        width (int): Width in pixels.
+        height (int): Height in pixels.
+        panelSize (int): Pixel size of each of the two panels.
+
+    Attributes:
+        result (str or None): The character picked by the user.
+
+    """
+    def __init__(self, x, y, width, height, panelSize):
+        self.x, self.y, self.width, self.height = x, y, width, height
+        self.panelSize = panelSize
         self.trackpad = RecognitionTrackpad(
             self.panelSize,                     # x
             0,                                  # y
@@ -41,21 +57,22 @@ class Classifier(Animation):
             0,                                  # y
             self.panelSize,                     # width
             self.height,                        # height
-            4)                                  # numPanels
+            4)                                  # numButtons
         self.settings = Settings(
             0,                                  # x
             0,                                  # y
             self.panelSize,                     # width
             self.height,                        # height
-            4)                                  # numPanels
+            4)                                  # numButtons
         self.trackpad.start()
+        self.result = None
 
-    def onDraw(self, canvas):
+    def draw(self, canvas):
         self.trackpad.draw(canvas)
         self.recognition.draw(canvas)
         self.settings.draw(canvas) 
 
-    def onStep(self):
+    def step(self):
         self.trackpad.step()
         self.updateButtonLabels(self.trackpad.results, self.recognition)
         self.settings.step()
@@ -64,32 +81,36 @@ class Classifier(Animation):
         self.controlMouse()
 
     def controlMouse(self):
-        mouse.mouseMove(10, 50)     # reset position
+        """Anchors mouse to top left corner and hides the cursor."""
+        mouse.mouseMove(self.x + 10, self.y + 50)     # reset position
         mouse.hideCursor()
 
     def updateButtonClick(self):
+        # Create local copy of trackpad.clickAreaData
         touchPoint = self.trackpad.clickAreaData
         if (touchPoint != None):
             touchTime = touchPoint[2]
             currentTime = time.time()
+            # touch has finished
             if (abs(touchTime - currentTime) > 0.05):
-                print "Clicked", touchPoint
                 self.trackpad.clickAreaData = None
                 self.click(touchPoint[:2])
-            else:
-                print "Hover", touchPoint
+            else:   # touch in progress
                 self.hover(touchPoint[:2])
 
     def click(self, (normx, normy)):
         panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numPanels)
+        button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(0)
+        self.result = panel.buttons[button].label
         if (panel == self.settings and button == 0):     # clear button
             self.trackpad.reset()
+        print self.result
 
     def hover(self, (normx, normy)):
+        """highlights the button being hovered over."""
         panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numPanels)
+        button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(1)
 
     def updateButtonLabels(self, newLabels, panel):
@@ -102,30 +123,17 @@ class Classifier(Animation):
         Returns: None
 
         """
-        labels = knn.topNClasses(newLabels, self.recognition.numPanels)
+        labels = knn.topNClasses(newLabels, self.recognition.numButtons)
         for i in xrange(len(labels)):
             label, subLabel = labels[i]
             panel.buttons[i].label = label
             panel.buttons[i].subLabel = subLabel
         # reset remaining labels
-        for i in xrange(len(labels), self.recognition.numPanels):
+        for i in xrange(len(labels), self.recognition.numButtons):
             panel.buttons[i].label = ""
             panel.buttons[i].subLabel = ""
 
  
-    def onMouse(self, event): pass
-
-
-
-    def onMouseMove(self, event): pass
-    def onMouseDrag(self, event): pass
-    def onKeyRelease(self, event): pass
-
-    def onQuit(self):
-        if (self.trackpad.isDrawing == True):
-            self.trackpad.stop()
-        mouse.showCursor()
-
 
 
 class RecognitionTrackpad(multitouch.VisualTrackpad):
@@ -149,7 +157,7 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         results (dict): Contains sym:proportion for the kth Nearest Neighbors.
         bounds (float): the proportion of the trackpad that constitutes a
             touch click.
-        clickAreaData (tuple):
+        clickAreaData (3 - tuple):
             x (float): Normalized x position.
             y (float): Normalized y position.
             time (float): System time.
@@ -163,8 +171,12 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
 
-    # Override the callback function
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
+        """Overrides touch_callback() in Parent.
+
+        Appends points to touchData if the touch lies inbetween the bounds.
+        Otherwise, most recent point is added to clickAreaData.
+        """
         data = data_ptr[0]      # only use the first finger
         pos = data.normalized.position
         p = (pos.x, pos.y, timestamp)
@@ -188,34 +200,47 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
 
 
 class Panel(object):
+    """Set of Button objects.
 
-    def __init__(self, x, y, width, height, numPanels):
+    Args:
+        x (int): X position of left side of Panel.
+        y (int): Y position of top of Panel.
+        width (int): Width.
+        height (int): Height.
+        numButtons (int): Number of vertical buttons in the Panel.
+
+    Attributes:
+        buttons (list): Collection of Button objects.
+        numButtons (int)
+
+    """
+    def __init__(self, x, y, width, height, numButtons):
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.numPanels = numPanels
+        self.numButtons = numButtons
         self.initButtons()
     
     def initButtons(self):
         self.buttons = []
         x0 = self.x
         width = self.width
-        height = self.height / self.numPanels
-        for i in xrange(self.numPanels):
+        height = self.height / self.numButtons
+        for i in xrange(self.numButtons):
             y0 = height * i
             self.buttons.append(Button(x0, y0, width, height))
 
     def draw(self, canvas):
         for button in self.buttons:
             button.draw(canvas)
-        self.drawLines(canvas)
+        self.drawSeparators(canvas)
 
-    def drawLines(self, canvas):
-        """Draws separators"""
+    def drawSeparators(self, canvas):
+        """Draws numButtons - 1 vertical separators."""
         x0, x1 = self.x, self.x + self.width
-        buttonHeight = self.height / self.numPanels
-        for i in xrange(1, self.numPanels):
+        buttonHeight = self.height / self.numButtons
+        for i in xrange(1, self.numButtons):
             y = buttonHeight * i
             canvas.create_line(x0, y, x1, y, fill="lightgrey")
     
@@ -226,8 +251,8 @@ class Panel(object):
 
 class Settings(Panel):
 
-    def __init__(self, x, y, width, height, numPanels):
-        super(Settings, self).__init__(x, y, width, height, numPanels)
+    def __init__(self, x, y, width, height, numButtons):
+        super(Settings, self).__init__(x, y, width, height, numButtons)
         self.initButtonLabels()
 
     def initButtonLabels(self):
@@ -245,11 +270,21 @@ class Settings(Panel):
         canvas.create_line(x, y0, x, y1, fill="lightgrey", width=2)
 
 
-
-
 class Button(object):
-    """Button(x, y, width, height[, **kws])"""
+    """Standard clickable Button object.
 
+    Args:
+        x (int): X position.
+        y (int): Y position.
+        width (int): Width.
+        height (int): Height.
+        kwargs: Can be used to override default labels.
+
+    Attributes:
+        label (str): Primary label, displayed in larger font.
+        subLabel (str): Secondary label, displayed in smaller font.
+
+    """
     def __init__(self, x, y, width, height, **kwargs):
         self.x = x
         self.y = y
@@ -258,8 +293,7 @@ class Button(object):
         self.margin = self.width / 10
         self.fg = "#1a1a1a"             # foreground color: dark grey
         self.bg = "#e5e6e6"             # background color: light grey
-        # self.activeColor = "#d5e5f8"    # active color: light blue
-        self.activeColor = "green"
+        self.activeColor = "#d5e5f8"    # active color: light blue
         self.label = ""
         self.subLabel = ""
         self.clickTimer = 0
@@ -305,7 +339,14 @@ if __name__ == "__main__":
     width = 840
     height = 400
     panelSize = 140
+    class ClassifierWindow(Animation):
+        def onInit(self):
+            self.classifier = Classifier(0, 0, width, height, panelSize)
+        def onDraw(self, canvas):
+            self.classifier.draw(canvas)
+        def onStep(self):
+            self.classifier.step()
     timerDelay = 64
-    mainWindow = Classifier(
-        width=width, height=height, panelSize=panelSize, timerDelay=timerDelay)
+    mainWindow = ClassifierWindow(
+        width=width, height=height, timerDelay=timerDelay)
     mainWindow.run()

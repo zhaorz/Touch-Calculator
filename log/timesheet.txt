@@ -225,4 +225,11 @@ Fri Apr 24 22:43:40 EDT 2015
 Fri Apr 24 23:14:54 EDT 2015
 
 Sat Apr 25 16:02:32 EDT 2015
+-Added classifier documentation
+-Added new main.py
+-Renamed main to classifier.
+-Added mouse controller function.
+-Added touch click functionality.
+Sat Apr 25 20:05:18 EDT 2015
 
+Sat Apr 25 22:53:27 EDT 2015
