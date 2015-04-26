@@ -48,22 +48,22 @@ class Classifier(object):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.panelSize = self.width / 6
         self.trackpad = RecognitionTrackpad(
-            self.panelSize,                     # x
-            0,                                  # y
-            self.width - 2 * self.panelSize,    # width
-            self.height)                        # height
+            self.x + self.panelSize,                # x
+            self.y,                                 # y
+            self.width - 2 * self.panelSize,        # width
+            self.height)                            # height
         self.recognition = Panel(
-            self.width - self.panelSize,        # x
-            0,                                  # y
-            self.panelSize,                     # width
-            self.height,                        # height
-            4)                                  # numButtons
+            self.x + self.width - self.panelSize,   # x
+            self.y,                                 # y
+            self.panelSize,                         # width
+            self.height,                            # height
+            4)                                      # numButtons
         self.settings = Settings(
-            0,                                  # x
-            0,                                  # y
-            self.panelSize,                     # width
-            self.height,                        # height
-            4)                                  # numButtons
+            self.x,                                 # x
+            self.y,                                 # y
+            self.panelSize,                         # width
+            self.height,                            # height
+            4)                                      # numButtons
         self.trackpad.start()
         self.result = None
 
@@ -74,16 +74,36 @@ class Classifier(object):
 
     def step(self):
         self.trackpad.step()
-        self.updateButtonLabels(self.trackpad.results, self.recognition)
         self.settings.step()
         self.recognition.step()
-        self.updateButtonClick()
         self.controlMouse()
+        self.updateButtons()
 
     def controlMouse(self):
         """Anchors mouse to top left corner and hides the cursor."""
         mouse.mouseMove(self.x + 10, self.y + 50)     # reset position
         mouse.hideCursor()
+
+    def click(self, (normx, normy)):
+        panel = self.settings if normx < 0.5 else self.recognition
+        button = int((1 - normy) * panel.numButtons)
+        panel.buttons[button].highlight(0)
+        self.result = panel.buttons[button].label
+        if (panel == self.settings and button == 0):     # clear button
+            self.trackpad.reset()
+            return
+        print self.result
+        self.trackpad.reset()
+
+    def hover(self, (normx, normy)):
+        """highlights the button being hovered over."""
+        panel = self.settings if normx < 0.5 else self.recognition
+        button = int((1 - normy) * panel.numButtons)
+        panel.buttons[button].highlight(1)
+   
+    def updateButtons(self):
+        self.updateButtonLabels(self.trackpad.results, self.recognition)
+        self.updateButtonClick()
 
     def updateButtonClick(self):
         # Create local copy of trackpad.clickAreaData
@@ -98,21 +118,6 @@ class Classifier(object):
             else:   # touch in progress
                 self.hover(touchPoint[:2])
 
-    def click(self, (normx, normy)):
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(0)
-        self.result = panel.buttons[button].label
-        if (panel == self.settings and button == 0):     # clear button
-            self.trackpad.reset()
-        print self.result
-
-    def hover(self, (normx, normy)):
-        """highlights the button being hovered over."""
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(1)
-
     def updateButtonLabels(self, newLabels, panel):
         """Finds the correct labels in newLabels and updates panel buttons.
 
@@ -123,6 +128,11 @@ class Classifier(object):
         Returns: None
 
         """
+        if (self.trackpad.touchData == []):         # empty data
+            for button in self.recognition.buttons:
+                button.label = ""
+                button.subLabel = ""
+            return
         labels = knn.topNClasses(newLabels, self.recognition.numButtons)
         for i in xrange(len(labels)):
             label, subLabel = labels[i]
@@ -228,7 +238,7 @@ class Panel(object):
         width = self.width
         height = self.height / self.numButtons
         for i in xrange(self.numButtons):
-            y0 = height * i
+            y0 = self.y + height * i
             self.buttons.append(Button(x0, y0, width, height))
 
     def draw(self, canvas):
@@ -241,7 +251,7 @@ class Panel(object):
         x0, x1 = self.x, self.x + self.width
         buttonHeight = self.height / self.numButtons
         for i in xrange(1, self.numButtons):
-            y = buttonHeight * i
+            y = self.y + buttonHeight * i
             canvas.create_line(x0, y, x1, y, fill="lightgrey")
     
     def step(self):
