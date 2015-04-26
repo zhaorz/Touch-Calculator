@@ -88,10 +88,11 @@ class Classifier(object):
         panel = self.settings if normx < 0.5 else self.recognition
         button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(0)
-        self.result = panel.buttons[button].label
         if (panel == self.settings and button == 0):     # clear button
+            self.result = ""
             self.trackpad.reset()
             return
+        self.result = panel.buttons[button].label
         print self.result
         self.trackpad.reset()
 
@@ -318,11 +319,11 @@ class Button(object):
         canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
         cx = x0 + self.width / 2
         cy = y0 + self.height / 2
-        font = "Arial " + str(self.width / 5)
+        font = ("Helvetica Neue Light", str(self.width / 5))
         canvas.create_text(cx, cy, anchor="center", fill=self.fg,
                            text=self.label, font=font)
         cy2 = y1 - self.margin
-        font2 = "Arial " + str(self.width / 12)
+        font2 = ("Helvetica Neue Light", str(self.width / 12))
         canvas.create_text(cx, cy2, anchor="center", fill=self.fg,
                            text=self.subLabel, font=font2)
 
@@ -346,8 +347,8 @@ class Button(object):
 
 
 if __name__ == "__main__":
-    width = 700
-    height = 300
+    width = 840
+    height = 400
     class ClassifierWindow(Animation):
         def onInit(self):
             self.classifier = Classifier(0, 0, width, height)
