@@ -141,8 +141,7 @@ class Classifier(object):
             panel.buttons[i].value = ""            
             panel.buttons[i].subLabel = ""
 
- 
-
+            
 
 class RecognitionTrackpad(multitouch.VisualTrackpad):
     """VisualTrackpad that includes data for touch clicking.
