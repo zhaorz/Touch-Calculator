@@ -40,9 +40,9 @@ class Feature(object):
     """
     def __init__(self, points=[], vecDimensions=3):
         self.rawDataPoints = points
-        self.vecDimensions = 3
-        self.dimensions = self.vecDimensions + 2
+        self.vecDimensions = 4
         self.process()
+        self.dimensions = len(self.feature)
 
     def process(self):
         """Data processing pipeline.
@@ -56,7 +56,10 @@ class Feature(object):
 
         """
         normalizedPoints = self.normalizePoints(self.rawDataPoints)
+        self.startPointFeature = self.findStartPoint(normalizedPoints)
+        self.endPointFeature = self.findEndPoint(normalizedPoints)
         self.rawStrokes = self.primativeSplit(normalizedPoints)
+        self.numStrokesFeature = self.numStrokes(self.rawStrokes)
         trimmedStrokes = [self.trimPoints(stroke) for stroke in self.rawStrokes]
         vectorStrokes = [self.vector(stroke) for stroke in trimmedStrokes]
         vectorSplit = self.vectorSplitCharacter(vectorStrokes)
@@ -64,7 +67,8 @@ class Feature(object):
         self.lenFeature = self.lengthFeature(vectorSplit)
         self.curvFeature = self.curvatureFeature(vectorSplit)
         self.feature = (self.vecFeature + [sigmoid(self.lenFeature)] + 
-            [sigmoid(self.curvFeature)])
+            [sigmoid(self.curvFeature)] + self.startPointFeature +
+            self.endPointFeature + [self.numStrokesFeature])
         #self.feature = self.normalizeVector(self.feature)
 
     def update(self, rawData):
@@ -141,6 +145,52 @@ class Feature(object):
             if (maxY == None or y > maxY):
                 maxY = y
         return ((minX, minY), (maxX, maxY))
+
+    def findStartPoint(self, points):
+        """Analyzes normalized points for start position.
+
+        Args:
+            points (list): A normalized list of (x, y, timestamp) tuples.
+
+        Returns:
+            2D list in form [x, y] of start point. [0.0, 0.0] if points 
+            is empty.
+
+        """
+        if (points == []):
+            return [0.0, 0.0]
+        else:
+            (x, y, time) = points[0]
+            return [x, y]
+
+    def findEndPoint(self, points):
+        """Analyzes normalized points for end position.
+
+        Args:
+            points (list): A normalized list of (x, y, timestamp) tuples.
+
+        Returns:
+            2D list in form [x, y] of end point. [0.0, 0.0] if points 
+            is empty.
+
+        """
+        if (points == []):
+            return [0.0, 0.0]
+        else:
+            (x, y, time) = points[-1]
+            return [x, y]
+
+    def numStrokes(self, rawStrokes):
+        """Counts number of primative strokes and normalizes.
+
+        Args:
+            rawStrokes (list): A list of primative split strokes.
+
+        Returns:
+            float: normalized number of strokes.
+
+        """
+        return sigmoid(len(rawStrokes))
 
     def primativeSplit(self, points):
         """Splits raw data into strokes based on timestamp values.

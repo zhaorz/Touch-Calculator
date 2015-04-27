@@ -200,10 +200,48 @@ def testCurvatureFeature():
         vectorSplit = processor.vectorSplitCharacter(vectorStrokes)
         print "    " + key + ": " + str(processor.curvatureFeature(vectorSplit))
 
+def testStartEndPoint():
+    print "Testing startPointFeature() and endPointFeature()... "
+    processor = process.Feature()
+    print "Testing straight lines... "
+    allData = fileIO.read("testData/straightLines.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        startPointFeature = processor.findStartPoint(normalizedPoints)
+        endPointFeature = processor.findEndPoint(normalizedPoints)
+        print ("    "  + key + " - Start: " + str(startPointFeature) + 
+                                 " End: " + str(endPointFeature))
+    print "Testing ABCDEF7..."
+    allData = fileIO.read("testData/ABCDEF7.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        startPointFeature = processor.findStartPoint(normalizedPoints)
+        endPointFeature = processor.findEndPoint(normalizedPoints)
+        print ("    "  + key + " - Start: " + str(startPointFeature) + 
+                                 " End: " + str(endPointFeature))
 
-
-
-
-
-
-
+def testNumStrokesFeature():
+    print "Testing numStrokes()... "
+    processor = process.Feature()
+    print "Testing lines..."
+    allData = fileIO.read("testData/straightLines.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        rawStrokes = processor.primativeSplit(normalizedPoints)
+        numStrokes = processor.numStrokes(rawStrokes)
+        print "    " + key + " numStrokes: " + str(numStrokes)
+    print "Testing ABCDEF7..."
+    allData = fileIO.read("testData/ABCDEF7.txt")
+    d = allData[0]
+    for key in d.keys():
+        charData = d[key]
+        normalizedPoints = processor.normalizePoints(charData)
+        rawStrokes = processor.primativeSplit(normalizedPoints)
+        numStrokes = processor.numStrokes(rawStrokes)
+        print "    " + key + " numStrokes: " + str(numStrokes)

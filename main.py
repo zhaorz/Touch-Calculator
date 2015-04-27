@@ -20,6 +20,7 @@ import classifier
 class MainWindow(eventBasedAnimation.Animation):
 
     def onInit(self):
+        self.windowTitle = "main"
         self.clsf = classifier.Classifier(0, 250, self.width, 300)
         self.input = TextDisplay(0, 0, self.width, 100,
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_700.gif"))
