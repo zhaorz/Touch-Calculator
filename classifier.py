@@ -270,6 +270,8 @@ class Settings(Panel):
         self.buttons[0].value = "clear"
         self.buttons[1].label = "AC"
         self.buttons[1].value = "allClear"
+        self.buttons[2].label = "123"
+        self.buttons[2].value = ""
         self.buttons[3].label = "="
         self.buttons[3].value = "equals"
 
@@ -311,7 +313,6 @@ class Button(object):
         self.x = x
         self.y = y
         self.width = width
-        print "width", width
         self.height = height
         self.margin = self.width / 10
         self.fg = "#1a1a1a"             # foreground color: dark grey
