@@ -15,9 +15,10 @@ class Display(object):
         self.x, self.y, self.width, self.height = x, y , width, height
         self.margin = self.width / 10
         self.displayText = ""
-        self.font = ("Helvetica Neue UltraLight", str(self.height / 5))
+        self.font = ("Helvetica Neue UltraLight", str(self.height / 2))
         self.bg = "#212834"
         self.fg = "#efefef"
+        self.bgImage = eventBasedAnimation.PhotoImage(file="graphics/top.gif")
         self.__dict__.update(kwargs)
 
     def addInput(self, char):
@@ -29,11 +30,14 @@ class Display(object):
         self.displayText = self.displayText[:-1]
 
     def draw(self, canvas):
+        """
         x0 = self.x
         x1 = self.x + self.width
         y0 = self.y
         y1 = self.y + self.height
         canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
+        """
+        canvas.create_image(0, 0, image=self.bgImage)
         cx = self.width - self.margin
         cy = self.y + self.height / 2
         canvas.create_text(cx, cy, anchor="e", text=self.displayText,
@@ -45,7 +49,7 @@ class Display(object):
 
 if __name__ == "__main__":
     width = 700
-    height = 200
+    height = 100
     class DisplayWindow(eventBasedAnimation.Animation):
         def onInit(self):
             self.display = Display(0, 0, width, height)

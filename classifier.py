@@ -266,11 +266,20 @@ class Settings(Panel):
     def __init__(self, x, y, width, height, numButtons):
         super(Settings, self).__init__(x, y, width, height, numButtons)
         self.initButtonLabels()
+        self.initButtonColors()
 
     def initButtonLabels(self):
         self.buttons[0].label = "C"
         self.buttons[1].label = "AC"
         self.buttons[3].label = "="
+
+    def initButtonColors(self):
+        """Equals gets a different color"""
+        self.buttons[3].fg = "#ffffff"
+        self.buttons[3].bg = "#f79332"
+        self.buttons[3].activeColor = "#c36c18"
+
+
 
     def draw(self, canvas):
         super(Settings, self).draw(canvas)

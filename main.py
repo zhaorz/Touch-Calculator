@@ -20,14 +20,16 @@ import classifier
 class MainWindow(eventBasedAnimation.Animation):
 
     def onInit(self):
-        self.clsf = classifier.Classifier(0, 400, self.width, 300)
-        self.input = TextDisplay(0, 0, self.width, 200)
+        self.clsf = classifier.Classifier(0, 250, self.width, 300)
+        self.input = TextDisplay(0, 0, self.width, 100,
+            bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_700.gif"))
         self.output = TextDisplay(
-            0, 200, self.width, 200, fg="#ffffff", bg="#3a475c",
-            font=("Helvetica Neue UltraLight", "72"))
+            0, 100, self.width, 150, fg="#ffffff", bg="#3a475c",
+            font=("Helvetica Neue UltraLight", "72"),
+            bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_700.gif"))
         self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        '*', '/', '+', '-', '^']
+                        '*', '/', '+', '-', '^', '(', ')', '.']
 
     def onStep(self):
         self.clsf.step()
@@ -62,17 +64,14 @@ class MainWindow(eventBasedAnimation.Animation):
     def evaluate(self):
         if (self.isLegal(self.input.displayText) == False):
             return -1
-        print "input display:", self.input.displayText
         try:
             result = str(eval(self.input.displayText))
         except:
             result = "Error"
-        print "result:", result
         self.output.displayText = result
 
     def isLegal(self, s):
         for c in s:
-            print c
             if c not in self.charset:
                 return False
         return True
@@ -102,9 +101,10 @@ class TextDisplay(object):
         self.x, self.y, self.width, self.height = x, y , width, height
         self.margin = self.width / 10
         self.displayText = ""
-        self.font = ("Helvetica Neue UltraLight", str(self.height / 5))
+        self.font = ("Helvetica Neue UltraLight", str(self.height / 3))
         self.bg = "#212834"
         self.fg = "#efefef"
+        self.bgImage = None
         self.__dict__.update(kwargs)
 
     def addInput(self, char):
@@ -119,11 +119,15 @@ class TextDisplay(object):
         self.displayText = ""
 
     def draw(self, canvas):
-        x0 = self.x
-        x1 = self.x + self.width
-        y0 = self.y
-        y1 = self.y + self.height
-        canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
+        if (self.bgImage != None):
+            canvas.create_image(self.x, self.y, image=self.bgImage,
+                                anchor="nw")
+        else:
+            x0 = self.x
+            x1 = self.x + self.width
+            y0 = self.y
+            y1 = self.y + self.height
+            canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
         cx = self.width - self.margin
         cy = self.y + self.height / 2
         canvas.create_text(cx, cy, anchor="e", text=self.displayText,
@@ -165,7 +169,7 @@ class TextDisplay(object):
 
 
 width = 700
-height = 700
+height = 550
 timerDelay = 64
 MainWindow(width=width, height=height, timerDelay=timerDelay).run()
 
