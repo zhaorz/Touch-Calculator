@@ -88,13 +88,8 @@ class Classifier(object):
         panel = self.settings if normx < 0.5 else self.recognition
         button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(0)
-        res = panel.buttons[button].label
-        # Uniquely handle clear "C"
-        if (panel == self.settings and res == "C"):
-            self.result = "clear"
-        else:
-            self.result = panel.buttons[button].label
-            self.trackpad.reset()
+        self.result = panel.buttons[button].value
+        self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         """highlights the button being hovered over."""
@@ -138,10 +133,12 @@ class Classifier(object):
         for i in xrange(len(labels)):
             label, subLabel = labels[i]
             panel.buttons[i].label = label
+            panel.buttons[i].value = label
             panel.buttons[i].subLabel = subLabel
         # reset remaining labels
         for i in xrange(len(labels), self.recognition.numButtons):
             panel.buttons[i].label = ""
+            panel.buttons[i].value = ""            
             panel.buttons[i].subLabel = ""
 
  
@@ -270,16 +267,17 @@ class Settings(Panel):
 
     def initButtonLabels(self):
         self.buttons[0].label = "C"
+        self.buttons[0].value = "clear"
         self.buttons[1].label = "AC"
+        self.buttons[1].value = "allClear"
         self.buttons[3].label = "="
+        self.buttons[3].value = "equals"
 
     def initButtonColors(self):
         """Equals gets a different color"""
         self.buttons[3].fg = "#ffffff"
         self.buttons[3].bg = "#f79332"
         self.buttons[3].activeColor = "#c36c18"
-
-
 
     def draw(self, canvas):
         super(Settings, self).draw(canvas)
@@ -305,12 +303,15 @@ class Button(object):
     Attributes:
         label (str): Primary label, displayed in larger font.
         subLabel (str): Secondary label, displayed in smaller font.
+        value (str): Operator or stored value of button, which sometime differs
+            from its label.
 
     """
     def __init__(self, x, y, width, height, **kwargs):
         self.x = x
         self.y = y
         self.width = width
+        print "width", width
         self.height = height
         self.margin = self.width / 10
         self.fg = "#1a1a1a"             # foreground color: dark grey
@@ -318,6 +319,7 @@ class Button(object):
         self.activeColor = "#d5e5f8"    # active color: light blue
         self.label = ""
         self.subLabel = ""
+        self.value = ""
         self.clickTimer = 0
         self.__dict__.update(kwargs)
 
@@ -358,8 +360,8 @@ class Button(object):
 
 
 if __name__ == "__main__":
-    width = 840
-    height = 400
+    width = 700
+    height = 300
     class ClassifierWindow(Animation):
         def onInit(self):
             self.classifier = Classifier(0, 0, width, height)

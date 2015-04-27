@@ -41,10 +41,9 @@ class MainWindow(eventBasedAnimation.Animation):
             res = self.clsf.result
             if (res == "clear"):
                 self.clear()
-            elif (res == "AC"):
+            elif (res == "allClear"):
                 self.allClear()
-            elif (res == "="):
-                print "equals pressed"
+            elif (res == "equals"):
                 self.evaluate()
             else:
                 self.input.addInput(self.clsf.result)

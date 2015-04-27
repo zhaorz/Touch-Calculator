@@ -263,3 +263,12 @@ Mon Apr 27 02:00:56 EDT 2015
 Mon Apr 27 03:13:26 EDT 2015
 
 Mon Apr 27 15:40:16 EDT 2015
+-Improvements to processing.
+-Feature vector is at 10 dimensions.
+-New dimensions:
+-start point
+-end point
+-number of primative strokes (normalized by sigmoid function)
+Mon Apr 27 16:20:16 EDT 2015
+
+Mon Apr 27 18:50:28 EDT 2015
