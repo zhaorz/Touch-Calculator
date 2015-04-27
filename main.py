@@ -38,6 +38,8 @@ class MainWindow(eventBasedAnimation.Animation):
             res = self.clsf.result
             if (res == "clear"):
                 self.clear()
+            elif (res == "AC"):
+                self.allClear()
             elif (res == "="):
                 print "equals pressed"
                 self.evaluate()
@@ -50,6 +52,12 @@ class MainWindow(eventBasedAnimation.Animation):
             self.clsf.trackpad.reset()
         else:                                       # del input
             self.input.delete()
+
+    def allClear(self):
+        self.clsf.trackpad.reset()
+        self.input.reset()
+        self.output.reset()
+
 
     def evaluate(self):
         if (self.isLegal(self.input.displayText) == False):
@@ -106,6 +114,9 @@ class TextDisplay(object):
 
     def delete(self):
         self.displayText = self.displayText[:-1]
+
+    def reset(self):
+        self.displayText = ""
 
     def draw(self, canvas):
         x0 = self.x

@@ -88,11 +88,13 @@ class Classifier(object):
         panel = self.settings if normx < 0.5 else self.recognition
         button = int((1 - normy) * panel.numButtons)
         panel.buttons[button].highlight(0)
-        self.result = panel.buttons[button].label
-        print self.result
-        # if (self.result != "clear"):        # clear is handled by main
-            # self.trackpad.reset()
-        self.trackpad.reset()
+        res = panel.buttons[button].label
+        # Uniquely handle clear "C"
+        if (panel == self.settings and res == "C"):
+            self.result = "clear"
+        else:
+            self.result = panel.buttons[button].label
+            self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         """highlights the button being hovered over."""
@@ -266,8 +268,8 @@ class Settings(Panel):
         self.initButtonLabels()
 
     def initButtonLabels(self):
-        self.buttons[0].label = "clear"
-        # self.buttons[1].label = "_"
+        self.buttons[0].label = "C"
+        self.buttons[1].label = "AC"
         self.buttons[3].label = "="
 
     def draw(self, canvas):

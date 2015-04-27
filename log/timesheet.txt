@@ -245,4 +245,15 @@ Sun Apr 26 02:00:33 EDT 2015
 Sun Apr 26 03:57:00 EDT 2015
 
 Sun Apr 26 15:21:33 EDT 2015
+-Simple math working.
+-Classifier refactoring to support C/AC in main.
+-Button click handling now done by main.
+-Operator data for addition, multiplication, subtraction, exponentiation now available.
+-Output display functional.
+-Equals button functional.
+Sun Apr 26 16:15:24 EDT 2015
+
+Mon Apr 27 00:30:36 EDT 2015
+
+Mon Apr 27 01:10:01 EDT 2015
 
