@@ -1,7 +1,7 @@
 """
-touchCalculator.py
+calculator.py
 ~~~~~~~~~~~~~~~
-The touchCalculator class provides a calculator implementation for use with
+The Calculator class provides a calculator implementation for use with
 trackpads.
 
 An instance of Calculator is self-drawing and interactive. For best results,

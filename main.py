@@ -12,7 +12,7 @@ WolframAlpha AppID: RAJVVX-8GEGHXV5LU
 import eventBasedAnimation
 import math
 import classifier
-import touchCalculator
+import calculator
 import mathParser
 
 
@@ -32,7 +32,7 @@ class MainWindow(eventBasedAnimation.Animation):
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_690.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
                                           state="inactive")
-        self.calculator = touchCalculator.Calculator(0, 250, self.width, 300,
+        self.calc = calculator.Calculator(0, 250, self.width, 300,
                                                      state="active")
         self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -42,11 +42,11 @@ class MainWindow(eventBasedAnimation.Animation):
         if (self.clsf.state == "active"):
             self.clsf.step()
         else:
-            self.calculator.step()
+            self.calc.step()
         self.getInput()
 
     def getInput(self):
-        src = self.clsf if self.clsf.state == "active" else self.calculator
+        src = self.clsf if self.clsf.state == "active" else self.calc
         if (src.result != None):
             res = src.result
             if (res == "clear"):
@@ -82,14 +82,14 @@ class MainWindow(eventBasedAnimation.Animation):
 
     def switch(self):
         self.clsf.trackpad.reset()
-        self.calculator.trackpad.reset()
+        self.calc.trackpad.reset()
         """Switch input source states."""
         if (self.clsf.state == "active"):            
             self.clsf.state = "inactive"
-            self.calculator.state = "active"
+            self.calc.state = "active"
         else:
             self.clsf.state = "active"
-            self.calculator.state = "inactive"
+            self.calc.state = "inactive"
 
     def onDraw(self, canvas):
         self.input.draw(canvas)
@@ -97,7 +97,7 @@ class MainWindow(eventBasedAnimation.Animation):
         if (self.clsf.state == "active"):
             self.clsf.draw(canvas)
         else:
-            self.calculator.draw(canvas)
+            self.calc.draw(canvas)
 
 
 
@@ -163,48 +163,7 @@ class TextDisplay(object):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 width = 690
 height = 550
 timerDelay = 64
 MainWindow(width=width, height=height, timerDelay=timerDelay).run()
-
-
-
-
-
-
-
-
