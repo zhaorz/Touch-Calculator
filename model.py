@@ -70,6 +70,15 @@ class Model(object):
         """Override default len() function by return length of data list"""
         return len(self.data)
 
+    def __repr__(self):
+        count = self.symCount()
+        result = ""
+        result += 'sym ' + '      count\n'
+        result += '____' + '     _______\n\n'
+        for sym in sorted(count.keys()):
+            result += repr(sym) + ':' + '\t\t' + str(count[sym]) + '\n'
+        return result
+
     def save(self):
         """Creates file if first save, overwrites if file aready exists."""
         saveData = dict()
@@ -111,6 +120,10 @@ class Model(object):
         self.data.extend(processedData)
         self.sources.append(rawDataFile)    # update sources list
 
+    def addNewData(self):
+        """Quickly adds the most recent data file in data/ directory."""
+        m1.extendData(fileIO.bottomFile("data"))
+
     def symCount(self):
         count = dict()
         for (sym, v) in self.data:
@@ -129,6 +142,14 @@ class Model(object):
         del self.data[:]
         self.data = copy.deepcopy(temp)
 
+    def printSymCount(self):
+        """Prints a vertical list of all data symbols and their counts."""
+        count = self.symCount()
+        print 'sym ' + '      count'
+        print '____' + '     _______'
+        print
+        for sym in sorted(count.keys()):
+            print repr(sym) + ':' + '\t\t' + str(count[sym])
 
     def modelKNN(self, instanceFeature, k):
         """Performs a kNN on the model data and returns a dictionary of the vote

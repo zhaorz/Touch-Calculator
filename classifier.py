@@ -51,7 +51,8 @@ class Classifier(object):
             self.x + self.panelSize,                # x
             self.y,                                 # y
             self.width - 2 * self.panelSize,        # width
-            self.height)                            # height
+            self.height,                            # height
+            "test_model_21", 11)                    # model and dimensions
         self.recognition = Panel(
             self.x + self.width - self.panelSize,   # x
             self.y,                                 # y
@@ -173,10 +174,10 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         results (dict): Contains sym:proportion for the kth Nearest Neighbors.
 
     """
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, modelName, dimensions):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
         self.processor = process.Feature()
-        self.recogModel = model.Model("test_model_19", 11)
+        self.recogModel = model.Model(modelName, dimensions)
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
         self.results = dict()
