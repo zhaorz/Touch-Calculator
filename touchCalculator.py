@@ -4,27 +4,49 @@ touchCalculator.py
 The touchCalculator class provides a calculator implementation for use with
 trackpads.
 
+An instance of Calculator is self-drawing and interactive. For best results,
+only have one instance of either Calculator or Classifier active at the same
+time. On initialization, state defaults to "active".
 
 """
 
+# 15-112 module
 from eventBasedAnimation import Animation
 
+# Standard libraries
 import time
 
-import knn
-import model
+# Packaged libraries
 import mouse
-import process
 import multitouch
 
+# UI elements
 from classifier import RecognitionTrackpad
 from classifier import Panel
 from classifier import Settings
 from classifier import Button
 
 
-class Calculator(object):
 
+class Calculator(object):
+    """Frame that includes calculator keys, operators, and settings.
+
+    The draw() and step() methods must be called for proper functionality.
+    Mouse is anchored by default at top left corner of the frame.
+    Button clicks are handled by the click() method.
+
+    Args:
+        x (int): X position in main frame.
+        y (int): Y position in main frame.
+        width (int): Width in pixels.
+        height (int): Height in pixels.
+        state (str, optional): Must be either "active" or "inactive".
+
+    Attributes:
+        result (str or None): Current button click. Read by main.
+        panelSize (int): Pixel size of each of the two panels.
+
+    """
     def __init__(self, x, y, width, height, state="active"):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.state = state
@@ -75,7 +97,7 @@ class Calculator(object):
                 self.trackpad.reset()
 
     def hover(self, (normx, normy)):
-        """highlights the button being hovered over."""
+        """Highlights the button being hovered over."""
         x = self.x + self.width * normx
         y = self.y + self.height - self.height * normy
         for button in (self.settings.buttons + self.calculator.buttons):
@@ -101,12 +123,25 @@ class Calculator(object):
 
 
 class CalculatorTrackpad(RecognitionTrackpad):
+    """Underfeatured version of RecognitionTrackpad.
 
+    Only keeps track of one data point, the most recent one. The data point
+    contains system time, which is used to calculate touch clicks.
+    Width and height are noncritical because this trackpad isn't drawn.
+    
+    Args:
+        x (int): Left canvas coordinate (in pixels).
+        y (int): Top canvas coordinate.
+        width (int): Width of the trackpad.
+        height (int): Height of the trackpad.
+
+    Attributes:
+        clickAreaData (tuple): Contains normalized x and y and a system time.
+
+    """
     def __init__(self, x, y, width, height):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
-        self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
-        self.results = dict()
 
     def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
         """Overrides touch_callback() in Parent.
@@ -123,11 +158,21 @@ class CalculatorTrackpad(RecognitionTrackpad):
 
 
 class CalculatorButtons(object):
-    """
-     7 | 8 | 9 
-     4 | 5 | 6
-     1 | 2 | 3
-       0   | . 
+    """A collection of self-drawing buttons for the calculator.
+
+                | 7 | 8 | 9 |
+                | 4 | 5 | 6 |
+                | 1 | 2 | 3 |
+                |   0   | . |
+
+    Args:
+        x (int): Left canvas coordinate (in pixels).
+        y (int): Top canvas coordinate.
+        width (int): Width of only the buttons and operators (no settings).
+        height (int): Height of the frame.
+
+    Attributes:
+        buttons (list): List of Button objects.
 
     """
     def __init__(self, x, y, width, height):

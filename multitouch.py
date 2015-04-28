@@ -172,7 +172,8 @@ class VisualTrackpad(Trackpad):
         x1 = self.x + self.width
         y1 = self.y + self.height
         color = self.bg if self.isDrawing == False else self.active
-        canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
+        canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=1,
+                                outline="lightgrey")
         self.drawLastTouch(canvas)
         self.drawDataLine(canvas)
         # self.drawData(canvas)

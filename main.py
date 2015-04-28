@@ -29,9 +29,9 @@ class MainWindow(eventBasedAnimation.Animation):
             font=("Helvetica Neue UltraLight", "72"),
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_700.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
-                                          state="active")
+                                          state="inactive")
         self.calculator = touchCalculator.Calculator(0, 250, self.width, 300,
-                                                     state="inactive")
+                                                     state="active")
         self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                         '*', '/', '+', '-', '^', '(', ')', '.']
@@ -193,7 +193,7 @@ class TextDisplay(object):
 
 
 
-width = 700
+width = 690
 height = 550
 timerDelay = 64
 MainWindow(width=width, height=height, timerDelay=timerDelay).run()

@@ -243,20 +243,11 @@ class Panel(object):
         height = self.height / self.numButtons
         for i in xrange(self.numButtons):
             y0 = self.y + height * i
-            self.buttons.append(Button(x0, y0, width, height))
+            self.buttons.append(Button(x0, y0, width, height, outline=True))
 
     def draw(self, canvas):
         for button in self.buttons:
             button.draw(canvas)
-        self.drawSeparators(canvas)
-
-    def drawSeparators(self, canvas):
-        """Draws numButtons - 1 vertical separators."""
-        x0, x1 = self.x, self.x + self.width
-        buttonHeight = self.height / self.numButtons
-        for i in xrange(1, self.numButtons):
-            y = self.y + buttonHeight * i
-            canvas.create_line(x0, y, x1, y, fill="lightgrey")
     
     def step(self):
         for button in self.buttons:
@@ -286,15 +277,6 @@ class Settings(Panel):
         self.buttons[3].bg = "#f79332"
         self.buttons[3].activeColor = "#c36c18"
 
-    def draw(self, canvas):
-        super(Settings, self).draw(canvas)
-        self.drawDivider(canvas)
-
-    def drawDivider(self, canvas):
-        x = self.x + self.width
-        y0 = self.y
-        y1 = y0 + self.height
-        canvas.create_line(x, y0, x, y1, fill="lightgrey", width=2)
 
 
 class Button(object):
