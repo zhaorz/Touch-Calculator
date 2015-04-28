@@ -37,13 +37,15 @@ class Classifier(object):
         y (int): Y position in main frame.
         width (int): Width in pixels.
         height (int): Height in pixels.
+        model (str): Name of classification model.
+        state (str, optional): Either 'active' or 'inactive'.
 
     Attributes:
         result (str or None): The character picked by the user.
         panelSize (int): Pixel size of each of the two panels.
 
     """
-    def __init__(self, x, y, width, height, state="active"):
+    def __init__(self, x, y, width, height, model, state="active"):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.state = state
         self.panelSize = self.width / 6
@@ -52,7 +54,7 @@ class Classifier(object):
             self.y,                                 # y
             self.width - 2 * self.panelSize,        # width
             self.height,                            # height
-            "test_model_21", 11)                    # model and dimensions
+            model, 11)                    # model and dimensions
         self.recognition = Panel(
             self.x + self.width - self.panelSize,   # x
             self.y,                                 # y

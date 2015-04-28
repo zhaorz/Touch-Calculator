@@ -80,12 +80,10 @@ class MainWindow(eventBasedAnimation.Animation):
             font=("Helvetica Neue UltraLight", "80"),
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_690.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
+                                          "test_model_23",
                                           state="inactive")
         self.calc = calculator.Calculator(0, 250, self.width, 300,
                                                      state="active")
-        self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
-                        '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                        '*', '/', '+', '-', '^', '(', ')', '.']
         self.isPaused = False
 
     def onStep(self):
