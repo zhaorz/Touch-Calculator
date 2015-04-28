@@ -12,6 +12,7 @@ WolframAlpha AppID: RAJVVX-8GEGHXV5LU
 import eventBasedAnimation
 
 import classifier
+import touchCalculator
 
 
 
@@ -21,24 +22,31 @@ class MainWindow(eventBasedAnimation.Animation):
 
     def onInit(self):
         self.windowTitle = "main"
-        self.clsf = classifier.Classifier(0, 250, self.width, 300)
         self.input = TextDisplay(0, 0, self.width, 100,
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_700.gif"))
         self.output = TextDisplay(
             0, 100, self.width, 150, fg="#ffffff", bg="#3a475c",
             font=("Helvetica Neue UltraLight", "72"),
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_700.gif"))
+        self.clsf = classifier.Classifier(0, 250, self.width, 300,
+                                          state="active")
+        self.calculator = touchCalculator.Calculator(0, 250, self.width, 300,
+                                                     state="inactive")
         self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                         '*', '/', '+', '-', '^', '(', ')', '.']
 
     def onStep(self):
-        self.clsf.step()
+        if (self.clsf.state == "active"):
+            self.clsf.step()
+        else:
+            self.calculator.step()
         self.getInput()
 
     def getInput(self):
-        if (self.clsf.result != None):
-            res = self.clsf.result
+        src = self.clsf if self.clsf.state == "active" else self.calculator
+        if (src.result != None):
+            res = src.result
             if (res == "clear"):
                 self.clear()
             elif (res == "allClear"):
@@ -47,9 +55,10 @@ class MainWindow(eventBasedAnimation.Animation):
                 self.evaluate()
             elif (res == "switch"):
                 print "switching..."
+                self.switch()
             else:
-                self.input.addInput(self.clsf.result)
-            self.clsf.result = None
+                self.input.addInput(res)
+            src.result = None
 
     def clear(self):
         if (self.clsf.trackpad.touchData != []):    # clear drawing
@@ -72,6 +81,17 @@ class MainWindow(eventBasedAnimation.Animation):
             result = "Error"
         self.output.displayText = result
 
+    def switch(self):
+        self.clsf.trackpad.reset()
+        self.calculator.trackpad.reset()
+        """Switch input source states."""
+        if (self.clsf.state == "active"):            
+            self.clsf.state = "inactive"
+            self.calculator.state = "active"
+        else:
+            self.clsf.state = "active"
+            self.calculator.state = "inactive"
+
     def isLegal(self, s):
         for c in s:
             if c not in self.charset:
@@ -79,9 +99,12 @@ class MainWindow(eventBasedAnimation.Animation):
         return True
 
     def onDraw(self, canvas):
-        self.clsf.draw(canvas)
         self.input.draw(canvas)
         self.output.draw(canvas)
+        if (self.clsf.state == "active"):
+            self.clsf.draw(canvas)
+        else:
+            self.calculator.draw(canvas)
 
 
 

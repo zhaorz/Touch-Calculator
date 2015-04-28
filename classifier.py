@@ -44,8 +44,9 @@ class Classifier(object):
         panelSize (int): Pixel size of each of the two panels.
 
     """
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, state="active"):
         self.x, self.y, self.width, self.height = x, y, width, height
+        self.state = state
         self.panelSize = self.width / 6
         self.trackpad = RecognitionTrackpad(
             self.x + self.panelSize,                # x
@@ -318,7 +319,7 @@ class Button(object):
         self.y = y
         self.width = width
         self.height = height
-        self.margin = self.width / 10
+        self.margin = self.width / 15
         self.fg = "#1a1a1a"             # foreground color: dark grey
         self.bg = "#e5e6e6"             # background color: light grey
         self.activeColor = "#d5e5f8"    # active color: light blue
@@ -344,13 +345,36 @@ class Button(object):
         cy = y0 + self.height / 2
         canvas.create_text(cx, cy, anchor="center", fill=self.fg,
                            text=self.label, font=self.mainFont)
-        cy2 = y1 - self.margin
+        cy2 = y1 - self.width / 10
         canvas.create_text(cx, cy2, anchor="center", fill=self.fg,
                            text=self.subLabel, font=self.subFont)
 
+    # def intersect(self, x, y):
+    #     if ((self.x < x and x < self.x + self.width) and
+    #         (self.y < y and y < self.y + self.height)):
+    #         return True
+    #     else:
+    #         return False
+
     def intersect(self, x, y):
-        if ((self.x < x and x < self.x + self.width) and
-            (self.y < y and y < self.y + self.height)):
+        """Test collision of pixel location with button.
+
+        Registers as collision if touchPoint is within a certain padding from
+        the actual border. This helps prevents false touches.
+
+        Args:
+            x (int): Pixel x location.
+            y (int): Pixel y location.
+
+        Returns:
+            True if (x, y) is contained within the margin of the button,
+                False otherwise
+
+        """
+        if ((self.x + self.margin < x) and 
+            (x < self.x + self.width - self.margin) and
+            (self.y + self.margin < y) and
+            (y < self.y + self.height - self.margin)):
             return True
         else:
             return False

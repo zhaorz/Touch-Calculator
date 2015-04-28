@@ -25,8 +25,9 @@ from classifier import Button
 
 class Calculator(object):
 
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, state="active"):
         self.x, self.y, self.width, self.height = x, y, width, height
+        self.state = state
         self.panelSize = self.width / 6
         self.trackpad = CalculatorTrackpad(
             self.x + self.panelSize,                # x
