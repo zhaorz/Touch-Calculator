@@ -30,7 +30,6 @@ class Classifier(object):
     """Frame that includes trackpad input and recognition tools.
 
     The draw() and step() methods must be called for proper functionality.
-    Mouse is anchored by default at top left corner of the frame.
     Button clicks are handled by the click() method.
 
     Args:
@@ -377,6 +376,8 @@ if __name__ == "__main__":
             self.classifier.draw(canvas)
         def onStep(self):
             self.classifier.step()
+            mouse.mouseMove(10, 50)     # reset position
+            mouse.hideCursor()
     timerDelay = 64
     mainWindow = ClassifierWindow(
         width=width, height=height, timerDelay=timerDelay)

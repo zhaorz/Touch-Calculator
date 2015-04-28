@@ -102,7 +102,6 @@ class MainWindow(eventBasedAnimation.Animation):
         mouse.mouseMove(10, 50)     # reset position
         mouse.hideCursor()
 
-
     def getInput(self):
         src = self.clsf if self.clsf.state == "active" else self.calc
         if (src.result != None):
@@ -134,6 +133,10 @@ class MainWindow(eventBasedAnimation.Animation):
     def evaluate(self):
         try:
             result = str(eval("".join(self.input.evalString)))
+        except ZeroDivisionError:
+            result = "Divide by Zero Error"
+        except ValueError as detail:
+            result = "Value Error"
         except:
             result = "Error"
         self.output.displayText = [result]
@@ -163,12 +166,12 @@ class MainWindow(eventBasedAnimation.Animation):
                 self.unpause()
             else:
                 self.pause()
-            print "Space pressed"
 
     def pause(self):
         self.isPaused = True
         self.clsf.trackpad.stop()
         self.calc.trackpad.stop()
+        mouse.showCursor()
 
     def unpause(self):
         self.isPaused = False

@@ -33,7 +33,6 @@ class Calculator(object):
     """Frame that includes calculator keys, operators, and settings.
 
     The draw() and step() methods must be called for proper functionality.
-    Mouse is anchored by default at top left corner of the frame.
     Button clicks are handled by the click() method.
 
     Args:
@@ -238,6 +237,8 @@ if __name__ == "__main__":
             self.calculator.draw(canvas)
         def onStep(self):
             self.calculator.step()
+            mouse.mouseMove(10, 50)     # reset position
+            mouse.hideCursor()
     timerDelay = 64
     mainWindow = CalculatorWindow(
         width=width, height=height, timerDelay=timerDelay)
