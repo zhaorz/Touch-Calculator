@@ -45,6 +45,8 @@ class MainWindow(eventBasedAnimation.Animation):
                 self.allClear()
             elif (res == "equals"):
                 self.evaluate()
+            elif (res == "switch"):
+                print "switching..."
             else:
                 self.input.addInput(self.clsf.result)
             self.clsf.result = None

@@ -31,12 +31,12 @@ class Calculator(object):
         self.trackpad = CalculatorTrackpad(
             self.x + self.panelSize,                # x
             self.y,                                 # y
-            self.width - 2 * self.panelSize,        # width
+            self.width,                             # width
             self.height)                            # height
         self.calculator = CalculatorButtons(
             self.x + self.panelSize,
             self.y,
-            self.width - 2 * self.panelSize,
+            self.width - self.panelSize,
             self.height)
         self.settings = Settings(
             self.x,                                 # x
@@ -44,6 +44,7 @@ class Calculator(object):
             self.panelSize,                         # width
             self.height,                            # height
             4)                                      # numButtons
+        self.settings.buttons[2].label = "draw"     # switch label
         self.trackpad.start()
         self.result = None
 
@@ -68,7 +69,7 @@ class Calculator(object):
         for button in (self.settings.buttons + self.calculator.buttons):
             if (button.intersect(x, y) == True):
                 button.highlight(0)
-                print "click", button.label
+                print "click", button.value
                 self.result = button.value
                 self.trackpad.reset()
 
@@ -78,7 +79,6 @@ class Calculator(object):
         y = self.y + self.height - self.height * normy
         for button in (self.settings.buttons + self.calculator.buttons):
             if (button.intersect(x, y) == True):
-                print "highlight", button.label
                 button.highlight(1)
    
     def updateButtons(self):
@@ -133,11 +133,11 @@ class CalculatorButtons(object):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.numbers = self.initNumbers()
         self.ops = self.initOperators()
-        self.buttons = self.numbers #+ self.ops
+        self.buttons = self.numbers + self.ops
 
     def initNumbers(self):
         buttons = []
-        buttonWidth = self.width / 3
+        buttonWidth = self.width * 4 / 15
         buttonHeight = self.height / 4
         buttonCounter = 0
         font = ("Helvetica Neue Light", "26")
@@ -162,10 +162,24 @@ class CalculatorButtons(object):
         return buttons
 
     def initOperators(self):
-        pass
+        buttons = []
+        buttonWidth = self.width / 5
+        buttonHeight = self.height / 4
+        x = self.x + self.width - buttonWidth
+        labels = [u'\u00f7', u'\u00d7', '-', '+']
+        values = ['/', '*', '-', '+']
+        font = ("Helvetica Neue Light", "26")
+        for i in xrange(4):
+            y = self.y + i * buttonHeight
+            buttons.append(Button(x, y, buttonWidth, buttonHeight,
+                                  mainFont=font, outline=True, label=labels[i],
+                                  value=values[i], fg="#ffffff", bg="#f79332",
+                                  activeColor="#c36c18"))
+        return buttons
+
 
     def draw(self, canvas):
-        for button in self.numbers:
+        for button in self.buttons:
             button.draw(canvas)
 
     def step(self):
@@ -175,7 +189,7 @@ class CalculatorButtons(object):
 
 
 if __name__ == "__main__":
-    width = 700
+    width = 690
     height = 300
     class CalculatorWindow(Animation):
         def onInit(self):

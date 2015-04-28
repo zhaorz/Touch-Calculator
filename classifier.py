@@ -83,20 +83,25 @@ class Classifier(object):
         """Anchors mouse to top left corner and hides the cursor."""
         mouse.mouseMove(self.x + 10, self.y + 50)     # reset position
         mouse.hideCursor()
-
+    
     def click(self, (normx, normy)):
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(0)
-        self.result = panel.buttons[button].value
-        self.trackpad.reset()
+        x = self.x + self.width * normx
+        y = self.y + self.height - self.height * normy
+        for button in (self.settings.buttons + self.recognition.buttons):
+            if (button.intersect(x, y) == True):
+                button.highlight(0)
+                print "click", button.value
+                self.result = button.value
+                self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         """highlights the button being hovered over."""
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(1)
-   
+        x = self.x + self.width * normx
+        y = self.y + self.height - self.height * normy
+        for button in (self.settings.buttons + self.recognition.buttons):
+            if (button.intersect(x, y) == True):
+                button.highlight(1)
+
     def updateButtons(self):
         self.updateButtonLabels(self.trackpad.results, self.recognition)
         self.updateButtonClick()
@@ -270,7 +275,7 @@ class Settings(Panel):
         self.buttons[1].label = "AC"
         self.buttons[1].value = "allClear"
         self.buttons[2].label = "123"
-        self.buttons[2].value = ""
+        self.buttons[2].value = "switch"
         self.buttons[3].label = "="
         self.buttons[3].value = "equals"
 
