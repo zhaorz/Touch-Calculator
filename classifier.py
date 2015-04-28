@@ -77,13 +77,7 @@ class Classifier(object):
         self.trackpad.step()
         self.settings.step()
         self.recognition.step()
-        self.controlMouse()
         self.updateButtons()
-
-    def controlMouse(self):
-        """Anchors mouse to top left corner and hides the cursor."""
-        mouse.mouseMove(self.x + 10, self.y + 50)     # reset position
-        mouse.hideCursor()
     
     def click(self, (normx, normy)):
         x = self.x + self.width * normx

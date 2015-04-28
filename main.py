@@ -62,6 +62,7 @@ import eventBasedAnimation
 import classifier
 import calculator
 import mathParser
+import mouse
 
 
 
@@ -85,6 +86,7 @@ class MainWindow(eventBasedAnimation.Animation):
         self.charset = ['A', 'B', 'C', 'D', 'E', 'F',
                         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                         '*', '/', '+', '-', '^', '(', ')', '.']
+        self.isPaused = False
 
     def onStep(self):
         if (self.clsf.state == "active"):
@@ -92,6 +94,14 @@ class MainWindow(eventBasedAnimation.Animation):
         else:
             self.calc.step()
         self.getInput()
+        if (self.isPaused == False):
+            self.controlMouse()
+
+    def controlMouse(self):
+        """Anchors mouse to top left corner and hides the cursor."""
+        mouse.mouseMove(10, 50)     # reset position
+        mouse.hideCursor()
+
 
     def getInput(self):
         src = self.clsf if self.clsf.state == "active" else self.calc
@@ -147,11 +157,26 @@ class MainWindow(eventBasedAnimation.Animation):
         else:
             self.calc.draw(canvas)
 
+    def onKey(self, event):
+        if (event.keysym == "space"):
+            if (self.isPaused == True):
+                self.unpause()
+            else:
+                self.pause()
+            print "Space pressed"
 
+    def pause(self):
+        self.isPaused = True
+        self.clsf.trackpad.stop()
+        self.calc.trackpad.stop()
+
+    def unpause(self):
+        self.isPaused = False
+        self.clsf.trackpad.start()
+        self.calc.trackpad.start()
 
 
     def onMouse(self, event): pass
-    def onKey(self, event): pass 
     def onMouseMove(self, event): pass
     def onMouseDrag(self, event): pass
     def onMouseRelease(self, event): pass
