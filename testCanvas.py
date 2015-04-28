@@ -9,9 +9,11 @@ of form (x, y, time).
 
 """
 
-
-import eventBasedAnimation
+# Standard libraries
 from random import randint
+
+# 15-112 libraries
+import eventBasedAnimation
 
 
 class TestWindowPoints(eventBasedAnimation.Animation):

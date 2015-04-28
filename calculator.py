@@ -10,11 +10,12 @@ time. On initialization, state defaults to "active".
 
 """
 
-# 15-112 module
-from eventBasedAnimation import Animation
 
 # Standard libraries
 import time
+
+# 15-112 module
+from eventBasedAnimation import Animation
 
 # Packaged libraries
 import mouse

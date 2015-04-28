@@ -11,13 +11,13 @@ to buttons in the GUI.
 """
 
 
-# 15-112 module
-from eventBasedAnimation import Animation
-
-# Standard Libraries
+# Standard libraries
 import time
 
-# Packaged files 
+# 15-112 libraries
+from eventBasedAnimation import Animation
+
+# Packaged libraries 
 import knn
 import model
 import mouse

@@ -1,14 +1,16 @@
 """
 fileIO.py
 ~~~~~~~~~~~~~~~
-
+General file input-output functions.
 
 """
 
 
+# Standard libraries
 import pickle
 import os
 from time import localtime, strftime
+
 
 
 # Creates new file and saves contents using pickle to serialize

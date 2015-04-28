@@ -8,9 +8,11 @@ WolframAlpha AppID: RAJVVX-8GEGHXV5LU
 """
 
 
+# Standard libraries
 import math
 
 
+# Maps raw input to evaluable strings
 evalCharDictionary = {
     '':'',
     'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F',
@@ -31,6 +33,7 @@ evalCharDictionary = {
 
 }
 
+# Maps raw input to visual display strings
 displayCharDictionary = {
     '':'',
     'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F',
@@ -73,18 +76,3 @@ def displayChar(value):
 
     """
     return displayCharDictionary[value]
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

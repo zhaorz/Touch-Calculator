@@ -1,19 +1,21 @@
 """
 multitouch.py
 ~~~~~~~~~~~~~~~
-Richard Zhao
-
 Access raw touchpad data using Apple's MultitouchSupport private framework.
+
 To start data collection, create a Trackpad() instance and call its start()
 method. To stop, call stop(). Data for a single start-stop cycle is stored in
 Trackpad's touchData list. See touch_callback() for the types of data stored.
 
-Source code for everything except touch_callback(), start(), and stop() from
+Also includes a VisualTrackpad class that draws data input in real time.
+
+Source code for lines 23-117 from
 http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
 The source was modified to be importable.
 """
 
 
+# Standard Libraries
 import ctypes
 import time
 

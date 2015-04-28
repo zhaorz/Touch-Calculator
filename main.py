@@ -1,16 +1,64 @@
 """
 main.py
 ~~~~~~~~~~~~~~~
+Touch Calculator
+
+for Mac OS X 10.6+
 
 
-WolframAlpha AppID: RAJVVX-8GEGHXV5LU
+Richard Zhao 2015
+~~~~~~~~~~~~~~~
+
+A calculator with the ability to touch type as well as draw out special
+characters. Drawings are recognized using a custom feature detection algorithm
+and standard machine learning techniques (namely knn).
+
+
+Installation:
+    All third-party dependencies are included with the source. Touchpad
+    frameworks are meant for Mac OS X versions 10.6 and higher.
+
+Getting Started:
+    The window opens to touch calculator input at first. The bottom portion
+    of the screen is essentially a one-to-one mapping of the physical
+    touchpad. Press where the keys are to type. Input is displayed in the top
+    input box. Pressing the '=' key evaluates the input.
+
+    Toggle between touch calculator and drawing calculator by pressing either
+    '123' or 'draw', the third button down from the left. In drawing mode,
+    recognition suggestions appear on the right hand side. Under each match,
+    there is a number between 0.0 and 1.0 that indicates the recognition
+    confidence.
+
+Training the Classifier:
+    The default character set is described in the readme.txt. To train any of
+    these characters, uncomment the desired sets in the dataCollection's
+    MainWindow class init() function.
+
+    Then, in model.py, load the most recent model, extend it using the new data,
+    and save it.
+
+    Adding new characters is similar. First, train them in dataCollection.py.
+    Then, add them to the model. Finally, the user must define how to both
+    display the character and evaluate them. This is done in mathParser.py.
+    In each of the dictionaries, define the desired displayChar mapping and 
+    evalChar mapping.
+
+Troubleshooting:
+    The classifier is only lightly trained at first. Users have a wide variance
+    of handwriting styles. For best results, users should personalize the 
+    classifier by performing a few training rounds.
 
 """
 
 
-
-import eventBasedAnimation
+# Standard libraries
 import math
+
+# 15-112 libraries
+import eventBasedAnimation
+
+# Packaged libraries
 import classifier
 import calculator
 import mathParser

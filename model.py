@@ -24,9 +24,13 @@ Example:
 
 """
 
+
+# Standard libraries
 import os
 import knn
 import copy
+
+# Packaged libraries
 import fileIO
 import process
 

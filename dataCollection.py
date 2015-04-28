@@ -26,7 +26,7 @@ import os
 # 15-112 libraries
 from eventBasedAnimation import Animation
 
-# Custom libraries
+# Packaged libraries
 import multitouch
 import fileIO
 import mouse

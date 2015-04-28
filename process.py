@@ -16,7 +16,11 @@ Example:
 
 """
 
+
+# Standard libraries
 import math
+
+# Packaged libraries
 import testCanvas
 import fileIO
 
