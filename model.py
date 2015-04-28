@@ -85,6 +85,12 @@ class Model(object):
         self.sources.extend(newModelData["sources"])
         self.data.extend(newModelData["data"])
 
+    def loadModelSources(self, modelName):
+        newModelData = fileIO.read(modelName)
+        print "Loading model sources from", newModelData["name"]
+        for source in newModelData["sources"]:
+            self.extendData(source)
+
     def extendData(self, rawDataFile):
         """Processes data in rawDataFile using process.vectorFeature() on each
         element of the raw data. Raw data is a list of dictionaries."""

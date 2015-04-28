@@ -29,7 +29,7 @@ class Feature(object):
         points (list, optional): Raw data from touchpad in (x, y, timestamp)
             tuples. Defaults to empty list.
         dimensions (int, optional): Number of dimensions used for vector sum.
-            Defaults to 3.
+            Defaults to 4.
 
     Public Attributes:
         rawDataPoints (list): Initial raw data.

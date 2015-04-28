@@ -274,5 +274,10 @@ Mon Apr 27 16:20:16 EDT 2015
 Mon Apr 27 18:50:28 EDT 2015
 -calculator work
 -input switching completed
-Mon Apr 27 21:55:58 EDT 2015
+-Documented touchCalculator.py
+-Added mathParser.py
+-Takes raw input string and coverts to eval and display strings.
+Mon Apr 27 23:15:27 EDT 2015
+
+Mon Apr 27 23:46:48 EDT 2015
 
