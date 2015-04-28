@@ -92,7 +92,6 @@ class Calculator(object):
         for button in (self.settings.buttons + self.calculator.buttons):
             if (button.intersect(x, y) == True):
                 button.highlight(0)
-                print "click", button.value
                 self.result = button.value
                 self.trackpad.reset()
 

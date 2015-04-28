@@ -13,6 +13,7 @@ import eventBasedAnimation
 
 import classifier
 import touchCalculator
+import mathParser
 
 
 
@@ -71,15 +72,12 @@ class MainWindow(eventBasedAnimation.Animation):
         self.input.reset()
         self.output.reset()
 
-
     def evaluate(self):
-        if (self.isLegal(self.input.displayText) == False):
-            return -1
         try:
-            result = str(eval(self.input.displayText))
+            result = str(eval("".join(self.input.evalString)))
         except:
             result = "Error"
-        self.output.displayText = result
+        self.output.displayText = [result]
 
     def switch(self):
         self.clsf.trackpad.reset()
@@ -91,12 +89,6 @@ class MainWindow(eventBasedAnimation.Animation):
         else:
             self.clsf.state = "active"
             self.calculator.state = "inactive"
-
-    def isLegal(self, s):
-        for c in s:
-            if c not in self.charset:
-                return False
-        return True
 
     def onDraw(self, canvas):
         self.input.draw(canvas)
@@ -125,7 +117,8 @@ class TextDisplay(object):
     def __init__(self, x, y, width, height, **kwargs):
         self.x, self.y, self.width, self.height = x, y , width, height
         self.margin = self.width / 10
-        self.displayText = ""
+        self.displayText = []
+        self.evalString = []
         self.font = ("Helvetica Neue UltraLight", str(self.height / 3))
         self.bg = "#212834"
         self.fg = "#efefef"
@@ -133,15 +126,18 @@ class TextDisplay(object):
         self.__dict__.update(kwargs)
 
     def addInput(self, char):
-        if (type(char) != str):
+        if (type(char) != str and type(char) != unicode):
             return -1
-        self.displayText += char
+        self.displayText.append(mathParser.displayChar(char))
+        self.evalString.append(mathParser.evalChar(char))
+
 
     def delete(self):
-        self.displayText = self.displayText[:-1]
+        self.displayText.pop()
 
     def reset(self):
-        self.displayText = ""
+        self.displayText = []
+        self.evalString = []
 
     def draw(self, canvas):
         if (self.bgImage != None):
@@ -155,7 +151,8 @@ class TextDisplay(object):
             canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
         cx = self.width - self.margin
         cy = self.y + self.height / 2
-        canvas.create_text(cx, cy, anchor="e", text=self.displayText,
+        msg = "".join(self.displayText)
+        canvas.create_text(cx, cy, anchor="e", text=msg,
                            fill=self.fg, font=self.font)
 
 
