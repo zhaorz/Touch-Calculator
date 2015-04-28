@@ -92,7 +92,6 @@ class Classifier(object):
             if (button.intersect(x, y) == True):
                 button.highlight(0)
                 self.result = button.value
-                self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         """highlights the button being hovered over."""

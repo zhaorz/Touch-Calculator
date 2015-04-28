@@ -115,6 +115,7 @@ class MainWindow(eventBasedAnimation.Animation):
                 self.switch()
             else:
                 self.input.addInput(res)
+                self.clsf.reset()
             src.result = None
 
     def clear(self):
