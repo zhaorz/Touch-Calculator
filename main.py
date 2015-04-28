@@ -10,7 +10,7 @@ WolframAlpha AppID: RAJVVX-8GEGHXV5LU
 
 
 import eventBasedAnimation
-
+import math
 import classifier
 import touchCalculator
 import mathParser
@@ -130,14 +130,17 @@ class TextDisplay(object):
             return -1
         self.displayText.append(mathParser.displayChar(char))
         self.evalString.append(mathParser.evalChar(char))
+        print "display:", repr("".join(self.displayText))
+        print "eval:", repr("".join(self.evalString))
 
 
     def delete(self):
         self.displayText.pop()
+        self.evalString.pop()
 
     def reset(self):
-        self.displayText = []
-        self.evalString = []
+        del self.displayText[:]
+        del self.evalString[:]
 
     def draw(self, canvas):
         if (self.bgImage != None):

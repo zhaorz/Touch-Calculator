@@ -178,7 +178,7 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
     def __init__(self, x, y, width, height):
         super(RecognitionTrackpad, self).__init__(x, y, width, height)
         self.processor = process.Feature()
-        self.recogModel = model.Model("test_model_17", 11)
+        self.recogModel = model.Model("test_model_18", 11)
         self.bounds = 1.0 / 6.0      # area of click area on each side
         self.clickAreaData = None
         self.results = dict()

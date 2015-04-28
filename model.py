@@ -26,6 +26,7 @@ Example:
 
 import os
 import knn
+import copy
 import fileIO
 import process
 
@@ -105,6 +106,25 @@ class Model(object):
                 processedData.append((key, feature))
         self.data.extend(processedData)
         self.sources.append(rawDataFile)    # update sources list
+
+    def symCount(self):
+        count = dict()
+        for (sym, v) in self.data:
+            if (sym not in count.keys()):
+                count[sym] = 1
+            else:
+                count[sym] += 1
+        return count
+
+    def removeSym(self, sym):
+        """Remove all data points of sym."""
+        temp = []
+        for (s, v) in self.data:
+            if (s != sym):
+                temp.append((s, v))
+        del self.data[:]
+        self.data = copy.deepcopy(temp)
+
 
     def modelKNN(self, instanceFeature, k):
         """Performs a kNN on the model data and returns a dictionary of the vote
