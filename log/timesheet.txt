@@ -280,4 +280,11 @@ Mon Apr 27 18:50:28 EDT 2015
 Mon Apr 27 23:15:27 EDT 2015
 
 Mon Apr 27 23:46:48 EDT 2015
+-Added a lot of test files.
+-test_model at v17, 11 dimensions.
+-New data
+-sin, cos, tan, asin, acos, atan
+-Added ln, log.
+-Fixed bug when delete from empty list.
+Tue Apr 28 01:28:49 EDT 2015
 

@@ -23,12 +23,13 @@ class MainWindow(eventBasedAnimation.Animation):
 
     def onInit(self):
         self.windowTitle = "main"
-        self.input = TextDisplay(0, 0, self.width, 100,
-            bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_700.gif"))
+        self.input = TextDisplay(0, 0, self.width, 100, margin=15,
+            font=("Helvetica Neue UltraLight", "48"),
+            bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_690.gif"))
         self.output = TextDisplay(
-            0, 100, self.width, 150, fg="#ffffff", bg="#3a475c",
-            font=("Helvetica Neue UltraLight", "72"),
-            bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_700.gif"))
+            0, 100, self.width, 150, margin=15,
+            font=("Helvetica Neue UltraLight", "80"),
+            bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_690.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
                                           state="inactive")
         self.calculator = touchCalculator.Calculator(0, 250, self.width, 300,
@@ -121,7 +122,7 @@ class TextDisplay(object):
         self.evalString = []
         self.font = ("Helvetica Neue UltraLight", str(self.height / 3))
         self.bg = "#212834"
-        self.fg = "#efefef"
+        self.fg = "#ffffff"
         self.bgImage = None
         self.__dict__.update(kwargs)
 
@@ -154,10 +155,10 @@ class TextDisplay(object):
             y0 = self.y
             y1 = self.y + self.height
             canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
-        cx = self.width - self.margin
-        cy = self.y + self.height / 2
+        cx = self.x + self.width - self.margin
+        cy = self.y + self.height - self.margin
         msg = "".join(self.displayText)
-        canvas.create_text(cx, cy, anchor="e", text=msg,
+        canvas.create_text(cx, cy, anchor="se", text=msg,
                            fill=self.fg, font=self.font)
 
 
