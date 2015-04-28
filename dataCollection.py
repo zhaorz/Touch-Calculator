@@ -65,11 +65,16 @@ class MainWindow(Animation):
             # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
             # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
             # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.']
-            ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
-            ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
-            ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
-            ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
-            ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!']
+            # ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
+            # ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
+            # ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
+            # ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!'],
+            # ['sin', 'cos', 'tan', 'asin', 'acos', 'atan', '!']
+            ['ln', 'log', '', '', '', '', ''],
+            ['ln', 'log', '', '', '', '', ''],
+            ['ln', 'log', '', '', '', '', ''],
+            ['ln', 'log', '', '', '', '', ''],
+            ['ln', 'log', '', '', '', '', ''],
             ]
         for charSet in self.characterSets:
             assert(len(charSet) == 7)

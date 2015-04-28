@@ -17,7 +17,7 @@ evalCharDictionary = {
     '0':'0', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5',
     '6':'6', '7':'7', '8':'8', '9':'9',
 
-    '*':'*', '+':'+', '/':'/',  '-':'-', '(':'(', ')':')', '^':'^',
+    '*':'*', '+':'+', '/':'/',  '-':'-', '(':'(', ')':')', '^':'**(',
     
     # division      # mult          # pi
     u'\u00f7':'/', u'\u00d7':'*', u'\u03c0':' math.pi ', 'e':' math.e ',
@@ -25,7 +25,9 @@ evalCharDictionary = {
     u'\u221a':' math.sqrt(', '%':'%', '.':'.',
 
     'sin':' math.sin(', 'cos':' math.cos(', 'tan':' math.tan(',
-    'asin':' math.asin(', 'acos':' math.acos(', 'atan':' math.atan('
+    'asin':' math.asin(', 'acos':' math.acos(', 'atan':' math.atan(',
+
+    'ln':' math.log(', 'log':' math.log10('
 
 }
 
@@ -34,14 +36,17 @@ displayCharDictionary = {
     'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F',
     '0':'0', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5',
     '6':'6', '7':'7', '8':'8', '9':'9',
-    '*':u'\u00d7', '+':'+', '/':'/',  '-':'-', '(':'(', ')':')', '^':'^',
+    '*':u'\u00d7', '+':'+', '/':'/',  '-':'-', '(':'(', ')':')', '^':'^(',
     # division      # mult          # pi
     u'\u00f7':u'\u00f7', u'\u00d7':u'\u00d7', u'\u03c0':u'\u03c0', 'e':'e',
     # sqrt
     u'\u221a': u'\u221a(', '%':'%', '.':'.',
 
     'sin':'sin(', 'cos':'cos(', 'tan':'tan(',
-    'asin':'asin(', 'acos':'acos(', 'atan':'atan('
+    'asin':'asin(', 'acos':'acos(', 'atan':'atan(',
+
+    'ln':'ln(', 'log':'log('
+
 }
 
 

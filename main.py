@@ -135,8 +135,10 @@ class TextDisplay(object):
 
 
     def delete(self):
-        self.displayText.pop()
-        self.evalString.pop()
+        if (self.displayText != []):
+            self.displayText.pop()
+        if (self.evalString != []):
+            self.evalString.pop()
 
     def reset(self):
         del self.displayText[:]
