@@ -141,7 +141,7 @@ class Classifier(object):
             panel.buttons[i].value = ""            
             panel.buttons[i].subLabel = ""
 
-            
+
 
 class RecognitionTrackpad(multitouch.VisualTrackpad):
     """VisualTrackpad that includes data for touch clicking.
@@ -321,6 +321,9 @@ class Button(object):
         self.subLabel = ""
         self.value = ""
         self.clickTimer = 0
+        self.mainFont = ("Helvetica Neue Light", str(self.width / 5))
+        self.subFont = ("Helvetica Neue Light", str(self.width / 12))
+        self.outline = False
         self.__dict__.update(kwargs)
 
     def draw(self, canvas):
@@ -329,22 +332,23 @@ class Button(object):
         y0 = self.y
         y1 = y0 + self.height
         color = self.bg if self.clickTimer == 0 else self.activeColor
-        canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=0)
+        width = 0 if self.outline == False else 1
+        canvas.create_rectangle(x0, y0, x1, y1, fill=color, width=width,
+                                outline="lightgrey")
         cx = x0 + self.width / 2
         cy = y0 + self.height / 2
-        font = ("Helvetica Neue Light", str(self.width / 5))
         canvas.create_text(cx, cy, anchor="center", fill=self.fg,
-                           text=self.label, font=font)
+                           text=self.label, font=self.mainFont)
         cy2 = y1 - self.margin
-        font2 = ("Helvetica Neue Light", str(self.width / 12))
         canvas.create_text(cx, cy2, anchor="center", fill=self.fg,
-                           text=self.subLabel, font=font2)
+                           text=self.subLabel, font=self.subFont)
 
     def intersect(self, x, y):
         if ((self.x < x and x < self.x + self.width) and
             (self.y < y and y < self.y + self.height)):
-            print "clicked!"
-            self.highlight(1)
+            return True
+        else:
+            return False
 
     def highlight(self, time):
         """Reset click timer"""

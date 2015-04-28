@@ -28,17 +28,16 @@ class Calculator(object):
     def __init__(self, x, y, width, height):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.panelSize = self.width / 6
-        self.trackpad = RecognitionTrackpad(
+        self.trackpad = CalculatorTrackpad(
             self.x + self.panelSize,                # x
             self.y,                                 # y
             self.width - 2 * self.panelSize,        # width
             self.height)                            # height
-        self.recognition = Panel(
-            self.x + self.width - self.panelSize,   # x
-            self.y,                                 # y
-            self.panelSize,                         # width
-            self.height,                            # height
-            4)                                      # numButtons
+        self.calculator = CalculatorButtons(
+            self.x + self.panelSize,
+            self.y,
+            self.width - 2 * self.panelSize,
+            self.height)
         self.settings = Settings(
             self.x,                                 # x
             self.y,                                 # y
@@ -49,14 +48,12 @@ class Calculator(object):
         self.result = None
 
     def draw(self, canvas):
-        self.trackpad.draw(canvas)
-        self.recognition.draw(canvas)
         self.settings.draw(canvas) 
+        self.calculator.draw(canvas)
 
     def step(self):
-        self.trackpad.step()
         self.settings.step()
-        self.recognition.step()
+        self.calculator.step()
         self.controlMouse()
         self.updateButtons()
 
@@ -66,20 +63,25 @@ class Calculator(object):
         mouse.hideCursor()
 
     def click(self, (normx, normy)):
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(0)
-        self.result = panel.buttons[button].value
-        self.trackpad.reset()
+        x = self.x + self.width * normx
+        y = self.y + self.height - self.height * normy
+        for button in (self.settings.buttons + self.calculator.buttons):
+            if (button.intersect(x, y) == True):
+                button.highlight(0)
+                print "click", button.label
+                self.result = button.value
+                self.trackpad.reset()
 
     def hover(self, (normx, normy)):
         """highlights the button being hovered over."""
-        panel = self.settings if normx < 0.5 else self.recognition
-        button = int((1 - normy) * panel.numButtons)
-        panel.buttons[button].highlight(1)
+        x = self.x + self.width * normx
+        y = self.y + self.height - self.height * normy
+        for button in (self.settings.buttons + self.calculator.buttons):
+            if (button.intersect(x, y) == True):
+                print "highlight", button.label
+                button.highlight(1)
    
     def updateButtons(self):
-        self.updateButtonLabels(self.trackpad.results, self.recognition)
         self.updateButtonClick()
 
     def updateButtonClick(self):
@@ -95,34 +97,80 @@ class Calculator(object):
             else:   # touch in progress
                 self.hover(touchPoint[:2])
 
-    def updateButtonLabels(self, newLabels, panel):
-        """Finds the correct labels in newLabels and updates panel buttons.
 
-        Args:
-            newLabels (dict): Dictionary of label:confidence pairs.
-            panel (Panel): The panel whose buttons are being updated.
 
-        Returns: None
+class CalculatorTrackpad(RecognitionTrackpad):
 
+    def __init__(self, x, y, width, height):
+        super(RecognitionTrackpad, self).__init__(x, y, width, height)
+        self.bounds = 1.0 / 6.0      # area of click area on each side
+        self.clickAreaData = None
+        self.results = dict()
+
+    def touch_callback(self, device, data_ptr, n_fingers, timestamp, frame):
+        """Overrides touch_callback() in Parent.
+
+        Only appends data points to clickAreaData. This trackpad doesn't need
+        to record touchData.
         """
-        if (self.trackpad.touchData == []):         # empty data
-            for button in self.recognition.buttons:
-                button.label = ""
-                button.subLabel = ""
-            return
-        labels = knn.topNClasses(newLabels, self.recognition.numButtons)
-        for i in xrange(len(labels)):
-            label, subLabel = labels[i]
-            panel.buttons[i].label = label
-            panel.buttons[i].value = label
-            panel.buttons[i].subLabel = subLabel
-        # reset remaining labels
-        for i in xrange(len(labels), self.recognition.numButtons):
-            panel.buttons[i].label = ""
-            panel.buttons[i].value = ""            
-            panel.buttons[i].subLabel = ""
+        data = data_ptr[0]      # only use the first finger
+        pos = data.normalized.position
+        p = (pos.x, pos.y, timestamp)
+        self.clickAreaData = p[:2] + (time.time(),)
+        return 0
 
- 
+
+
+class CalculatorButtons(object):
+    """
+     7 | 8 | 9 
+     4 | 5 | 6
+     1 | 2 | 3
+       0   | . 
+
+    """
+    def __init__(self, x, y, width, height):
+        self.x, self.y, self.width, self.height = x, y, width, height
+        self.numbers = self.initNumbers()
+        self.ops = self.initOperators()
+        self.buttons = self.numbers #+ self.ops
+
+    def initNumbers(self):
+        buttons = []
+        buttonWidth = self.width / 3
+        buttonHeight = self.height / 4
+        buttonCounter = 0
+        font = ("Helvetica Neue Light", "26")
+        for row in xrange(2, -1, -1):       # init 1 - 9 first
+            for col in xrange(3):
+                x = self.x + col * buttonWidth
+                y = self.y + row * buttonHeight
+                buttons.append(Button(x, y, buttonWidth, buttonHeight,
+                                      mainFont=font, outline=True))
+                buttons[buttonCounter].label = str(buttonCounter + 1)
+                buttons[buttonCounter].value = str(buttonCounter + 1)
+                buttonCounter += 1
+        zeroButton = Button(
+            self.x, self.y + 3 * buttonHeight, 2 * buttonWidth, buttonHeight,
+            mainFont=font, outline=True)
+        zeroButton.label = zeroButton.value = "0"
+        decimalButton = Button(
+            self.x + 2 * buttonWidth, self.y + 3 * buttonHeight,
+            buttonWidth, buttonHeight, mainFont=font, outline=True)
+        decimalButton.label = decimalButton.value = "."
+        buttons.extend([zeroButton, decimalButton])
+        return buttons
+
+    def initOperators(self):
+        pass
+
+    def draw(self, canvas):
+        for button in self.numbers:
+            button.draw(canvas)
+
+    def step(self):
+        for button in self.buttons:
+            button.step()
 
 
 
