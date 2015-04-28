@@ -51,39 +51,26 @@ class Calculator(object):
         self.x, self.y, self.width, self.height = x, y, width, height
         self.state = state
         self.panelSize = self.width / 6
-        self.trackpad = CalculatorTrackpad(
-            self.x + self.panelSize,                # x
-            self.y,                                 # y
-            self.width,                             # width
-            self.height)                            # height
-        self.calculator = CalculatorButtons(
-            self.x + self.panelSize,
-            self.y,
-            self.width - self.panelSize,
-            self.height)
-        self.settings = Settings(
-            self.x,                                 # x
-            self.y,                                 # y
-            self.panelSize,                         # width
-            self.height,                            # height
-            4)                                      # numButtons
-        self.settings.buttons[2].label = "draw"     # switch label
+        self.trackpad = CalculatorTrackpad(self.x, self.y,
+                                           self.width, self.height)
+        self.calculator = CalculatorButtons(self.x, self.y,
+                                            self.width, self.height, 
+                                            self.panelSize)
         self.trackpad.start()
         self.result = None
 
     def draw(self, canvas):
-        self.settings.draw(canvas) 
         self.calculator.draw(canvas)
+        self.trackpad.draw(canvas)
 
     def step(self):
-        self.settings.step()
         self.calculator.step()
         self.updateButtons()
 
     def click(self, (normx, normy)):
         x = self.x + self.width * normx
         y = self.y + self.height - self.height * normy
-        for button in (self.settings.buttons + self.calculator.buttons):
+        for button in  self.calculator.buttons:
             if (button.intersect(x, y) == True):
                 button.highlight(0)
                 self.result = button.value
@@ -93,7 +80,7 @@ class Calculator(object):
         """Highlights the button being hovered over."""
         x = self.x + self.width * normx
         y = self.y + self.height - self.height * normy
-        for button in (self.settings.buttons + self.calculator.buttons):
+        for button in  self.calculator.buttons:
             if (button.intersect(x, y) == True):
                 button.highlight(1)
    
@@ -121,6 +108,7 @@ class CalculatorTrackpad(RecognitionTrackpad):
     Only keeps track of one data point, the most recent one. The data point
     contains system time, which is used to calculate touch clicks.
     Width and height are noncritical because this trackpad isn't drawn.
+    Draws a little blue dot where finger touch is.
     
     Args:
         x (int): Left canvas coordinate (in pixels).
@@ -148,6 +136,15 @@ class CalculatorTrackpad(RecognitionTrackpad):
         self.clickAreaData = p[:2] + (time.time(),)
         return 0
 
+    def draw(self, canvas):
+        if (self.clickAreaData == None):
+            return
+        (normx, normy, t0) = self.clickAreaData
+        x = self.x + normx * self.width
+        y = self.y + self.height - normy * self.height
+        r = self.lineWidth * 3 / 2 
+        self.drawDot(canvas, x, y, r, self.highlight)
+
 
 
 class CalculatorButtons(object):
@@ -168,21 +165,29 @@ class CalculatorButtons(object):
         buttons (list): List of Button objects.
 
     """
-    def __init__(self, x, y, width, height):
+    def __init__(self, x, y, width, height, panelSize):
         self.x, self.y, self.width, self.height = x, y, width, height
+        self.panelSize = panelSize
+        self.settings = Settings(
+            self.x,                                 # x
+            self.y,                                 # y
+            self.panelSize,                         # width
+            self.height,                            # height
+            4)                                      # numButtons
+        self.settings.buttons[2].label = "draw"
         self.numbers = self.initNumbers()
         self.ops = self.initOperators()
-        self.buttons = self.numbers + self.ops
+        self.buttons = self.numbers + self.ops + self.settings.buttons
 
     def initNumbers(self):
         buttons = []
-        buttonWidth = self.width * 4 / 15
+        buttonWidth = self.width * 2 / 9
         buttonHeight = self.height / 4
         buttonCounter = 0
         font = ("Helvetica Neue Light", "26")
         for row in xrange(2, -1, -1):       # init 1 - 9 first
             for col in xrange(3):
-                x = self.x + col * buttonWidth
+                x = self.x + self.panelSize + col * buttonWidth
                 y = self.y + row * buttonHeight
                 buttons.append(Button(x, y, buttonWidth, buttonHeight,
                                       mainFont=font, outline=True))
@@ -190,19 +195,20 @@ class CalculatorButtons(object):
                 buttons[buttonCounter].value = str(buttonCounter + 1)
                 buttonCounter += 1
         zeroButton = Button(
-            self.x, self.y + 3 * buttonHeight, 2 * buttonWidth, buttonHeight,
-            mainFont=font, outline=True)
+            self.x + self.panelSize, self.y + 3 * buttonHeight, 2 * buttonWidth,
+            buttonHeight, mainFont=font, outline=True)
         zeroButton.label = zeroButton.value = "0"
         decimalButton = Button(
-            self.x + 2 * buttonWidth, self.y + 3 * buttonHeight,
-            buttonWidth, buttonHeight, mainFont=font, outline=True)
+            self.x + self.panelSize + 2 * buttonWidth,
+            self.y + 3 * buttonHeight, buttonWidth, buttonHeight,
+            mainFont=font, outline=True)
         decimalButton.label = decimalButton.value = "."
         buttons.extend([zeroButton, decimalButton])
         return buttons
 
     def initOperators(self):
         buttons = []
-        buttonWidth = self.width / 5
+        buttonWidth = self.width / 6
         buttonHeight = self.height / 4
         x = self.x + self.width - buttonWidth
         labels = [u'\u00f7', u'\u00d7', '-', '+']
@@ -218,10 +224,12 @@ class CalculatorButtons(object):
 
 
     def draw(self, canvas):
+        self.settings.draw(canvas)
         for button in self.buttons:
             button.draw(canvas)
 
     def step(self):
+        self.settings.step()
         for button in self.buttons:
             button.step()
 

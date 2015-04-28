@@ -40,7 +40,7 @@ Training the Classifier:
 
     Adding new characters is similar. First, train them in dataCollection.py.
     Then, add them to the model. Finally, the user must define how to both
-    display the character and evaluate them. This is done in mathParser.py.
+    display the character and evaluate them. This is done in evaluate.py.
     In each of the dictionaries, define the desired displayChar mapping and 
     evalChar mapping.
 
@@ -61,7 +61,7 @@ import eventBasedAnimation
 # Packaged libraries
 import classifier
 import calculator
-import mathParser
+import evaluate
 import mouse
 
 
@@ -131,14 +131,8 @@ class MainWindow(eventBasedAnimation.Animation):
         self.output.reset()
 
     def evaluate(self):
-        try:
-            result = str(eval("".join(self.input.evalString)))
-        except ZeroDivisionError:
-            result = "Divide by Zero Error"
-        except ValueError as detail:
-            result = "Value Error"
-        except:
-            result = "Error"
+        print self.input.evalString
+        result = evaluate.evaluate(self.input.evalString)
         self.output.displayText = [result]
 
     def switch(self):
@@ -205,8 +199,8 @@ class TextDisplay(object):
     def addInput(self, char):
         if (type(char) != str and type(char) != unicode):
             return -1
-        self.displayText.append(mathParser.displayChar(char))
-        self.evalString.append(mathParser.evalChar(char))
+        self.displayText.append(evaluate.displayChar(char))
+        self.evalString.append(evaluate.evalChar(char))
         print "display:", repr("".join(self.displayText))
         print "eval:", repr("".join(self.evalString))
 

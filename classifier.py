@@ -77,6 +77,10 @@ class Classifier(object):
         self.settings.step()
         self.recognition.step()
         self.updateButtons()
+
+    def reset(self):
+        self.trackpad.reset()
+        self.updateButtons()
     
     def click(self, (normx, normy)):
         x = self.x + self.width * normx
@@ -125,6 +129,7 @@ class Classifier(object):
         if (self.trackpad.touchData == []):         # empty data
             for button in self.recognition.buttons:
                 button.label = ""
+                button.value = ""
                 button.subLabel = ""
             return
         labels = knn.topNClasses(newLabels, self.recognition.numButtons)
