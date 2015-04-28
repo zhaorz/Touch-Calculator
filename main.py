@@ -80,7 +80,7 @@ class MainWindow(eventBasedAnimation.Animation):
             font=("Helvetica Neue UltraLight", "80"),
             bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_690.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
-                                          "test_model_23",
+                                          "model3",
                                           state="inactive")
         self.calc = calculator.Calculator(0, 250, self.width, 300,
                                                      state="active")

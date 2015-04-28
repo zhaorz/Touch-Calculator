@@ -379,7 +379,7 @@ if __name__ == "__main__":
     height = 300
     class ClassifierWindow(Animation):
         def onInit(self):
-            self.classifier = Classifier(0, 0, width, height)
+            self.classifier = Classifier(0, 0, width, height, "model3")
         def onDraw(self, canvas):
             self.classifier.draw(canvas)
         def onStep(self):

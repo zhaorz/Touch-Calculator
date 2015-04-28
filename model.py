@@ -49,7 +49,7 @@ class Model(object):
         sources (list): Elements are str corresponding with the raw data files.
 
     """
-    def __init__(self, name, dimensions, directory="model"):
+    def __init__(self, name, dimensions=11, directory="model"):
         self.name = name
         self.dimensions = dimensions
         self.directory = directory
