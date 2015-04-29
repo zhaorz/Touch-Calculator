@@ -92,8 +92,8 @@ def evaluate(evalList):
     # Convert to int if the float is whole
     if (almostEqual(eval(result), round(eval(result)), 0.000001)):
         result = str(int(round(eval(result))))
-    if len(result) > 14:
-        result = "Overflow Error"
+    # if len(result) > 14:
+    #     result = "Overflow Error"
     return result
 
 def testEvaluate():

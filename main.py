@@ -87,20 +87,33 @@ class MainWindow(eventBasedAnimation.Animation):
 
     """
     def onInit(self):
-        self.windowTitle = "main"
+        self.windowTitle = "Touch Calculator"
+        self.aboutText = """\
+Touch Calculator
+for Mac OS X 10.6+
+Richard Zhao 2015
+~~~~~~~~~~~~~~~~~~~
+
+Press space to pause and see instructions.
+"""
         self.input = TextDisplay(0, 0, self.width, 100, margin=15,
             font=("Helvetica Neue UltraLight", "48"),
-            bgImage=eventBasedAnimation.PhotoImage(file="graphics/top_690.gif"))
+            bgImage=eventBasedAnimation.PhotoImage(
+                                            file="graphics/top_690.gif"))
         self.output = TextDisplay(
             0, 100, self.width, 150, margin=15,
             font=("Helvetica Neue UltraLight", "80"),
-            bgImage=eventBasedAnimation.PhotoImage(file="graphics/bottom_690.gif"))
+            bgImage=eventBasedAnimation.PhotoImage(
+                                            file="graphics/bottom_690.gif"))
         self.clsf = classifier.Classifier(0, 250, self.width, 300,
                                           "model3",
                                           state="inactive")
         self.calc = calculator.Calculator(0, 250, self.width, 300,
                                                      state="active")
         self.isPaused = False
+        self.pauseScreenImage = eventBasedAnimation.PhotoImage(
+                                    file="graphics/pauseScreen.gif")
+
         mouse.lockCursor(10, 50)
 
     def onStep(self):
@@ -169,12 +182,18 @@ class MainWindow(eventBasedAnimation.Animation):
             self.calc.state = "inactive"
 
     def onDraw(self, canvas):
-        self.input.draw(canvas)
-        self.output.draw(canvas)
-        if (self.clsf.state == "active"):
-            self.clsf.draw(canvas)
+        if (self.isPaused == True):
+            self.drawPauseScreen(canvas)
         else:
-            self.calc.draw(canvas)
+            self.input.draw(canvas)
+            self.output.draw(canvas)
+            if (self.clsf.state == "active"):
+                self.clsf.draw(canvas)
+            else:
+                self.calc.draw(canvas)
+
+    def drawPauseScreen(self, canvas):
+        canvas.create_image(0, 0, anchor="nw", image=self.pauseScreenImage)
 
     def onKey(self, event):
         if (event.keysym == "space"):

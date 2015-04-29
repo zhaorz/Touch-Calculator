@@ -2,7 +2,7 @@
 mouse.py
 ~~~~~~~~~~~~~~~
 
-Functions that hook Apple's mouse framework to python. Used for locking down
+Functions that hook Apple's Quartz framework to python. Used for locking down
 the mouse position.
 
 Slight modifications to convert code to python.
