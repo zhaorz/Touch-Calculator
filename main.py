@@ -17,7 +17,7 @@ and standard machine learning techniques (namely knn).
 
 
 Installation:
-    All third-party dependencies are included with the source. Touchpad
+    PyObjC is needed for touchpad and mouse controlling functionality. Touchpad
     frameworks are meant for Mac OS X versions 10.6 and higher.
 
 Getting Started:

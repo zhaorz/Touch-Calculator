@@ -92,9 +92,17 @@ def evaluate(evalList):
     # Convert to int if the float is whole
     if (almostEqual(eval(result), round(eval(result)), 0.000001)):
         result = str(int(round(eval(result))))
-    # if len(result) > 14:
-    #     result = "Overflow Error"
+    if len(result) > 14:
+        result = checkOverflow(result)
     return result
+
+def checkOverflow(result):
+    if len(result) < 15:
+        return result
+    elif type(eval(result)) == float:
+        return result[:15]
+    elif type(eval(result)) == int:
+        return "Overflow Error"
 
 def testEvaluate():
     print "Testing evaluate()... ",
