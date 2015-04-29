@@ -1,5 +1,20 @@
-# Richard Zhao
-# script that calculates total time logged
+"""
+timecalc.py
+~~~~~~~~~~~~~~~
+Script that calculates total time from a timesheet.
+
+timesheet should consist of pairs of times with comments starting with '-'.
+
+Example:
+    
+    $ cat timesheet
+    Wed Apr 29 02:28:49 EDT 2015
+    -work comments
+    Wed Apr 29 02:30:49 EDT 2015
+    $ python timecalc.py
+    >>> Total time: 00:00:02:00
+
+"""
 
 # Total time from all pairs
 def displayTime(filename):

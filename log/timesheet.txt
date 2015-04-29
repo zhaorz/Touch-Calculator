@@ -289,4 +289,15 @@ Mon Apr 27 23:46:48 EDT 2015
 Tue Apr 28 01:28:49 EDT 2015
 
 Tue Apr 28 14:50:18 EDT 2015
+-Improved error handling.
+-mathParser --> evaluate
+-Model extras, data collection.
+-Refactored model name to main.
+-model3, n=462
+-Fixed clear button bug
+Tue Apr 28 17:48:10 EDT 2015
 
+Wed Apr 29 02:26:31 EDT 2015
+-Removed unneccessary mouse code.
+-From Apple docs now.
+Wed Apr 29 03:42:44 EDT 2015

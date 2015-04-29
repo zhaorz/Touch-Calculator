@@ -1,9 +1,15 @@
 """
 evaluate.py
 ~~~~~~~~~~~~~~~
+Handles behavior of math string input and evaluation.
 
+Contains two dictionaries. Each maps a result char (from an input source) to
+either a display or eval string. This dictionaries are global, but they are only
+accessed by displayChar() and evalChar().
 
-WolframAlpha AppID: RAJVVX-8GEGHXV5LU
+The primary function is evaluate(), which attempts to evaluate a list of
+legal evalChars, and returns a list corresponding to the result. If exceptions
+are raised during evaluation, strings describing the error are returned.
 
 """
 
@@ -86,6 +92,8 @@ def evaluate(evalList):
     # Convert to int if the float is whole
     if (almostEqual(eval(result), round(eval(result)), 0.000001)):
         result = str(int(round(eval(result))))
+    if len(result) > 14:
+        result = "Overflow Error"
     return result
 
 def testEvaluate():

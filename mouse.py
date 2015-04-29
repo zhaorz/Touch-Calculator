@@ -5,57 +5,32 @@ mouse.py
 Functions that hook Apple's mouse framework to python. Used for locking down
 the mouse position.
 
-Slight modifications to condense code.
+Slight modifications to convert code to python.
 
 Original source code from: 
-http://www.geekorgy.com/index.php/2010/06/
-    python-mouse-click-and-move-mouse-in-apple-mac-osx-snow-leopard-10-6-x/
-
+https://developer.apple.com/library/mac/documentation/GraphicsImaging/
+Conceptual/QuartzDisplayServicesConceptual/Articles/MouseCursor.html
 """
 
 
 # Apple Frameworks
-from Quartz.CoreGraphics import CGEventCreateMouseEvent
-from Quartz.CoreGraphics import CGEventPost
-from Quartz.CoreGraphics import kCGEventMouseMoved
-from Quartz.CoreGraphics import kCGEventLeftMouseDown
-from Quartz.CoreGraphics import kCGEventLeftMouseDown
-from Quartz.CoreGraphics import kCGEventLeftMouseUp
-from Quartz.CoreGraphics import kCGMouseButtonLeft
-from Quartz.CoreGraphics import kCGHIDEventTap
 import Quartz
+from Quartz.CoreGraphics import kCGNullDirectDisplay
 
+import time
 
 ##########################
 # Code by Richard Zhao
 ##########################
 
-def hideCursor():
-    Quartz.CGDisplayHideCursor(Quartz.CGMainDisplayID())
 
-def showCursor():
-    Quartz.CGDisplayShowCursor(Quartz.CGMainDisplayID())
+def lockCursor(x, y):
+    """Moves cursor to pixel location (x, y) and locks movement."""
+    Quartz.CGDisplayHideCursor(kCGNullDirectDisplay)
+    Quartz.CGAssociateMouseAndMouseCursorPosition(False)
+    Quartz.CGDisplayMoveCursorToPoint(Quartz.CGMainDisplayID(), (x,y))
 
-
-##########################
-# Code from source:
-##########################
-
-
-def mouseEvent(mode, posx, posy):
-        event = CGEventCreateMouseEvent(
-                    None, 
-                    mode, 
-                    (posx, posy), 
-                    kCGMouseButtonLeft)
-        CGEventPost(kCGHIDEventTap, event)
-
-def mouseMove(posx, posy):
-        mouseEvent(kCGEventMouseMoved, posx, posy);
-
-def mouseClick(posx,posy):
-        # uncomment this line if you want to force the mouse 
-        # to MOVE to the click location first (I found it was not necessary).
-        #mouseEvent(kCGEventMouseMoved, posx,posy);
-        mouseEvent(kCGEventLeftMouseDown, posx,posy);
-        mouseEvent(kCGEventLeftMouseUp, posx,posy);
+def freeCursor():
+    """Release mouse control."""
+    Quartz.CGAssociateMouseAndMouseCursorPosition(True)
+    Quartz.CGDisplayShowCursor(kCGNullDirectDisplay)

@@ -7,6 +7,8 @@ for Mac OS X 10.6+
 
 
 Richard Zhao 2015
+15-112 Spring 2015 Term Project
+
 ~~~~~~~~~~~~~~~
 
 A calculator with the ability to touch type as well as draw out special
@@ -66,10 +68,24 @@ import mouse
 
 
 
-
-
 class MainWindow(eventBasedAnimation.Animation):
+    """The main program window.
 
+    Input and output displays use images that are loaded using Tkinter's
+    PhotoImage class. Tkinter import occurs in eventBasedAnimation.
+
+    By default, the program initializes with the button based calculator.
+    This class handles mouse anchoring. Evaluation of input is passed to
+    the evaluate module.
+
+    Attributes:
+        input (TextDisplay): Displays what the user enters.
+        ouput (TextDisplay): Displays the program's evaluation.
+        clsf (classifier.Classifier): Touch drawing classifier.
+        calc (calculator.Calculator): Touch calculator.
+        isPaused (bool): Value controls mouse anchoring.
+
+    """
     def onInit(self):
         self.windowTitle = "main"
         self.input = TextDisplay(0, 0, self.width, 100, margin=15,
@@ -85,22 +101,25 @@ class MainWindow(eventBasedAnimation.Animation):
         self.calc = calculator.Calculator(0, 250, self.width, 300,
                                                      state="active")
         self.isPaused = False
+        mouse.lockCursor(10, 50)
 
     def onStep(self):
+        if (self.isPaused == False):
+            self.controlMouse()
         if (self.clsf.state == "active"):
             self.clsf.step()
         else:
             self.calc.step()
         self.getInput()
-        if (self.isPaused == False):
-            self.controlMouse()
 
     def controlMouse(self):
         """Anchors mouse to top left corner and hides the cursor."""
-        mouse.mouseMove(10, 50)     # reset position
-        mouse.hideCursor()
+        # mouse.mouseMove(10, 50)     # reset position
+        # mouse.hideCursor()
+        # mouse.lockCursor(10,50)
 
     def getInput(self):
+        """Checks active input source for a result."""
         src = self.clsf if self.clsf.state == "active" else self.calc
         if (src.result != None):
             res = src.result
@@ -115,29 +134,33 @@ class MainWindow(eventBasedAnimation.Animation):
                 self.switch()
             else:
                 self.input.addInput(res)
-                self.clsf.reset()
-            src.result = None
+                self.clsf.reset()       # clear drawing board after input
+            src.result = None       # reset result
 
     def clear(self):
+        """Standard functioning clear function. If there is drawing happening,
+        the trackpad is cleared. Else, the most recent input is removed."""
         if (self.clsf.trackpad.touchData != []):    # clear drawing
             self.clsf.trackpad.reset()
         else:                                       # del input
             self.input.delete()
 
     def allClear(self):
+        """Complete reset of input and output."""
         self.clsf.trackpad.reset()
         self.input.reset()
         self.output.reset()
 
     def evaluate(self):
+        """Pass input to be evaluated."""
         print self.input.evalString
         result = evaluate.evaluate(self.input.evalString)
-        self.output.displayText = [result]
+        self.output.displayString = [result]
 
     def switch(self):
+        """Switch between two input sources."""
         self.clsf.trackpad.reset()
         self.calc.trackpad.reset()
-        """Switch input source states."""
         if (self.clsf.state == "active"):            
             self.clsf.state = "inactive"
             self.calc.state = "active"
@@ -164,30 +187,36 @@ class MainWindow(eventBasedAnimation.Animation):
         self.isPaused = True
         self.clsf.trackpad.stop()
         self.calc.trackpad.stop()
-        mouse.showCursor()
+        mouse.freeCursor()
 
     def unpause(self):
         self.isPaused = False
         self.clsf.trackpad.start()
         self.calc.trackpad.start()
+        mouse.lockCursor(10, 50)
 
-
-    def onMouse(self, event): pass
-    def onMouseMove(self, event): pass
-    def onMouseDrag(self, event): pass
-    def onMouseRelease(self, event): pass
-    def onKeyRelease(self, event): pass
-    def onQuit(self): pass
-
+    def onQuit(self):
+        mouse.freeCursor()
 
 
 
 class TextDisplay(object):
+    """Handles visual display of mathematical strings.
 
+    Each instance keeps two lists of chars--one for display and one for
+    evaluation. In most cases, the display string differs in that mathematical
+    characters (such as sqrt) are displayed with glyphs. The evaluation string
+    contains Python types or functions that evaluate as desired.
+
+    Attributes:
+        displayString (list): The visual characters. Some are unicode.
+        evalString (list): The evaluation characters.
+
+    """
     def __init__(self, x, y, width, height, **kwargs):
         self.x, self.y, self.width, self.height = x, y , width, height
         self.margin = self.width / 10
-        self.displayText = []
+        self.displayString = []
         self.evalString = []
         self.font = ("Helvetica Neue UltraLight", str(self.height / 3))
         self.bg = "#212834"
@@ -196,22 +225,22 @@ class TextDisplay(object):
         self.__dict__.update(kwargs)
 
     def addInput(self, char):
+        """Add a character to the display and eval strings."""
         if (type(char) != str and type(char) != unicode):
             return -1
-        self.displayText.append(evaluate.displayChar(char))
+        self.displayString.append(evaluate.displayChar(char))
         self.evalString.append(evaluate.evalChar(char))
-        print "display:", repr("".join(self.displayText))
+        print "display:", repr("".join(self.displayString))
         print "eval:", repr("".join(self.evalString))
 
-
     def delete(self):
-        if (self.displayText != []):
-            self.displayText.pop()
+        if (self.displayString != []):
+            self.displayString.pop()
         if (self.evalString != []):
             self.evalString.pop()
 
     def reset(self):
-        del self.displayText[:]
+        del self.displayString[:]
         del self.evalString[:]
 
     def draw(self, canvas):
@@ -226,7 +255,7 @@ class TextDisplay(object):
             canvas.create_rectangle(x0, y0, x1, y1, fill=self.bg, width=0)
         cx = self.x + self.width - self.margin
         cy = self.y + self.height - self.margin
-        msg = "".join(self.displayText)
+        msg = "".join(self.displayString)
         canvas.create_text(cx, cy, anchor="se", text=msg,
                            fill=self.fg, font=self.font)
 
@@ -234,5 +263,5 @@ class TextDisplay(object):
 
 width = 690
 height = 550
-timerDelay = 64
+timerDelay = 16
 MainWindow(width=width, height=height, timerDelay=timerDelay).run()

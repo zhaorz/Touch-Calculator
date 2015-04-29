@@ -330,13 +330,6 @@ class Button(object):
         canvas.create_text(cx, cy2, anchor="center", fill=self.fg,
                            text=self.subLabel, font=self.subFont)
 
-    # def intersect(self, x, y):
-    #     if ((self.x < x and x < self.x + self.width) and
-    #         (self.y < y and y < self.y + self.height)):
-    #         return True
-    #     else:
-    #         return False
-
     def intersect(self, x, y):
         """Test collision of pixel location with button.
 

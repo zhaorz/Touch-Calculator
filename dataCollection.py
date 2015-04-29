@@ -90,11 +90,11 @@ class MainWindow(Animation):
             # ['asin', 'acos', 'atan', '', '', '', ''],
             # ['asin', 'acos', 'atan', '', '', '', '']
 
-            ['ln', 'log', '', '', '', '', ''],
-            ['ln', 'log', '', '', '', '', ''],
-            ['ln', 'log', '', '', '', '', ''],
-            ['ln', 'log', '', '', '', '', ''],
-            ['ln', 'log', '', '', '', '', '']
+            # ['ln', 'log', '', '', '', '', ''],
+            # ['ln', 'log', '', '', '', '', ''],
+            # ['ln', 'log', '', '', '', '', ''],
+            # ['ln', 'log', '', '', '', '', ''],
+            # ['ln', 'log', '', '', '', '', '']
             ]
         for charSet in self.characterSets:
             assert(len(charSet) == 7)
