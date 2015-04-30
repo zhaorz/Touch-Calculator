@@ -33,7 +33,26 @@ Installation
 External modules:
 
     PyObjC: for Mac OS X Cocoa bindings in Python.
+
+        Installation:
+
+            $ pip install -U pyobjc
+
+            or 
+
+            $ sudo pip install -U pyobjc
+
+
     py2app: to bundle the program into a standalone Mac OS X applet.
+	   
+        Installation:
+
+            $ pip install -U py2app
+
+            or
+
+            $ sudo pip install -U py2app
+	
 
 Build (optional):
 
