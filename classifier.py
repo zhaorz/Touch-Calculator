@@ -205,6 +205,8 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         self.processor.update(self.touchData)
         instance = self.processor.feature
         self.results = self.recogModel.modelKNN(instance, k)
+        if (len(self.touchData) > 400):         # prevent lag out
+            self.reset()
 
     def reset(self):
         del self.touchData[:]
@@ -372,13 +374,14 @@ if __name__ == "__main__":
     class ClassifierWindow(Animation):
         def onInit(self):
             self.classifier = Classifier(0, 0, width, height, "model3")
+            mouse.lockCursor(10, 50)
         def onDraw(self, canvas):
             self.classifier.draw(canvas)
         def onStep(self):
             self.classifier.step()
-            mouse.mouseMove(10, 50)     # reset position
-            mouse.hideCursor()
-    timerDelay = 64
+        def onQuit(self):
+            mouse.freeCursor()
+    timerDelay = 8
     mainWindow = ClassifierWindow(
         width=width, height=height, timerDelay=timerDelay)
     mainWindow.run()
