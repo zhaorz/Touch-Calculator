@@ -28,7 +28,7 @@ Example:
 # Standard libraries
 import os
 import knn
-import copy
+from copy import deepcopy
 
 # Packaged libraries
 import fileIO
@@ -140,7 +140,7 @@ class Model(object):
             if (s != sym):
                 temp.append((s, v))
         del self.data[:]
-        self.data = copy.deepcopy(temp)
+        self.data = deepcopy(temp)
 
     def printSymCount(self):
         """Prints a vertical list of all data symbols and their counts."""

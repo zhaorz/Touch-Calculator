@@ -25,7 +25,7 @@ def almostEqual(d1, d2, epsilon=10**-3):
 
 
 # Maps raw input to evaluable strings
-evalCharDictionary = {
+EVALCHARDICTIONARY = {
     '':'',
     'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F',
     '0':'0', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5',
@@ -47,7 +47,7 @@ evalCharDictionary = {
 }
 
 # Maps raw input to visual display strings
-displayCharDictionary = {
+DISPLAYCHARDICTIONARY = {
     '':'',
     'A':'A', 'B':'B', 'C':'C', 'D':'D', 'E':'E', 'F':'F',
     '0':'0', '1':'1', '2':'2', '3':'3', '4':'4', '5':'5',
@@ -148,7 +148,7 @@ def evalChar(value):
         str: The str that evaluates to the desired value or method.
 
     """
-    return evalCharDictionary[value]
+    return EVALCHARDICTIONARY[value]
 
 def displayChar(value):
     """Converts raw input string to display string.
@@ -160,6 +160,6 @@ def displayChar(value):
         str: The appropriate display string.
 
     """
-    return displayCharDictionary[value]
+    return DISPLAYCHARDICTIONARY[value]
 
 

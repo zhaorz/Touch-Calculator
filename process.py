@@ -21,7 +21,6 @@ Example:
 import math
 
 # Packaged libraries
-import testCanvas
 import fileIO
 
 
