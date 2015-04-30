@@ -1,0 +1,19 @@
+Hi, I’m Richard Zhao and this is Touch Calculator, my term project for 15-112 at Carnegie Mellon University.
+
+Touch Calculator is a single line, multifunction calculator that uses a laptop touchpad as input. The on screen window is a one-to-one mapping of the touchpad. In button input mode, simply press the area on the trackpad that corresponds to the button you want to press. The blue circle helps you reorient yourself if you miss a button.
+
+Button input provides standard numeric input along with the four basic operators. To input more complex operators, switch to draw mode.
+
+Draw mode uses a custom built classifier to recognize characters. The classifier recognizes drawing in real time, and makes recommendations to the user. Tapping on a recommendation inputs it to the calculator.
+
+To make Touch Calculator, I designed and implemented an original feature detection algorithm that takes raw data as input and outputs well defined features. I then use my own implementation of an existing machine learning algorithm, the K-Nearest-Neighbors algorithm, to classify the character based on its extracted features.
+
+My algorithm is fast and accurate. With small amounts of training data, its recognition rate is still high.
+
+The default classifier recognizes standard mathematical constants and functions. Included in the Touch Calculator distribution is a training program, where users can train the classifier to better recognize their style of handwriting. Touch Calculator is also extensible. Users can define new characters for the classifier to recognize.
+
+Using Touch Calculator is faster than entering math using a keyboard and mouse, since switching between the two input modes makes Touch Calculator more versatile than a fixed input source. Programs like Touch Calculator have applications in devices without keyboards, such as smartphones and even the new generation of wearables.
+
+Touch Calculator is written in Python, and distributed as a Mac OS X applet. It uses TKinter as its GUI, and has minimal third party dependencies. The current classifier, which uses my algorithms, can recognize 32 characters at a recognition rate of over 90 percent.
+
+This is Touch Calculator. Thank you for watching.

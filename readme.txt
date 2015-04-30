@@ -59,6 +59,9 @@ Feature Detection
     in an arbitrary dimensionality while dimension switching in between each
     addition.
 
+    The pipeline contains normalization, vectorization, and a collection of
+    other processes.
+
     The module is also able to analyze more traditional features, such as
     length, curvature, and number of strokes. All together, the processing
     outputs feature vectors of length 11.
