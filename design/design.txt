@@ -32,6 +32,9 @@ are displayed on the main classifier window for the user to select.
 
 Touch button selection is also handled by a superclass of multitouch.py.
 
+mathParser manages display strings and evaluation strings as input is added
+and deleted.
+
 When the user presses the equals button, input stored in the main program gets
 passed to evaluate.py, which attempts to return either the answer or an error
 message.
