@@ -3,6 +3,7 @@ Richard Zhao
 
 Tallies total lines of code and original lines written by me.
 Last updated May 2, 2015.
+Commit SHA-2: c5cf4bbe2d7b1d7fef33a8c701ff029fce0cbdba
 
                             total           third party         original
                            -------         -------------       ----------
