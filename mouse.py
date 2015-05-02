@@ -21,10 +21,6 @@ from Quartz import CGMainDisplayID
 from Quartz.CoreGraphics import kCGNullDirectDisplay
 
 
-##########################
-# Code by Richard Zhao
-##########################
-
 
 def lockCursor(x, y):
     """Moves cursor to pixel location (x, y) and locks movement."""
