@@ -8,7 +8,9 @@
 
 ## About
 
-[![Touch Calculator Video](http://img.youtube.com/vi/9xGWnnozi-M&feature=youtu.be/0.jpg)](http://www.youtube.com/watch?v=9xGWnnozi-M&feature=youtu.be)
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=9xGWnnozi-M&feature=youtu.be
+" target="_blank"><img src="http://img.youtube.com/vi/9xGWnnozi-M&feature=youtu.be/1.jpg" 
+alt="Touch Calculator Video" width="480" height="360" border="10" /></a>
 
 Touch Calculator is a Python program that performs basic numerical and
 scientific calculations. Instead of using keyboard input, Touch Calculator
