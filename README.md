@@ -23,16 +23,15 @@ can use their finger to draw characters on the touchpad. The touchpad has self
 resets if input is taken too long (which prevents lag).
 
 No mouse control is allowed while the application window is active. To quit,
-use command-Q or ctrl-Q.
+use `command-Q` or `ctrl-Q`.
 
 
-## Installation
+## Getting Started
 
-#### External modules:
 
-1. **PyObjC:** for Mac OS X Cocoa bindings in Python.
+1. **Install PyObjC:** *(required)* for Mac OS X Cocoa bindings in Python.
 
-    Installation:
+    Installation (with pip):
 
             $ pip install -U pyobjc
 
@@ -41,7 +40,8 @@ use command-Q or ctrl-Q.
             $ sudo pip install -U pyobjc
 
 
-2. **py2app:** to bundle the program into a standalone Mac OS X applet.
+2. **Install py2app:** *(optional)* to bundle the program into a standalone Mac
+OS X applet.
 	   
     Installation:
 
@@ -52,16 +52,16 @@ use command-Q or ctrl-Q.
             $ sudo pip install -U py2app
 	
 
-#### Build (optional):
+3. **Build** *(optional)*
 
-To create a standalone applet from the source. Not included because the file
-size is much larger (~17 MB).
+    To create a standalone applet from the source. Not included because the file
+    size is much larger (~17 MB).
 
             $ python setup.py py2app
 
-This creates a directory named 'dist' that contains the app. A directory
-named 'build' is also created that contains intermediate files. 'build' is
-unnecessary after packaging, so it can be removed with
+    This creates a directory named 'dist' that contains the app. A directory
+    named 'build' is also created that contains intermediate files. 'build' is
+    unnecessary after packaging, so it can be removed with
 
             $ rm -rf build
 
