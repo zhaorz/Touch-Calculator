@@ -10,7 +10,7 @@ couse taught by Professor David Kosbie.
 ## About
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=9xGWnnozi-M&feature=youtu.be
-" target="_blank"><img src="https://raw.githubusercontent.com/zhaorz/Touch-Calculator/master/design/screenshot.jpg" 
+" target="_blank"><img src="https://raw.githubusercontent.com/zhaorz/Touch-Calculator/master/graphics/screenshot.jpg" 
 alt="Touch Calculator Video" width="660" height="471" border="10" /></a>
 
 Touch Calculator is a Python program for Mac that performs basic numerical and
