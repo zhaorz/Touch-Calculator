@@ -1,8 +1,11 @@
 # Touch Calculator
 
-##### Richard Zhao 2015
-##### Carnegie Mellon University
-##### for 15-112 Spring 2015, Professor David Kosbie
+Richard Zhao | 2015 | Carnegie Mellon University
+
+richardz@andrew.cmu.edu
+
+This project was made for 15-112 in spring 2015, an introductory programming
+couse taught by Professor David Kosbie.
 
 ## About
 
@@ -77,13 +80,13 @@ On your local file system, navigate to dist/ and run the .app file.
 
 To run the program directly from the Terminal,
 
-        $ open -a dist/Touch\ Calculator.app
+    $ open -a dist/Touch\ Calculator.app
 
 #### From build (debug mode)
 
 In the top level directory, execute
 
-        $ ./dist/Touch\ Calculator.app/Contents/MacOS/Touch\ Calculator
+    $ ./dist/Touch\ Calculator.app/Contents/MacOS/Touch\ Calculator
 
 which runs the program direction from the Terminal, and displays console
 output.
@@ -92,7 +95,7 @@ output.
 
 In the top level directory, execute
 
-        $ python main.py
+    $ python main.py
 
 ## Technology
 
@@ -136,26 +139,31 @@ be rebuilt using py2app. The existing distribution must be removed first.
 
 This rebuilds the app, which is still found in the dist/ directory.
 
+## License
+
+This code is avaiable for use under the [MIT License]
+(https://github.com/zhaorz/Touch-Calculator/blob/master/LICENSE).
+
 ## Citations
 
-#### eventBasedAnimation.py - all
+1. **eventBasedAnimation.py** - all
 
-From Carnegie Mellon Professor <a
-href="http://www.cs.cmu.edu/~112/notes/eventBasedAnimation.py">David Kosbie</a>.
-Provides animation framework.
+    From Carnegie Mellon Professor <a
+    href="http://www.cs.cmu.edu/~112/notes/eventBasedAnimation.py">David Kosbie</a>.
+    Provides animation framework.
 
-#### multitouch.py - lines 23-117 
+2.  **multitouch.py** - lines 23-117 
 
-From <a href="http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html">blog.sendapatch.se</a>. 
-The source was modified into object oriented code.
+    From <a href="http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html">blog.sendapatch.se</a>. 
+    The source was modified into object oriented code.
 
-#### mouse.py - lines 27-36
+3.  **mouse.py** - lines 27-36
 
-From the <a
-href="https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/QuartzDisplayServicesConceptual/Articles/MouseCursor.html">Apple Quartz Display Services</a> documentation. 
-Modified to work in Python using PyObjC bindings.
+    From the <a
+    href="https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/QuartzDisplayServicesConceptual/Articles/MouseCursor.html">Apple Quartz Display Services</a> documentation. 
+    Modified to work in Python using PyObjC bindings.
 
-#### TouchCalculator.icns - all
+4.  **TouchCalculator.icns** - all
 
-Carbon copy of the Apple default Calculator app icon.
+    Carbon copy of the Apple default Calculator app icon.
 
