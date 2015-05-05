@@ -1,18 +1,16 @@
-# Touch Calculator (for Mac OS X 10.6+)
+# Touch Calculator
 
 ##### Richard Zhao 2015
 ##### Carnegie Mellon University
 ##### for 15-112 Spring 2015, Professor David Kosbie
 
-
-
 ## About
 
 <a href="http://www.youtube.com/watch?feature=player_embedded&v=9xGWnnozi-M&feature=youtu.be
-" target="_blank"><img src="http://img.youtube.com/vi/9xGWnnozi-M&feature=youtu.be/1.jpg" 
-alt="Touch Calculator Video" width="480" height="360" border="10" /></a>
+" target="_blank"><img src="https://raw.githubusercontent.com/zhaorz/Touch-Calculator/master/design/screenshot.jpg" 
+alt="Touch Calculator Video" width="660" height="471" border="10" /></a>
 
-Touch Calculator is a Python program that performs basic numerical and
+Touch Calculator is a Python program for Mac that performs basic numerical and
 scientific calculations. Instead of using keyboard input, Touch Calculator
 accepts input from the Mac touchpad.
 
@@ -25,49 +23,78 @@ resets if input is taken too long (which prevents lag).
 No mouse control is allowed while the application window is active. To quit,
 use `command-Q` or `ctrl-Q`.
 
-
 ## Getting Started
 
+1. **Clone** into an empty directory.
+    
+        $ git clone https://github.com/zhaorz/Touch-Calculator.git
 
-1. **Install PyObjC:** *(required)* for Mac OS X Cocoa bindings in Python.
+2. **Install PyObjC:** *(required)* for Mac OS X Quartz bindings in Python.
 
     Installation (with pip):
 
-            $ pip install -U pyobjc
+        $ pip install -U pyobjc
 
     or 
 
-            $ sudo pip install -U pyobjc
+        $ sudo pip install -U pyobjc
 
+    For more information, visit the [PyObjC source website]
+    (https://pythonhosted.org/pyobjc/install.html "PyObjC install Page")
 
-2. **Install py2app:** *(optional)* to bundle the program into a standalone Mac
+3. **Install py2app:** *(optional)* to bundle the program into a standalone Mac
 OS X applet.
 	   
     Installation:
 
-            $ pip install -U py2app
+        $ pip install -U py2app
 
     or
 
-            $ sudo pip install -U py2app
+        $ sudo pip install -U py2app
 	
+    For more information, visit the [py2app source website]
+    (https://pythonhosted.org/py2app/install.html "py2app install Page")
 
-3. **Build** *(optional)*
+4. **Build** *(optional)*
 
     To create a standalone applet from the source. Not included because the file
     size is much larger (~17 MB).
 
-            $ python setup.py py2app
+        $ python setup.py py2app
 
     This creates a directory named 'dist' that contains the app. A directory
     named 'build' is also created that contains intermediate files. 'build' is
     unnecessary after packaging, so it can be removed with
 
-            $ rm -rf build
+        $ rm -rf build
 
+## Usage
+
+#### From dist/
+
+On your local file system, navigate to dist/ and run the .app file.
+
+To run the program directly from the Terminal,
+
+        $ open -a dist/Touch\ Calculator.app
+
+#### From build (debug mode)
+
+In the top level directory, execute
+
+        $ ./dist/Touch\ Calculator.app/Contents/MacOS/Touch\ Calculator
+
+which runs the program direction from the Terminal, and displays console
+output.
+
+#### From source
+
+In the top level directory, execute
+
+        $ python main.py
 
 ## Technology
-
 
 #### Feature Detection
 
@@ -104,29 +131,29 @@ in line 113 of main.py.
 If the user needs to build a standalone app of the new data, the app must
 be rebuilt using py2app. The existing distribution must be removed first.
 
-            $ rm -rf build dist
-            $ python setup.py py2app
+    $ rm -rf build dist
+    $ python setup.py py2app
 
 This rebuilds the app, which is still found in the dist/ directory.
-
 
 ## Citations
 
 #### eventBasedAnimation.py - all
 
-David Kosbie - http://www.cs.cmu.edu/~112/notes/eventBasedAnimation.py
+From Carnegie Mellon Professor <a
+href="http://www.cs.cmu.edu/~112/notes/eventBasedAnimation.py">David Kosbie</a>.
 Provides animation framework.
 
 #### multitouch.py - lines 23-117 
 
-http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html
-The source was modified to be importable.
+From <a href="http://blog.sendapatch.se/2009/november/macbook-multitouch-in-python.html">blog.sendapatch.se</a>. 
+The source was modified into object oriented code.
 
 #### mouse.py - lines 27-36
 
-https://developer.apple.com/library/mac/documentation/GraphicsImaging/
-Conceptual/QuartzDisplayServicesConceptual/Articles/MouseCursor.html
-Modified to work as PyObjC bindings.
+From the <a
+href="https://developer.apple.com/library/mac/documentation/GraphicsImaging/Conceptual/QuartzDisplayServicesConceptual/Articles/MouseCursor.html">Apple Quartz Display Services</a> documentation. 
+Modified to work in Python using PyObjC bindings.
 
 #### TouchCalculator.icns - all
 
