@@ -5,7 +5,7 @@ Richard Zhao | 2015 | Carnegie Mellon University
 richardz@andrew.cmu.edu
 
 This project was made for 15-112 in spring 2015, an introductory programming
-couse taught by Professor David Kosbie.
+couse taught by Professor David Kosbie and Professor Dave Andersen.
 
 ## About
 
@@ -20,11 +20,12 @@ accepts input from the Mac touchpad.
 There are two main forms of input: button and draw. Button mode behaves like a
 regular pocket calculator. Tap the buttons to input numbers and basic operators.
 To input more complex functions and constants, use draw mode. Users in draw mode
-can use their finger to draw characters on the touchpad. The touchpad has self
-resets if input is taken too long (which prevents lag).
+can use their finger to draw characters on the touchpad. Drawings are recognized
+using machine learning, and the top 4 matches are displayed for the user to
+select.
 
-No mouse control is allowed while the application window is active. To quit,
-use `command-Q` or `ctrl-Q`.
+Mouse control is disabled while the application window is active. To quit, use
+`command-Q` or `ctrl-Q`.
 
 ## Getting Started
 
@@ -61,8 +62,7 @@ OS X applet.
 
 4. **Build** *(optional)*
 
-    To create a standalone applet from the source. Not included because the file
-    size is much larger (~17 MB).
+    To create a standalone app.
 
         $ python setup.py py2app
 
@@ -82,6 +82,12 @@ To run the program directly from the Terminal,
 
     $ open -a dist/Touch\ Calculator.app
 
+#### From source
+
+In the top level directory, execute
+
+    $ python main.py
+
 #### From build (debug mode)
 
 In the top level directory, execute
@@ -91,20 +97,13 @@ In the top level directory, execute
 which runs the program direction from the Terminal, and displays console
 output.
 
-#### From source
-
-In the top level directory, execute
-
-    $ python main.py
-
 ## Technology
 
 #### Feature Detection
 
 The process.py module contains a feature detection pipeline for raw trackpad
 drawings. It implements an original algorithm that adds vectorized strokes
-in an arbitrary dimensionality while dimension switching in between each
-addition.
+in an arbitrary dimensional space.
 
 The pipeline contains normalization, vectorization, and a collection of
 other processes.

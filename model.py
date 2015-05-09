@@ -14,13 +14,20 @@ implementation is still handled in knn.py.
 Example:
 
     $ python model.py
-    >>> model2 = Model("test_model_2", 3)
-    >>>
-    >>> model2.load("model/test_model_1")
-    >>>
+    >>> model2 = Model("model3")
     >>> instance = [ 0.432, 0.192, 0.416 ]
     >>> print model2.modelKNN(instance, 5)
     >>> { 'A': 0.8 , 'B': 0.2 }
+
+To add new data to an existing model:
+
+    $ python model.py
+    >>> model = Model("model3")
+    >>> model.addNewData()      # adds most recent data file in data/
+    >>> model.extendData("data/newdatafile.txt")    # adds data file
+    >>> model.name = "model4"   # rename
+    >>> model.save()
+
 
 """
 

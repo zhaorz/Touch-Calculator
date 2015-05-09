@@ -44,6 +44,7 @@ class MainWindow(Animation):
         self.initInstructionsDisplay()
         self.saveDialogueTimer = 0
         self.data = list()      # empty container for user data
+        mouse.lockCursor(10, 50)
 
     # Character sets must have length 7
     def initCharacterSets(self):
@@ -73,11 +74,11 @@ class MainWindow(Animation):
             # ['*', '/', '+', '-', '^', '(', ')']
 
             # div       # mult      # pi            # sqrt
-            # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
-            # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
-            # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
-            # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
-            # [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.']
+            [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
+            [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
+            [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
+            [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.'],
+            [u'\u00f7', u'\u00d7', u'\u03c0', 'e', u'\u221a', '%', '.']
 
             # ['sin', 'cos', 'tan', '', '', '', ''],
             # ['sin', 'cos', 'tan', '', '', '', ''],
@@ -126,9 +127,6 @@ class MainWindow(Animation):
         self.instructions.activeCell = self.display.activeCell
         self.instructions.completedCells = self.display.completedCells
         self.instructions.isDrawing = self.trackpad.isDrawing
-
-
-    def onMouse(self, event): pass
     
     def onKey(self, event): 
         if (event.keysym == "space"):
@@ -193,12 +191,6 @@ class MainWindow(Animation):
         self.instructions.totalSets = len(self.characterSets)
         if (self.saveDialogueTimer > 0):
             self.saveDialogueTimer -= 1
-        self.controlMouse()
-
-    def controlMouse(self):
-        """Anchors mouse to top left corner and hides the cursor."""
-        mouse.mouseMove(10, 50)     # reset position
-        mouse.hideCursor()
 
     # Display save success dialogue for some time
     def saveSuccess(self):
@@ -236,15 +228,8 @@ class MainWindow(Animation):
         canvas.create_text(x, y, text=msg, anchor="se", 
                            font="Arial 22 bold", fill="green")
 
-    def onMouseMove(self, event): pass
-    
-    def onMouseDrag(self, event): pass
-    
-    def onMouseRelease(self, event): pass
-    
-    def onKeyRelease(self, event): pass
-    
-    def onQuit(self): pass
+    def onQuit(self):
+        mouse.freeCursor()
 
 
 class CharactersDisplay(object):
