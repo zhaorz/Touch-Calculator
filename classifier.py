@@ -17,7 +17,7 @@ import time
 # 15-112 libraries
 from eventBasedAnimation import Animation
 
-# Packaged libraries 
+# Packaged libraries
 import knn
 import model
 import mouse
@@ -73,7 +73,7 @@ class Classifier(object):
     def draw(self, canvas):
         self.trackpad.draw(canvas)
         self.recognition.draw(canvas)
-        self.settings.draw(canvas) 
+        self.settings.draw(canvas)
 
     def step(self):
         self.trackpad.step()
@@ -84,7 +84,7 @@ class Classifier(object):
     def reset(self):
         self.trackpad.reset()
         self.updateButtons()
-    
+
     def click(self, (normx, normy)):
         x = self.x + self.width * normx
         y = self.y + self.height - self.height * normy
@@ -143,7 +143,7 @@ class Classifier(object):
         # reset remaining labels
         for i in xrange(len(labels), self.recognition.numButtons):
             panel.buttons[i].label = ""
-            panel.buttons[i].value = ""            
+            panel.buttons[i].value = ""
             panel.buttons[i].subLabel = ""
 
 
@@ -193,7 +193,7 @@ class RecognitionTrackpad(multitouch.VisualTrackpad):
         pos = data.normalized.position
         p = (pos.x, pos.y, timestamp)
         if (pos.x > self.bounds and pos.x < 1.0 - self.bounds):
-            self.touchData.append(p)    
+            self.touchData.append(p)
             self.lastTouch = p[:2] + (time.time(),)
         else:
             self.clickAreaData = p[:2] + (time.time(),)
@@ -236,7 +236,7 @@ class Panel(object):
         self.height = height
         self.numButtons = numButtons
         self.initButtons()
-    
+
     def initButtons(self):
         self.buttons = []
         x0 = self.x
@@ -249,7 +249,7 @@ class Panel(object):
     def draw(self, canvas):
         for button in self.buttons:
             button.draw(canvas)
-    
+
     def step(self):
         for button in self.buttons:
             button.step()
@@ -347,7 +347,7 @@ class Button(object):
                 False otherwise
 
         """
-        if ((self.x + self.margin < x) and 
+        if ((self.x + self.margin < x) and
             (x < self.x + self.width - self.margin) and
             (self.y + self.margin < y) and
             (y < self.y + self.height - self.margin)):
